@@ -1,0 +1,4 @@
+(library
+ (name xynolog_protocol_model)
+ (public_name xynolog-protocol.model)
+ (libraries xynolog_protocol_schema yojson))
