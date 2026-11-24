@@ -41,9 +41,10 @@ frames after it. Its first fault is named by its way from the frame: a
 member of the frame (`correlationId`, `payload`, or one `BusFrame` does not
 name), or, for a fault a typed read finds in its payload, `payload.` and
 the way within it (§ Identity). One whose `channel` is a text of at least
-one character, and that carries no `scope` (a null one is none) or one
-that is a resource's id, names its readers, and they are told of it as
-they are of a payload that is not its channel's: its frame refusal is
+one character, and that carries no `scope` or one that is a resource's
+id (a scope that holds null is carried, and is no resource's id), names
+its readers, and they are told of it as they are of a payload that is
+not its channel's: its frame refusal is
 given in its place, on the transport's frames and on every typed read of
 its channel in its scope, naming its channel, the way to its fault and why,
 with its payload as it came, its scope, and its `correlationId` whenever
