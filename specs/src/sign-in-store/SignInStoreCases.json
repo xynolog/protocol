@@ -38,11 +38,8 @@
             "description": "XDG_STATE_HOME, or null when it is not set."
           },
           "localAppData": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "LOCALAPPDATA, or null or left out when it is not set."
+            "type": "string",
+            "description": "LOCALAPPDATA, or left out when it is not set."
           },
           "dir": {
             "type": [

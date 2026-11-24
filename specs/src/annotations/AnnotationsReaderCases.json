@@ -33,7 +33,7 @@
             "$ref": "https://xynolog.org/protocol/Annotation.json"
           },
           "reads": {
-            "description": "What each reader answers, null for nothing; textQuoteSelector is left out where the target has no selector to give it.",
+            "description": "What each reader answers, null for nothing; textQuoteSelector is null where the target has no selector to give it.",
             "type": "object",
             "properties": {
               "bodySource": {
@@ -143,6 +143,7 @@
               "isResolvedReference",
               "exactText",
               "annotationExactText",
+              "textQuoteSelector",
               "entityTypes",
               "tagCategory",
               "tagSchemaId"
