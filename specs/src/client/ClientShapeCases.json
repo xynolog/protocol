@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/ClientShapeCases.json",
+  "description": "client/shape-cases.json: what every SDK's reading of a value finds of it, as a value of a schema Protocol states.",
+  "allOf": [
+    {
+      "$ref": "https://xynolog.org/protocol/CaseTable.json"
+    }
+  ],
+  "type": "object",
+  "properties": {
+    "$comment": true,
+    "cases": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "title": "ShapeAccepted",
+            "description": "A value that is read.",
+            "type": "object",
+            "properties": {
+              "why": {
+                "$ref": "https://xynolog.org/protocol/CaseTable.json#/properties/cases/items/properties/why"
+              },
+              "schema": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Za-z0-9]*$",
+                "description": "The schema the value is read as: the stem of its file under specs/src."
+              },
+              "value": {
+                "$comment": "The value read: JSON, as it is given."
+              }
+            },
+            "required": [
+              "why",
+              "schema",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "title": "ShapeRefused",
+            "description": "A value that is refused, for its first fault.",
+            "type": "object",
+            "properties": {
+              "why": {
+                "$ref": "https://xynolog.org/protocol/CaseTable.json#/properties/cases/items/properties/why"
+              },
+              "schema": {
+                "$ref": "#/properties/cases/items/oneOf/0/properties/schema"
+              },
+              "value": {
+                "$comment": "The value refused: JSON, as it is given."
+              },
+              "refused": {
+                "type": "boolean",
+                "enum": [
+                  true
+                ]
+              },
+              "member": {
+                "type": "string",
+                "pattern": "^([A-Za-z]+(\\.[A-Za-z]+)*)?$",
+                "description": "The first fault's way from the value: the names of the members it is within, and its own, joined by dots; empty for the value itself."
+              },
+              "reason": {
+                "$ref": "https://xynolog.org/protocol/FrameRefusalReason.json"
+              }
+            },
+            "required": [
+              "why",
+              "schema",
+              "value",
+              "refused",
+              "member",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "cases"
+  ],
+  "additionalProperties": false
+}

@@ -337,21 +337,6 @@ let keywords
       is "$defs" defs;
     ]
 
-(* The keywords [schema] states that no SDK reads, in the order [keywords]
-   names them. An SDK that dropped one would accept what the schema refuses,
-   so a schema an SDK validates by states none. *)
-let unread schema =
-  List.filter
-    (fun keyword ->
-      List.mem keyword [ "const"; "propertyNames"; "minProperties"; "not" ])
-    (keywords schema)
-
-(* [unread] of a schema and of every schema it holds, at any depth. *)
-let unread_anywhere : t -> string list =
-  cata
-    ~boolean:(fun _ -> [])
-    ~schema:(fun s -> unread s @ List.concat (children s))
-
 let literal_json : literal -> Yojson.Safe.t = function
   | String_literal s -> `String s
   | Int_literal n -> `Int n
@@ -391,12 +376,15 @@ let runtime : t -> Yojson.Safe.t =
                s.type_;
              some "format" (fun f -> `String (format_word f)) s.format;
              some "enum" (fun vs -> `List (List.map literal_json vs)) s.enum;
+             some "const" literal_json s.const;
              some "properties" (fun ps -> `Assoc ps) s.properties;
              some "required"
                (fun rs -> `List (List.map (fun r -> `String r) rs))
                s.required;
              some "additionalProperties" Fun.id s.additional_properties;
              some "unevaluatedProperties" Fun.id s.unevaluated_properties;
+             some "propertyNames" Fun.id s.property_names;
+             some "minProperties" int s.min_properties;
              some "maxProperties" int s.max_properties;
              some "items" Fun.id s.items;
              some "minItems" int s.min_items;
@@ -410,6 +398,7 @@ let runtime : t -> Yojson.Safe.t =
              Option.map (fun v -> ("allOf", v)) (schemas s.all_of);
              Option.map (fun v -> ("anyOf", v)) (schemas s.any_of);
              Option.map (fun v -> ("oneOf", v)) (schemas s.one_of);
+             some "not" Fun.id s.not_;
              some "$defs" (fun ds -> `Assoc ds) s.defs;
            ]))
 

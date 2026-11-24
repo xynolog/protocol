@@ -151,39 +151,25 @@ let () =
                 "children" true
                 (Schema.children every = List.init 11 leaf));
         ] );
-      ( "unread",
+      ( "runtime",
         [
-          case "each keyword no SDK reads is one the model names" (fun () ->
-              let stated : Schema.t = Schema Schema.empty in
-              let every =
-                {
-                  Schema.empty with
-                  const = Some (Bool_literal true);
-                  property_names = Some stated;
-                  min_properties = Some 1;
-                  not_ = Some stated;
-                }
+          case "a validator reads each keyword that holds a value" (fun () ->
+              let stated : Schema.t =
+                Schema { Schema.empty with type_ = Some [ String ] }
               in
-              Alcotest.(check (list string))
-                "unread"
-                [ "const"; "propertyNames"; "minProperties"; "not" ]
-                (Schema.unread every));
-          case "unread anywhere is each held schema's too" (fun () ->
-              let below : Schema.t =
-                Schema { Schema.empty with min_properties = Some 1 }
-              in
-              let holding : Schema.t =
+              let every : Schema.t =
                 Schema
                   {
                     Schema.empty with
                     const = Some (Bool_literal true);
-                    properties = Some [ ("a", below) ];
-                    all_of = Some [ below ];
+                    property_names = Some stated;
+                    min_properties = Some 1;
+                    not_ = Some stated;
                   }
               in
-              Alcotest.(check (list string))
-                "unread anywhere"
-                [ "const"; "minProperties"; "minProperties" ]
-                (Schema.unread_anywhere holding));
+              Alcotest.(check string)
+                "runtime"
+                {|{"const":true,"propertyNames":{"type":"string"},"minProperties":1,"not":{"type":"string"}}|}
+                (Yojson.Safe.to_string (Schema.runtime every)));
         ] );
     ]

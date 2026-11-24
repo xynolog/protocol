@@ -729,6 +729,7 @@ let load root =
   let retry_rules =
     Retry_rules.refusals tables.retry_rules tables.retry_cases
   in
+  let shape_rules = Shape_rules.refusals ~ids ~files ~schema_at ~read_json in
   let path_item_names =
     List.filter_map
       (fun (file, item) ->
@@ -859,7 +860,7 @@ let load root =
     @ empty_services @ validation @ public_api @ client_surface @ reply_bounds
     @ offset_units @ registry_rules @ jobs_rules @ archivist_rules
     @ smelter_rules @ identifiers_rules @ client_types_rules @ protocol_rules
-    @ control_rules @ retry_rules @ worker_rules @ graph_rules
+    @ control_rules @ retry_rules @ worker_rules @ graph_rules @ shape_rules
   in
   match (schemas, census) with
   | Ok schemas, [] ->
