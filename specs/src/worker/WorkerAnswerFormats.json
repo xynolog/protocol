@@ -25,7 +25,7 @@
           },
           "element": {
             "$ref": "https://xynolog.org/protocol/JsonSchema.json",
-            "$comment": "The JSON Schema of one element of the answer."
+            "description": "The JSON Schema of one element of the answer."
           }
         },
         "required": [
