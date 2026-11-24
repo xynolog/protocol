@@ -336,11 +336,6 @@ make generate          # in sdk: regenerate every generated file
 make check-generated   # in sdk: verify without writing (what CI runs)
 ```
 
-Hand-written TypeScript that the registry cannot express — runtime-only UI
-types like `AnchorRect` (DOM geometry, callbacks) — lives in the companion
-module `sdk/typescript/core/src/bus-ui-types.ts`, which the generated file imports
-and re-exports.
-
 Payload *schemas* live in the OpenAPI components — the registry only
 names which schema each channel carries. Channels whose payload is
 TypeScript-only (DOM geometry, callbacks) are excluded from the Go output:
