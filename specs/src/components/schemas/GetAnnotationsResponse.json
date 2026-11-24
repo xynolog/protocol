@@ -14,14 +14,7 @@
       "description": "Total number of annotations"
     },
     "motivation": {
-      "anyOf": [
-        {
-          "$ref": "https://xynolog.org/protocol/Motivation.json"
-        },
-        {
-          "type": "null"
-        }
-      ],
+      "$ref": "https://xynolog.org/protocol/Motivation.json",
       "description": "Motivation filter applied (if any)"
     }
   },
