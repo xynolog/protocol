@@ -351,6 +351,19 @@ let () =
         (update [ "refresh"; "noResponse" ] (fun _ -> `Bool false)))
     "retry/cases.json: /rules/36/retries: is true, and retry/rules.json's \
      refresh set says false";
+  changed specs ~why:"has a shape case read that its schema does not allow"
+    "client/shape-cases.json" "cases/0/value"
+    (fun _ -> `Assoc [])
+    "/cases/0: is read, and Runner does not allow its value, by Protocol's \
+     validator";
+  changed specs ~why:"has a shape case refused that its schema allows"
+    "client/shape-cases.json" "cases/2/value"
+    (fun _ -> `Assoc [ ("external", `String "db.example.org:5432") ])
+    "/cases/2: is refused, and Runner allows its value, by Protocol's validator";
+  changed specs ~why:"has a shape case name no schema file"
+    "client/shape-cases.json" "cases/0/schema"
+    (fun _ -> `String "Nowhere")
+    "/cases/0/schema: Nowhere names no schema file";
   changed specs ~why:"names a schema by its path"
     "components/schemas/JobCancelRequest.json" "properties/jobId/$ref"
     (fun _ -> `String "./JobId.json")
@@ -1368,9 +1381,9 @@ let () =
      disagrees with itself, an Archivist stated short, a graph schema that \
      names what neither it nor the codec holds, an id nothing checks, a client \
      type that disagrees with what restates it, a control schema named by \
-     other than its $id, a retry row its rule's sets disagree with, a server \
-     URL its variables disagree with, a malformed or ambiguous path, a path \
-     parameter undeclared or unnamed, a parameter or an operationId twice, a \
-     response keyed by no status, an operation without the 2xx or the 4xx it \
-     owes, or a protocol fact left to the code; and it reads each value as the \
-     type its schema states"
+     other than its $id, a retry row its rule's sets disagree with, a shape \
+     case its schema disagrees with, a server URL its variables disagree with, \
+     a malformed or ambiguous path, a path parameter undeclared or unnamed, a \
+     parameter or an operationId twice, a response keyed by no status, an \
+     operation without the 2xx or the 4xx it owes, or a protocol fact left to \
+     the code; and it reads each value as the type its schema states"
