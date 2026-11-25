@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/Fault.json",
+  "title": "Fault",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The first fault a value has as its schema allows: where it is, and why (contract/TRANSPORT-CONTRACT.md § Identity). What a refusal of a frame, a payload or an answer names.",
+  "properties": {
+    "member": {
+      "type": "string",
+      "pattern": "^([A-Za-z]+(\\.[A-Za-z]+)*)?$",
+      "description": "The way from the value to its first fault: the names of the members it is within, and its own, joined by dots; empty for the value itself."
+    },
+    "reason": {
+      "$ref": "https://xynolog.org/protocol/FrameRefusalReason.json",
+      "description": "Why it is at fault."
+    }
+  },
+  "required": [
+    "member",
+    "reason"
+  ]
+}
