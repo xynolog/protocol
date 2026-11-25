@@ -330,6 +330,12 @@ let () =
      [browser,dispatcher,gateway,librarian,smelter,weaver,worker], where \
      service-telemetry/ServiceTelemetryTelemetry.json names \
      [archivist,dispatcher,gateway,librarian,smelter,weaver,worker]";
+  changed specs ~why:"has a local stack generated for a provider none names"
+    "control/RootsInitParams.json" "properties/inference/enum/1"
+    (fun _ -> `String "bedrock")
+    "/properties/inference/enum: names [anthropic,bedrock], which are not some \
+     of components/schemas/InferenceProvider.json's \
+     [anthropic,google,llamacpp,ollama,openai,together,vllm]";
   changed specs ~why:"has a control method send a notification none states"
     "control/methods.json" "methods/2/sends/0"
     (fun _ -> `String "notifications/nowhere")
@@ -1107,6 +1113,16 @@ let () =
      [\"unique-match\",\"context-recovered\",\"first-of-many\"], not \
      AnchorMethod's \
      [\"unique-match\",\"context-recovered\",\"first-of-many\",\"fuzzy-match\"]";
+  changed specs
+    ~why:"lists inference providers that are not InferenceProvider's"
+    "service-telemetry/telemetry.json" "spans/12/attributes/0/values"
+    (function
+      | `List l -> `List (List.filteri (fun i _ -> i < List.length l - 1) l)
+      | _ -> failwith "not a list")
+    "/spans/12/attributes/0/values: lists inference.provider values \
+     [\"anthropic\",\"google\",\"llamacpp\",\"ollama\",\"openai\",\"together\"], \
+     not InferenceProvider's \
+     [\"anthropic\",\"google\",\"llamacpp\",\"ollama\",\"openai\",\"together\",\"vllm\"]";
   changed specs ~why:"has a fuzzy match name no search"
     "annotations/reconcile-cases.json" "cases/22/reconciled"
     (members (List.remove_assoc "matchQuality"))

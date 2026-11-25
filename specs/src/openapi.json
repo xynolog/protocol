@@ -1036,6 +1036,9 @@
       "Engine": {
         "$ref": "https://xynolog.org/protocol/Engine.json"
       },
+      "InferenceProvider": {
+        "$ref": "https://xynolog.org/protocol/InferenceProvider.json"
+      },
       "GatherFailed": {
         "$ref": "https://xynolog.org/protocol/GatherFailed.json"
       },
