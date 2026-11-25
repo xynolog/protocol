@@ -9,7 +9,7 @@
     {"state": "open"},
 
     {"observe": {"query": "resources"}, "as": "list"},
-    {"fetch": "browse:resources-requested", "payload": {"limit": 100, "offset": 0}, "as": "f1"},
+    {"fetch": "browse:resources-requested", "payload": {}, "as": "f1"},
     {"backend": "emit", "with": {"channel": "browse:resources-result", "correlationId": {"$var": "f1"}, "payload": {"response": {"resources": [], "total": 0, "offset": 0, "limit": 100}}}},
     {"reaches": "list", "state": {"status": "ready", "value": {"resources": [], "total": 0, "offset": 0, "limit": 100}}},
     {"observe": {"query": "entityTypes"}, "as": "types"},
@@ -36,7 +36,7 @@
     {"backend": "record", "with": {"resource": {"$var": "r2"}, "channel": "frame:entity-type-added", "sequence": 2, "live": true, "unscoped": true}},
     {"backend": "up"},
     {"state": "open"},
-    {"fetches": [{"fetch": "browse:resources-requested", "payload": {"limit": 100, "offset": 0}, "as": "g1"}, {"fetch": "browse:entity-types-requested", "as": "g2"}, {"fetch": "browse:tag-schemas-requested", "as": "g3"}, {"fetch": "browse:resource-requested", "payload": {"resourceId": {"$var": "r1"}}, "as": "g4"}]},
+    {"fetches": [{"fetch": "browse:resources-requested", "payload": {}, "as": "g1"}, {"fetch": "browse:entity-types-requested", "as": "g2"}, {"fetch": "browse:tag-schemas-requested", "as": "g3"}, {"fetch": "browse:resource-requested", "payload": {"resourceId": {"$var": "r1"}}, "as": "g4"}]},
     {"backend": "emit", "with": {"channel": "browse:resources-result", "correlationId": {"$var": "g1"}, "payload": {"response": {"resources": [{"$var": "two"}], "total": 1, "offset": 0, "limit": 100}}}},
     {"backend": "emit", "with": {"channel": "browse:entity-types-result", "correlationId": {"$var": "g2"}, "payload": {"response": {"entityTypes": ["Person", "Place"]}}}},
     {"backend": "emit", "with": {"channel": "browse:tag-schemas-result", "correlationId": {"$var": "g3"}, "payload": {"response": {"tagSchemas": []}}}},
