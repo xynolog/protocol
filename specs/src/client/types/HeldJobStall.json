@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/HeldJobStall.json",
+  "title": "HeldJobStall",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A held job that showed no activity for `heldJobStallMs` (contract/WORKER-CONTRACT.md V2): what a worker's claims say on `stalled`. What its host does then is the host's.",
+  "properties": {
+    "jobId": {
+      "$ref": "https://xynolog.org/protocol/JobId.json"
+    },
+    "jobType": {
+      "$ref": "https://xynolog.org/protocol/JobType.json"
+    },
+    "heldSince": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the worker was handed the job."
+    },
+    "lastActivityAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the job last showed activity: its claim, a progress report, a checkpoint or a commit."
+    },
+    "silentForMs": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How long it has shown none, in milliseconds."
+    },
+    "thresholdMs": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The `heldJobStallMs` it was held to, in milliseconds."
+    }
+  },
+  "required": [
+    "jobId",
+    "jobType",
+    "heldSince",
+    "lastActivityAt",
+    "silentForMs",
+    "thresholdMs"
+  ]
+}

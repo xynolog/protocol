@@ -1,5 +1,5 @@
 {
-  "$comment": "AUTHORITY for how a Xynolog client presents itself to the issuer a knowledge base trusts. The realm registers these clients (the launcher writes the registration), and every SDK and the launcher sign in as them: a client id restated in each language is a sign-in that fails in one of them the day the registration changes. TypeScript: the consumer-owned generator writes sdk/typescript/core/src/oauth-clients.ts. Rust: the consumer-owned generator writes sdk/rust/sdk/src/generated/oauth_clients.rs. Python: the consumer-owned generator writes sdk/python/sdk/src/xynolog/oauth_clients.py. Go: the consumer-owned generator writes sdk/go/oauthclients_gen.go, which the launcher reads too. Kotlin: the consumer-owned generator writes sdk/kotlin/sdk/src/generated/kotlin/xynolog/signin/OAuthClients.kt.",
+  "$comment": "AUTHORITY for how a Xynolog client presents itself to the issuer a knowledge base trusts. The realm registers these clients (the launcher writes the registration), and every SDK and the launcher sign in as them: a client id restated in each language is a sign-in that fails in one of them the day the registration changes.",
   "clients": [
     {
       "name": "browser",

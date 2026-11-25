@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/ConnectionState.json",
+  "title": "ConnectionState",
+  "type": "string",
+  "description": "Where a client's stream is: one of the states of client/connection-states.json, which says what each means and where it moves.",
+  "enum": [
+    "initial",
+    "connecting",
+    "open",
+    "reconnecting",
+    "degraded",
+    "unauthenticated",
+    "closed"
+  ]
+}

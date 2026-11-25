@@ -1,0 +1,64 @@
+{
+  "$comment": "AUTHORITY for the states of a client's stream and the moves between them (contract/TRANSPORT-HTTP.md § Connection lifecycle). `state` is a value of client/types/ConnectionState.json, each once and in its order; `moves` the states a client moves to from it, and no other: a client that reports a move the row does not list is wrong. `open` is reported only once the subscribe response is streaming, never while the request is pending, and a request waits on it before it is sent. Every SDK generates its ConnectionState and the moves from this file.",
+  "states": [
+    {
+      "state": "initial",
+      "meaning": "Before the client has started its stream.",
+      "moves": [
+        "connecting",
+        "unauthenticated",
+        "closed"
+      ]
+    },
+    {
+      "state": "connecting",
+      "meaning": "A subscribe request is in flight and no stream is live.",
+      "moves": [
+        "open",
+        "reconnecting",
+        "unauthenticated",
+        "closed"
+      ]
+    },
+    {
+      "state": "open",
+      "meaning": "A stream is live. A changed subscription is handed to a new stream while this state holds: it is left only when the stream drops.",
+      "moves": [
+        "reconnecting",
+        "closed"
+      ]
+    },
+    {
+      "state": "reconnecting",
+      "meaning": "The stream dropped, or a connect failed with none live; the client is retrying.",
+      "moves": [
+        "connecting",
+        "degraded",
+        "unauthenticated",
+        "closed"
+      ]
+    },
+    {
+      "state": "degraded",
+      "meaning": "Has been `reconnecting` for longer than `degradedThresholdMs`.",
+      "moves": [
+        "connecting",
+        "unauthenticated",
+        "closed"
+      ]
+    },
+    {
+      "state": "unauthenticated",
+      "meaning": "Not attempting: the client has no token, or the gateway refused the one it has (contract/TRANSPORT-CONTRACT.md § A refused credential).",
+      "moves": [
+        "connecting",
+        "closed"
+      ]
+    },
+    {
+      "state": "closed",
+      "meaning": "The client was stopped or disposed. Terminal.",
+      "moves": []
+    }
+  ]
+}

@@ -248,16 +248,7 @@
       "type": "object",
       "properties": {
         "state": {
-          "type": "string",
-          "enum": [
-            "initial",
-            "connecting",
-            "open",
-            "reconnecting",
-            "degraded",
-            "unauthenticated",
-            "closed"
-          ],
+          "$ref": "https://xynolog.org/protocol/ConnectionState.json",
           "description": "The state."
         }
       },
@@ -272,16 +263,7 @@
       "type": "object",
       "properties": {
         "stays": {
-          "type": "string",
-          "enum": [
-            "initial",
-            "connecting",
-            "open",
-            "reconnecting",
-            "degraded",
-            "unauthenticated",
-            "closed"
-          ],
+          "$ref": "https://xynolog.org/protocol/ConnectionState.json",
           "description": "The state."
         }
       },

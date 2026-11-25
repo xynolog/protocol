@@ -6,7 +6,11 @@
    And each method's [returns] against its shape: a [signal] or [count]
    returns null, its shape saying all it gives; a promise may return null,
    resolving with nothing; any other shape gives a value. An [events] method
-   returns the schema bus/registry.json states for the channel it observes. *)
+   returns the schema bus/registry.json states for the channel it observes.
+
+   And each module constant's [names]: each of [repliesOf] is an operation of
+   bus/registry.json, by its request, and each of [channels] a channel it
+   states. *)
 
 let file = "client/surface.json"
 let ( / ) pointer token = pointer ^ "/" ^ Decode.escape token
@@ -169,6 +173,64 @@ let returns_refusals ~registry ~at ~called
           ])
   | _ -> []
 
+(* What a constant's [names] names that bus/registry.json does not state. *)
+let names_refusals ~registry_json surface =
+  let field name = function
+    | `Assoc members -> List.assoc_opt name members
+    | _ -> None
+  in
+  let items = function Some (`List items) -> items | _ -> [] in
+  let texts value =
+    List.filter_map (function `String s -> Some s | _ -> None) (items value)
+  in
+  let operations =
+    List.filter_map
+      (fun op ->
+        match field "request" op with Some (`String s) -> Some s | _ -> None)
+      (items (field "operations" registry_json))
+  in
+  let channels =
+    List.filter_map
+      (fun c ->
+        match field "channel" c with Some (`String s) -> Some s | _ -> None)
+      (items (field "channels" registry_json))
+  in
+  List.concat_map
+    (fun (i, module_) ->
+      List.concat_map
+        (fun (j, member) ->
+          match field "names" member with
+          | None -> []
+          | Some names ->
+              let at =
+                "" / "modules" / string_of_int i / "members" / string_of_int j
+                / "names"
+              in
+              List.filter_map
+                (fun operation ->
+                  if List.mem operation operations then None
+                  else
+                    Some
+                      (refusal (at / "repliesOf")
+                         (Printf.sprintf
+                            "names %s, which is no operation of \
+                             bus/registry.json"
+                            operation)))
+                (texts (field "repliesOf" names))
+              @ List.filter_map
+                  (fun channel ->
+                    if List.mem channel channels then None
+                    else
+                      Some
+                        (refusal (at / "channels")
+                           (Printf.sprintf
+                              "names %s, which is no channel of \
+                               bus/registry.json"
+                              channel)))
+                  (texts (field "channels" names)))
+        (indexed (items (field "members" module_))))
+    (indexed (items (field "modules" surface)))
+
 let refusals ~ids ~read_json ~schema_at ~registry
     (surface : Tables.Client_surface.t) =
   let each f =
@@ -186,6 +248,9 @@ let refusals ~ids ~read_json ~schema_at ~registry
       (indexed surface.namespaces)
   in
   each (returns_refusals ~registry)
+  @ (match (read_json file, read_json "bus/registry.json") with
+    | Some json, Some registry_json -> names_refusals ~registry_json json
+    | _ -> [])
   @
   match Option.bind (read_json file) (Decode.at_pointer "/fixtures") with
   | None -> [ refusal "" "has no fixtures" ]

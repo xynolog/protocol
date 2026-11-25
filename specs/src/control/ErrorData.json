@@ -7,8 +7,8 @@
   "properties": {
     "code": {
       "type": "string",
-      "description": "Why the request failed: a code of the control group of specs/src/errors/codes.json.",
-      "pattern": "^control\\.[a-z]+(-[a-z]+)*$"
+      "x-xynolog-codes": "control",
+      "description": "Why the request failed: a code of the control group of specs/src/errors/codes.json."
     },
     "retryable": {
       "type": "boolean",

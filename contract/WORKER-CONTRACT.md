@@ -40,8 +40,10 @@ worker that exports telemetry runs a job in ([Traces](#traces)).
 ## The stream
 
 - **S1.** A worker's stream names the reply channels of the operations it
-  awaits, and two broadcasts: `job:queued` and `job:cancel-requested`. It
-  names no channel it does not read.
+  awaits, and the channels its claims read: the `names` of
+  [`client/surface.json`](../specs/src/client/surface.json)'s
+  `jobClaimChannels`, and of `jobCommitChannels` for a worker that commits.
+  It names no channel it does not read.
   *Held by `worker/claim-on-start`.*
 
 ## Claiming

@@ -15,17 +15,8 @@
       "description": "The DID of the knowledge base it serves: the one its settings name, which that knowledge base said it is before the Smelter reached its index."
     },
     "stream": {
-      "type": "string",
-      "enum": [
-        "initial",
-        "connecting",
-        "open",
-        "reconnecting",
-        "degraded",
-        "unauthenticated",
-        "closed"
-      ],
-      "description": "The state of its own stream of the record, one of the seven of TRANSPORT-HTTP.md § Connection lifecycle. Events are delivered to it while it is `open`."
+      "$ref": "https://xynolog.org/protocol/ConnectionState.json",
+      "description": "The state of its own stream of the record, one of client/connection-states.json's. Events are delivered to it while it is `open`."
     },
     "following": {
       "$ref": "https://xynolog.org/protocol/FollowerFollowing.json",

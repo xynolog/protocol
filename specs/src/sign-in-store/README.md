@@ -94,9 +94,9 @@ Every writer takes the lock:
 - the Rust SDK (`xynolog::sign_in_store`);
 - the Python SDK (`xynolog.sign_in_store`);
 - the Kotlin SDK (`xynolog.signin.SignInStore`);
-- the Swift SDK (`SignInStore`, `sdk/swift/sdk/Sources/Xynolog/SignIn`);
+- the Swift SDK (`SignInStore`);
 - the C# SDK (`Xynolog.SignIn.SignInStore`);
-- the TypeScript SDK (`SignInStore`, `sdk/typescript/sdk/src/session/sign-in-store.ts`);
+- the TypeScript SDK (`SignInStore`);
 - the Haskell SDK (`Xynolog.SignInStore`);
 - the OCaml SDK (`Xynolog.Sign_in_store`).
 

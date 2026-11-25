@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/JobReached.json",
+  "title": "JobReached",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "What a held job that stops on a cancellation states it had reached (`job:cancel`): the units finished, and the furthest each unit begun got.",
+  "properties": {
+    "completedUnits": {
+      "$ref": "https://xynolog.org/protocol/JobCancelCommand.json#/properties/completedUnits"
+    },
+    "unitCursors": {
+      "$ref": "https://xynolog.org/protocol/JobCancelCommand.json#/properties/unitCursors"
+    }
+  }
+}

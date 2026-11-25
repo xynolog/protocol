@@ -26,7 +26,9 @@
      names, by its [$id], a component or a client type of client/types, and
      a query's value in
      client/refresh.json a component: an [$id] does not say where its
-     schema is. *)
+     schema is.
+   - client/connection-states.json states each of ConnectionState's values
+     once, in its order, and each row's moves in that order. *)
 
 let ( / ) pointer token = pointer ^ "/" ^ Decode.escape token
 let at = Decode.at_pointer
@@ -393,5 +395,32 @@ let refusals ~ids ~files ~(read_json : string -> Yojson.Safe.t option) =
                   target ~places:[ Places.components ] ~what:"a component"
             | _ -> ())
           (items (at "/queries" refresh))
+    | _ -> ());
+  let connection_state = "client/types/ConnectionState.json" in
+  let connection_states = "client/connection-states.json" in
+  with_files [ connection_state; connection_states ] (function
+    | [ state; table ] ->
+        let order = texts (at "/enum" state) in
+        let rows = items (at "/states" table) in
+        let stated = List.map (fun row -> text (at "/state" row)) rows in
+        if stated <> List.map Option.some order then
+          refuse connection_states "/states"
+            "states %s, not, each once and in order, ConnectionState's %s"
+            (shown
+               (`List
+                  (List.map
+                     (function Some s -> `String s | None -> `Null)
+                     stated)))
+            (words order);
+        List.iteri
+          (fun i row ->
+            let moves = texts (at "/moves" row) in
+            let ordered = List.filter (fun s -> List.mem s moves) order in
+            if moves <> ordered then
+              refuse connection_states
+                ("/states" / string_of_int i / "moves")
+                "lists %s, not in ConnectionState's order (%s)" (words moves)
+                (words ordered))
+          rows
     | _ -> ());
   List.rev !found
