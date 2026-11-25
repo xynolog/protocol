@@ -250,6 +250,42 @@ let () =
     "/namespaces/0/methods/0/parameters/0/schema/$ref: names \
      https://xynolog.org/protocol/WorkerConfig.json, worker/WorkerConfig.json, \
      which is not a component or a client type";
+  surface specs ~why:"has a client send the page the service defaults"
+    "namespaces/1/methods/1/cases/0/sends"
+    (fun _ -> `Assoc [ ("limit", `Int 100); ("offset", `Int 0) ])
+    "/namespaces/1/methods/1/cases/0/sends/limit: is sent, and the request's \
+     schema states its default, 50: a client sends nothing its caller left out";
+  surface specs ~why:"has a client send a default other than the table's"
+    "namespaces/4/methods/1/cases/0/sends/options/depth"
+    (fun _ -> `Int 3)
+    "/namespaces/4/methods/1/cases/0/sends: gives none of gather.resource's \
+     defaulted parameters, and sends 3 at /options/depth, not \
+     option-defaults.json's 2 (/defaults/2)";
+  surface specs ~why:"has a client send what it was not given"
+    "namespaces/1/methods/15/cases/0/sends"
+    (members (fun m -> m @ [ ("extra", `Bool true) ]))
+    "/namespaces/1/methods/15/cases/0/sends/extra: is neither an argument nor \
+     a default of option-defaults.json";
+  changed specs ~why:"defaults a parameter its method does not take"
+    "client/option-defaults.json" "defaults/0/parameter"
+    (fun _ -> `String "path")
+    "/defaults/0/parameter: browse.files takes no parameter path";
+  changed specs ~why:"defaults an option to a value its schema refuses"
+    "client/option-defaults.json" "defaults/2/value"
+    (fun _ -> `Int 9)
+    "/defaults/2/value: /depth: is more than 3";
+  changed specs ~why:"gives a method's default a schema of its own"
+    "client/option-defaults.json" "defaults/6"
+    (members (fun m ->
+         m
+         @ [
+             ( "schema",
+               `Assoc
+                 [ ("type", `String "integer"); ("description", `String "x") ]
+             );
+           ]))
+    "/defaults/6/schema: states a schema, and surface.json states \
+     match.search's";
   surface specs ~why:"has a method return an $id no schema states"
     "namespaces/1/methods/0/returns/$ref"
     (fun _ -> `String (id "Nowhere.json"))

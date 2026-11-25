@@ -1,0 +1,88 @@
+{
+  "$comment": "AUTHORITY for what a public option of a Xynolog client is when its caller leaves it out, where the client decides it: every SDK takes these values, and generates them from this file. A default the service decides is not here: the request's schema states it as its member's `default` (BrowseResourcesRequest's page, MatchResourcesRequest's page, MatchSearchRequest's `useSemanticScoring`, GatherAnnotationOptions' context), and a client sends nothing for a member its caller leaves out, so that the service's default is the only one. A row names what takes the option as specs/src/client/surface.json does (`method`), its `parameter`, and, where the parameter is an object of options, its `option`. `value` is the default, of the option's schema: the parameter's, or its option's, where surface.json states the parameter's schema, and the row's own `schema` where it does not. `sends` is where in the request a call sends it, as a JSON Pointer into a surface case's `sends`: a case that gives none of a method's defaulted parameters sends each row's value there. A row without `sends` is an option a call does not send, which only changes what the client does.",
+  "defaults": [
+    {
+      "method": "browse.files",
+      "parameter": "dirPath",
+      "value": ".",
+      "sends": "/path",
+      "docs": "The directory listed: the knowledge base's root."
+    },
+    {
+      "method": "browse.files",
+      "parameter": "sort",
+      "value": "name",
+      "sends": "/sort",
+      "docs": "How the listing is ordered: by name."
+    },
+    {
+      "method": "gather.resource",
+      "parameter": "options",
+      "option": "depth",
+      "value": 2,
+      "sends": "/options/depth",
+      "docs": "How many links out from the resource the graph reaches."
+    },
+    {
+      "method": "gather.resource",
+      "parameter": "options",
+      "option": "maxResources",
+      "value": 10,
+      "sends": "/options/maxResources",
+      "docs": "The most resources the context holds."
+    },
+    {
+      "method": "gather.resource",
+      "parameter": "options",
+      "option": "includeContent",
+      "value": true,
+      "sends": "/options/includeContent",
+      "docs": "Whether the context carries the resources' text."
+    },
+    {
+      "method": "gather.resource",
+      "parameter": "options",
+      "option": "includeSummary",
+      "value": false,
+      "sends": "/options/includeSummary",
+      "docs": "Whether the context carries a summary of the resource."
+    },
+    {
+      "method": "match.search",
+      "parameter": "options",
+      "option": "limit",
+      "value": 10,
+      "sends": "/limit",
+      "docs": "The most candidates the search answers."
+    },
+    {
+      "method": "keptSignIn.sessionFromKept",
+      "parameter": "validate",
+      "value": true,
+      "schema": {
+        "type": "boolean",
+        "description": "Whether the session asks the gateway who its token is."
+      },
+      "docs": "Whether a session opened over a kept sign-in asks the gateway who its token is."
+    },
+    {
+      "method": "testing.createTestSession",
+      "parameter": "options",
+      "option": "kb",
+      "value": {
+        "id": "test-kb",
+        "label": "Test KB",
+        "endpoint": {
+          "kind": "http",
+          "host": "localhost",
+          "port": 4000,
+          "protocol": "http"
+        }
+      },
+      "schema": {
+        "$ref": "https://xynolog.org/protocol/KbTarget.json"
+      },
+      "docs": "The knowledge base a test session is with: test-kb, at http://localhost:4000."
+    }
+  ]
+}

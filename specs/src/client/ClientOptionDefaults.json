@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/ClientOptionDefaults.json",
+  "description": "client/option-defaults.json: what a public option of a Xynolog client is when its caller leaves it out, where the client, not the service, decides.",
+  "type": "object",
+  "properties": {
+    "$comment": {
+      "$ref": "https://xynolog.org/protocol/CaseTable.json#/properties/$comment"
+    },
+    "defaults": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Each default, once.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "pattern": "^[a-z][A-Za-z]*\\.[a-z][A-Za-z]*$",
+            "description": "What takes the option, as client/surface.json names it: a namespace's method, or a module's function, the two joined by a dot."
+          },
+          "parameter": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The parameter it is, or the parameter whose member it is."
+          },
+          "option": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The member of the parameter it is, where the parameter is an object of options. Absent: the parameter itself."
+          },
+          "value": {
+            "$comment": "What the client takes when the caller leaves it out: JSON, of the option's schema."
+          },
+          "schema": {
+            "$ref": "https://xynolog.org/protocol/ClientSurface.json#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema"
+          },
+          "sends": {
+            "type": "string",
+            "pattern": "^(/[A-Za-z]+)+$",
+            "description": "Where in the request the method sends it, as a JSON Pointer into a case's `sends`. Absent: the option is not sent, and only changes what the client does."
+          },
+          "docs": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What the option is, in prose."
+          }
+        },
+        "required": [
+          "method",
+          "parameter",
+          "value",
+          "docs"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "$comment",
+    "defaults"
+  ],
+  "additionalProperties": false
+}
