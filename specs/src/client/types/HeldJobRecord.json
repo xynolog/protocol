@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/HeldJobRecord.json",
+  "title": "HeldJobRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The job a worker holds, as its claim hands it: read from the `JobRunning` that `job:claimed` carries, its metadata's id, type, units, cursors and retries, and its params with the resource they name. A unit the job has not reached is no member of `completedUnits` and no key of `unitCursors`.",
+  "properties": {
+    "jobId": {
+      "$ref": "https://xynolog.org/protocol/JobId.json"
+    },
+    "jobType": {
+      "$ref": "https://xynolog.org/protocol/JobType.json"
+    },
+    "resourceId": {
+      "$ref": "https://xynolog.org/protocol/ResourceId.json"
+    },
+    "params": {
+      "$ref": "https://xynolog.org/protocol/JobParams.json"
+    },
+    "completedUnits": {
+      "$ref": "https://xynolog.org/protocol/JobMetadata.json#/properties/completedUnits"
+    },
+    "unitCursors": {
+      "$ref": "https://xynolog.org/protocol/JobMetadata.json#/properties/unitCursors"
+    },
+    "retryCount": {
+      "$ref": "https://xynolog.org/protocol/JobMetadata.json#/properties/retryCount"
+    },
+    "maxRetries": {
+      "$ref": "https://xynolog.org/protocol/JobMetadata.json#/properties/maxRetries"
+    }
+  },
+  "required": [
+    "jobId",
+    "jobType",
+    "resourceId",
+    "params",
+    "completedUnits",
+    "unitCursors",
+    "retryCount",
+    "maxRetries"
+  ]
+}

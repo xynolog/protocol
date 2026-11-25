@@ -102,7 +102,7 @@ It writes, as they happen, beside the transport's `state` and `error` lines:
 
 | Line | Meaning |
 |---|---|
-| `{"claimed": {"jobId": "...", "jobType": "...", "resourceId": "...", "params": {...}, "completedUnits": [...], "unitCursors": {...}, "retryCount": 0, "maxRetries": 3}}` | the worker holds a job, read from the claimed record |
+| `{"claimed": {...}}` | the worker holds a job: its [`HeldJobRecord`](../../specs/src/client/types/HeldJobRecord.json), every member of it, as the worker read it from the claimed record |
 | `{"refused": {"code": "...", "detail": "..."}}` | a claim was refused; `code` is absent when the worker refused the reply itself |
 | `{"signalled": "<jobId>"}` | a cancellation of the held job was signalled to the work |
 | `{"stalled": "<jobId>"}` | the held job has stalled |

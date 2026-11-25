@@ -935,10 +935,7 @@
           "payloads": [
             {
               "annotationId": "ann-1",
-              "resourceId": "res-1",
-              "options": {
-                "contextWindow": 2000
-              }
+              "resourceId": "res-1"
             }
           ]
         },
@@ -1035,8 +1032,7 @@
               "$has": {
                 "options": {
                   "includeSourceContext": false,
-                  "includeTargetContext": true,
-                  "contextWindow": 2000
+                  "includeTargetContext": true
                 }
               }
             }

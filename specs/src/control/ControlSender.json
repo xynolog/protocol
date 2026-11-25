@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/ControlSender.json",
+  "title": "ControlSender",
+  "type": "string",
+  "enum": [
+    "client",
+    "launcher"
+  ],
+  "description": "Which side of the control API sends a message: the client, whose notifications arrive on the launcher's stdin, or the launcher, whose notifications leave on its stdout (LAUNCHER-CONTROL.md F1)."
+}
