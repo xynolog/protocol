@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/WorkerActiveJob.json",
+  "type": "object",
+  "description": "The job an engine holds: which it is, of what type, and since when.",
+  "properties": {
+    "jobId": {
+      "$ref": "https://xynolog.org/protocol/JobId.json"
+    },
+    "type": {
+      "$ref": "https://xynolog.org/protocol/JobType.json"
+    },
+    "since": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was handed the job."
+    }
+  },
+  "required": [
+    "jobId",
+    "type",
+    "since"
+  ],
+  "additionalProperties": false
+}
