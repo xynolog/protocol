@@ -1,5 +1,5 @@
 {
-  "$comment": "AUTHORITY for why a client that read a launcher's discovery document (specs/src/discovery/DiscoveryDocument.json) found no launcher: each reason as every SDK spells it, and what it means. A reader shows an absent launcher by its reason, and an absent launcher is not one that manages nothing, so a reason means one thing in every language. Kotlin (sdk/kotlin/sdk/src/main/kotlin/xynolog/discovery/Discovery.kt) is held to this table by sdk/kotlin/sdk/src/test/kotlin/xynolog/discovery/DiscoveryTest.kt. TypeScript (sdk/typescript/sdk/src/discovery.ts), Rust (sdk/rust/sdk/src/discovery.rs), Python (sdk/python/sdk/src/xynolog/discovery.py) and Go (sdk/go/discovery/discovery.go) state the reasons by hand.",
+  "$comment": "AUTHORITY for why a client that read a launcher's discovery document (specs/src/discovery/DiscoveryDocument.json) found no launcher: each reason as every SDK spells it, and what it means. A reader shows an absent launcher by its reason, and an absent launcher is not one that manages nothing, so a reason means one thing in every language.",
   "reasons": [
     {
       "reason": "not-found",
