@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/JobFailure.json",
+  "title": "JobFailure",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "What a held job's failure states beside its error (`job:fail`): what it had reached, and the failure's class when the worker knows it. What its commits observed is the held job's own to state.",
+  "properties": {
+    "completedUnits": {
+      "$ref": "https://xynolog.org/protocol/JobFailCommand.json#/properties/completedUnits"
+    },
+    "unitCursors": {
+      "$ref": "https://xynolog.org/protocol/JobFailCommand.json#/properties/unitCursors"
+    },
+    "failureClass": {
+      "$ref": "https://xynolog.org/protocol/JobFailCommand.json#/properties/failureClass"
+    }
+  }
+}

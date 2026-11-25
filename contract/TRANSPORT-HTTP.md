@@ -333,25 +333,11 @@ drop. The timing named here is
 
 ### Connection lifecycle
 
-| State | Meaning |
-|---|---|
-| `initial` | Before the client has started its stream. |
-| `connecting` | A subscribe request is in flight and no stream is live. |
-| `open` | A stream is live. A changed subscription is handed to a new stream while this state holds: it is left only when the stream drops. |
-| `reconnecting` | The stream dropped, or a connect failed with none live; the client is retrying. |
-| `degraded` | Has been `reconnecting` for longer than `degradedThresholdMs`. |
-| `unauthenticated` | Not attempting: the client has no token, or the gateway refused the one it has with 401. |
-| `closed` | The client was stopped or disposed. Terminal. |
-
-```
-initial         → connecting | unauthenticated | closed
-connecting      → open | reconnecting | unauthenticated | closed
-open            → reconnecting | closed
-reconnecting    → connecting | degraded | unauthenticated | closed
-degraded        → connecting | unauthenticated | closed
-unauthenticated → connecting | closed
-closed          → (terminal)
-```
+A client's stream is in one of the states of
+[`specs/src/client/connection-states.json`](../specs/src/client/connection-states.json),
+which says what each means and the states it can move to, and no other
+move is reported. Each is a value of
+[`ConnectionState`](../specs/src/client/types/ConnectionState.json).
 
 `open` is reported only once the subscribe response is streaming, never
 while the request is pending: a request waits on this state before it is

@@ -666,7 +666,7 @@ let trace_answered run correlation_id =
           List.filter_map
             (fun name ->
               Option.map (fun v -> (name, v)) (Client_proxy.header asked name))
-            [ "traceparent"; "tracestate" ])
+            (Protocol.trace_members ()))
 
 let backend run directive (args : (string * Yojson.Safe.t) list) =
   let word = Conformance.conformance_step_backend_value directive in
@@ -1369,7 +1369,7 @@ let step run (step : Conformance.conformance_step) =
           | None -> ());
           Hashtbl.replace run.emission_cursor holds (List.length states))
   | State { state } ->
-      let word = Conformance.conformance_step_state_value state in
+      let word = Conformance.connection_state_value state in
       let at =
         driver_until run
           (Printf.sprintf "the state %s (reported since: %s)" word
@@ -1389,7 +1389,7 @@ let step run (step : Conformance.conformance_step) =
       run.state_cursor <- at + 1
   | Stays { stays } -> (
       sync run;
-      let word = Conformance.conformance_step_state_value stays in
+      let word = Conformance.connection_state_value stays in
       (match drop run.state_cursor (Dynarray.to_list run.driver.states) with
       | [] -> ()
       | since ->

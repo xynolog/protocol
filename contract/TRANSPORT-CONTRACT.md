@@ -328,9 +328,11 @@ So is every line the stream carried that names no reader (§ The transport).
 
 ### A refused credential
 
-A request's credential is refused when the gateway answers 401, or 429 with
-the `code` `refusal-rate`: a limit that answers only a request whose token
-has already failed verification. Whatever the request (an emit, the stream's
+A request's credential is refused when the gateway answers with the status
+of [`errors/codes.json`](../specs/src/errors/codes.json)'s `unauthorized`
+(401), or with one of its `limitRefusals` (429 with the `code`
+`refusal-rate`: a limit that answers only a request whose token has already
+failed verification). Whatever the request (an emit, the stream's
 connect, a read or an upload, one of the gateway's own operations), a client
 that can renew its token does the same:
 

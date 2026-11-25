@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/ClientConnectionStates.json",
+  "description": "client/connection-states.json: where a client's stream can be, and where it can move from each.",
+  "type": "object",
+  "properties": {
+    "$comment": {
+      "$ref": "https://xynolog.org/protocol/CaseTable.json#/properties/$comment"
+    },
+    "states": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Each state, in ConnectionState's order, what it means, and the states it can move to.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "$ref": "https://xynolog.org/protocol/ConnectionState.json"
+          },
+          "meaning": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What the state is, in prose."
+          },
+          "moves": {
+            "type": "array",
+            "uniqueItems": true,
+            "description": "The states it can move to, in ConnectionState's order; none for a terminal state.",
+            "items": {
+              "$ref": "https://xynolog.org/protocol/ConnectionState.json"
+            }
+          }
+        },
+        "required": [
+          "state",
+          "meaning",
+          "moves"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "$comment",
+    "states"
+  ],
+  "additionalProperties": false
+}

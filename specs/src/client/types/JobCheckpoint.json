@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/JobCheckpoint.json",
+  "title": "JobCheckpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "What a held job states when it checkpoints (`job:checkpoint`, contract/JOBS.md § Checkpoints): the units finished, and the furthest each unit begun got.",
+  "properties": {
+    "completedUnits": {
+      "$ref": "https://xynolog.org/protocol/JobCheckpointCommand.json#/properties/completedUnits"
+    },
+    "unitCursors": {
+      "$ref": "https://xynolog.org/protocol/JobCheckpointCommand.json#/properties/unitCursors"
+    }
+  },
+  "required": [
+    "completedUnits"
+  ]
+}

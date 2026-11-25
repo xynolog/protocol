@@ -178,14 +178,7 @@ Two declarations make this work, and together they rule out a whole bug class (a
 
 ## Trace context on a relayed frame
 
-Distributed traces ride on a relayed frame's payload, in the field the bus registry names: `trace` in [`specs/src/bus/registry.json`](../specs/src/bus/registry.json) states the field and what it carries, and the gateway and every SDK are generated from it. It carries the W3C `traceparent` (and optional `tracestate`) so spans started by handlers become children of the originating span:
-
-```ts
-interface TraceCarrier {
-  traceparent: string;     // W3C: '00-<traceId>-<spanId>-<flags>'
-  tracestate?: string;     // vendor extensions
-}
-```
+Distributed traces ride on a relayed frame's payload, in the field the bus registry names: `trace` in [`specs/src/bus/registry.json`](../specs/src/bus/registry.json) states the field and what it carries, and the gateway and every SDK are generated from it. It carries a [`TraceCarrier`](../specs/src/client/types/TraceCarrier.json), the W3C `traceparent` and, when the trace has one, `tracestate`, so spans started by handlers become children of the originating span.
 
 The two directions carry it differently:
 

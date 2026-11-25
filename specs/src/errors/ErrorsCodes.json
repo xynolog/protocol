@@ -78,6 +78,28 @@
                   },
                   "status": {
                     "$ref": "https://xynolog.org/protocol/HttpStatus.json"
+                  },
+                  "limitRefusals": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "description": "The limit refusals read as this code and not as the code of their status: each a status and the LimitRefusal `code` it carries, as a row of gateway/messages.json states them.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "$ref": "https://xynolog.org/protocol/HttpStatus.json"
+                        },
+                        "code": {
+                          "$ref": "https://xynolog.org/protocol/LimitRefusal.json#/allOf/1/properties/code"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "code"
+                      ],
+                      "additionalProperties": false
+                    }
                   }
                 },
                 "required": [
