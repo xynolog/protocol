@@ -14,11 +14,7 @@
       "description": "Local TCP port of the KB's API (the gateway port for a local stack; the allocated forward port for a codespace stack)"
     },
     "placement": {
-      "type": "string",
-      "enum": [
-        "local",
-        "codespace"
-      ],
+      "$ref": "https://xynolog.org/protocol/KbPlacement.json",
       "description": "Where the stack actually runs. \"local\": containers on this machine. \"codespace\": a GitHub-hosted VM whose KB is port-forwarded here."
     },
     "repo": {
