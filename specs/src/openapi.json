@@ -892,6 +892,9 @@
       "KbIdentity": {
         "$ref": "https://xynolog.org/protocol/KbIdentity.json"
       },
+      "Binary": {
+        "$ref": "https://xynolog.org/protocol/Binary.json"
+      },
       "ResourceUpload": {
         "$ref": "https://xynolog.org/protocol/ResourceUpload.json"
       },

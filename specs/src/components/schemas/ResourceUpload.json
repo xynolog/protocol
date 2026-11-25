@@ -9,8 +9,7 @@
       "description": "Human-readable resource name"
     },
     "file": {
-      "type": "string",
-      "format": "binary",
+      "$ref": "https://xynolog.org/protocol/Binary.json",
       "description": "Binary content"
     },
     "format": {

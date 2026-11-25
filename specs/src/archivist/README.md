@@ -24,13 +24,14 @@ because the gateway forwards it untouched.
 
 ## What holds each side to it
 
-- `npm run lint:spec-protocol` holds this document to the same rules as the
-  gateway's: every operation says whether it is public, every response has a
-  body schema, every error is an `ErrorResponse`, every 401 carries its
-  challenge, every operation declares a 500. It also holds this document's
-  waits in order: the hold on a read of anchored text (`settleWaitSeconds`)
-  shorter than `readSeconds`, and `connectSeconds` and `readSeconds` together
-  shorter than a client's `httpRequestTimeoutMs`.
+- The reader's protocol rules (`reader/lib/protocol_rules.ml`, `make reader`)
+  hold this document to the same rules as the gateway's: every operation says
+  whether it is public, every response has a body schema, every error is an
+  `ErrorResponse`, every 401 carries its challenge, every operation declares a
+  500. They also hold this document's waits in order: the hold on a read of
+  anchored text (`settleWaitSeconds`) shorter than `readSeconds`, and
+  `connectSeconds` and `readSeconds` together shorter than a client's
+  `httpRequestTimeoutMs`.
 - The Archivist conformance suite (`conformance/ocaml/archivist`): every reply
   it reads from the Archivist's HTTP surface must match its declaration here.
 - The gateway conformance suite's stand-in Archivist
