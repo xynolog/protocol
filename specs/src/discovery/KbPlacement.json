@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/KbPlacement.json",
+  "title": "KbPlacement",
+  "type": "string",
+  "description": "Where a knowledge base's stack runs: on this machine (local), or in a GitHub codespace whose knowledge base is forwarded here (codespace).",
+  "enum": [
+    "local",
+    "codespace"
+  ]
+}

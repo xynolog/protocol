@@ -6,12 +6,8 @@
   "description": "Which knowledge base an operation acts on: a local clone's stack, or a codespace's. The launcher resolves it as the command line resolves --root and --repo, and refuses a choice it would have to guess.",
   "properties": {
     "kind": {
-      "type": "string",
-      "description": "Where the stack runs: on this machine (local), or on a GitHub codespace whose knowledge base is forwarded here (codespace).",
-      "enum": [
-        "local",
-        "codespace"
-      ]
+      "$ref": "https://xynolog.org/protocol/KbPlacement.json",
+      "description": "Where the stack runs: on this machine (local), or on a GitHub codespace whose knowledge base is forwarded here (codespace)."
     },
     "root": {
       "type": "string",

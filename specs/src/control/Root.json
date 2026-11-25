@@ -6,7 +6,7 @@
   "description": "One knowledge base this machine knows: a registered or running local clone, or a codespace stack recorded here. Registration, the directory, the stack and the forward are separate facts, each stated as it is.",
   "properties": {
     "placement": {
-      "$ref": "https://xynolog.org/protocol/DiscoveredKB.json#/properties/placement"
+      "$ref": "https://xynolog.org/protocol/KbPlacement.json"
     },
     "path": {
       "type": "string",
