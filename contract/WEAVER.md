@@ -25,9 +25,7 @@ two case tables,
 and
 [`specs/src/graph/codec-cases.json`](../specs/src/graph/codec-cases.json),
 which every implementation runs through its own code. A rule marked "Held by
-no case" is one nothing checks. `npm run lint:transport-contract` fails when a
-case named here does not exist, and when a case of the suite is named by no
-rule.
+no case" is one nothing checks.
 
 **The graph is a projection, and not a copy.** The record is the system of
 record: everything in the graph can be made again from it. The graph holds

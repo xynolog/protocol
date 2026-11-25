@@ -21,8 +21,6 @@ that fails when a Worker service breaks it: `worker-service/<case>` is the
 file `<case>.ml` there. The suite starts the service as a process and
 meets it only at its boundary, so the same cases judge every implementation. A
 rule marked "Held by no case" is one nothing checks.
-`npm run lint:transport-contract` fails when a case named here does not exist,
-and when a case of the suite is named by no rule.
 
 **What this document does not cover.** A `yield` job to PDF, and so the
 citations of a generated PDF; and the budget of an Anthropic model whose
