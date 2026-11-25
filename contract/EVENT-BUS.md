@@ -432,8 +432,8 @@ Then for the OpenAPI schema:
 
 3. Add the schema file to `specs/src/components/schemas/`.
 4. Reference it from the right path file under `specs/src/paths/` (if the channel has an HTTP entry point too).
-5. Run `npm run generate:openapi --workspace=@xynolog/core` to bundle and regenerate types.
-6. Rebuild `@xynolog/core`.
+5. Run `make validate`, which reads the specifications and bundles them.
+6. Run `make generate` in the sdk repository, which writes every SDK's generated files from the Protocol it pins.
 
 And for the SDK:
 

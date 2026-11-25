@@ -198,9 +198,10 @@ status 1 before it serves.
   refused 400. A `scope` is a resource's id and is held to the same rule,
   on an emit and in each `scoped` entry of a subscription; so are an
   annotation target's `source`, a reference body's `source`, and a
-  description's `wasDerivedFrom`. `npm run lint:spec-identifiers` holds the spec to it: a
+  description's `wasDerivedFrom`. The reader's identifier rules
+  (`reader/lib/identifiers_rules.ml`, `make reader`) hold the spec to it: a
   property named for an id that refers to no kind, and a case the rule
-  does not agree with, fail it. The gateway is held to it by its suite,
+  does not agree with, fail them. The gateway is held to it by its suite,
   which sends every string the table says a kind accepts and every one it
   refuses: in a payload and as a `scope` (`gateway/emit`), in a
   subscription's `scoped` entry (`gateway/stream`), to

@@ -44,8 +44,6 @@ principals are named, which the Archivist runs too. The runner of each is the fi
 `librarian/tests`, such as `test_score_cases.py`. The others are tests of
 Xynolog's own Librarian and of the packages it is built on. A rule marked
 "Held by no case" is one nothing checks.
-`npm run lint:transport-contract` fails when a case or a test named here does
-not exist, and when a case of the suite is named by no rule.
 
 **It owns no store, and it reads only.** Everything a Librarian answers is
 read from a store another service writes, or made by a model from what was
