@@ -27,9 +27,15 @@ let wire =
 let live =
   {|{"about": "a", "source": "s", "tier": "fleet", "steps": [{"observe": {"query": "resource"}, "as": "one"}, {"fetch": "browse:resource-requested", "as": "first"}, {"fetch": "GET /resources/{id}/annotations"}]}|}
 
-let worker =
-  {|{"about": "a", "source": "s", "steps": [{"driver": "claim", "returns": {}}, {"claimed": {}}]}|}
+let held =
+  {|"jobId": "job-1", "jobType": "mark", "resourceId": {"$var": "r1"}, "params": {"$var": "_"}, "completedUnits": [], "unitCursors": {}, "retryCount": 0|}
 
+let claimed row =
+  Printf.sprintf
+    {|{"about": "a", "source": "s", "steps": [{"driver": "claim", "returns": {}}, {"claimed": {%s}}]}|}
+    row
+
+let worker = claimed (held ^ {|, "maxRetries": 3|})
 let base = [ ("wire", wire); ("live", live); ("worker", worker) ]
 
 let directory = function
@@ -168,6 +174,17 @@ let () =
     (at "wire"
    ^ ": /steps/0: is what a worker reports, which this directory's cases have \
       none of");
+  refused ~why:"expects a claimed row without a member of the record" "worker"
+    (claimed held)
+    (at "worker"
+   ^ ": /steps/1/claimed: lacks maxRetries, a member of HeldJobRecord");
+  refused ~why:"expects a claimed row with a member the record has not" "worker"
+    (claimed (held ^ {|, "maxRetries": 3, "attempt": 1|}))
+    (at "worker" ^ ": /steps/1/claimed/attempt: is no member of HeldJobRecord");
+  refused ~why:"expects a claimed row with a value its member's schema refuses"
+    "worker"
+    (claimed (held ^ {|, "maxRetries": -1|}))
+    (at "worker" ^ ": /steps/1/claimed/maxRetries: is less than 0");
   if !failures > 0 then exit 1;
   print_endline
     "The reader holds the conformance corpus to its schema, refusing a case \
@@ -175,4 +192,5 @@ let () =
      steps, an outcome both returned and failed, a settling of two kinds; and \
      to the spec, refusing an operation the gateway does not declare, a \
      channel or a request the registry does not have, a live case without its \
-     tier or another with one, and a step of another layer"
+     tier or another with one, a step of another layer, and a claimed row that \
+     is not the record a driver's claimed line carries"
