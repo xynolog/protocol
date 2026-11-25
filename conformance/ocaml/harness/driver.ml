@@ -113,7 +113,9 @@ let take t line =
                 | Ready { value; _ } -> Ready value
                 | Failed { error; _ } -> Failed error)
           | Completed { completed } -> t.completed <- completed :: t.completed
-          | Claimed { claimed } -> Dynarray.add_last t.claimed (`Assoc claimed)
+          | Claimed _ ->
+              Dynarray.add_last t.claimed
+                (Option.get (Decode.at_pointer "/claimed" json))
           | Refused { refused } -> Dynarray.add_last t.refusals refused
           | Signalled { signalled } -> Dynarray.add_last t.signalled signalled
           | Stalled { stalled } -> Dynarray.add_last t.stalled stalled))

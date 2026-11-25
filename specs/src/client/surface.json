@@ -2688,6 +2688,7 @@
     {
       "handed": "heldJob",
       "docs": "A job a worker holds, from its claim until it settles it. A held job is its verb's, `mark` or `yield`. A member with `takes` is one a held job has as its verb's, and it takes what that verb's entry names; every other member is the same for both verbs, and a job held as either verb's has it without its verb being asked.",
+      "record": "HeldJobRecord",
       "members": [
         {
           "member": "jobId"

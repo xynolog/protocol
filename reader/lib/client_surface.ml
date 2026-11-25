@@ -10,7 +10,11 @@
 
    And each module constant's [names]: each of [repliesOf] is an operation of
    bus/registry.json, by its request, and each of [channels] a channel it
-   states. *)
+   states.
+
+   And each [record] a worker's handed names: a client type of client/types,
+   whose properties are, in its order, the handed's first members, none of
+   which takes anything. *)
 
 let file = "client/surface.json"
 let ( / ) pointer token = pointer ^ "/" ^ Decode.escape token
@@ -173,13 +177,14 @@ let returns_refusals ~registry ~at ~called
           ])
   | _ -> []
 
+let field name = function
+  | `Assoc members -> List.assoc_opt name members
+  | _ -> None
+
+let items = function Some (`List items) -> items | _ -> []
+
 (* What a constant's [names] names that bus/registry.json does not state. *)
 let names_refusals ~registry_json surface =
-  let field name = function
-    | `Assoc members -> List.assoc_opt name members
-    | _ -> None
-  in
-  let items = function Some (`List items) -> items | _ -> [] in
   let texts value =
     List.filter_map (function `String s -> Some s | _ -> None) (items value)
   in
@@ -231,6 +236,53 @@ let names_refusals ~registry_json surface =
         (indexed (items (field "members" module_))))
     (indexed (items (field "modules" surface)))
 
+(* How a handed is not what the [record] it names says it is. *)
+let record_refusals ~read_json surface =
+  List.concat_map
+    (fun (i, handed) ->
+      match field "record" handed with
+      | Some (`String record) -> (
+          let at = "" / "worker" / string_of_int i / "record" in
+          match read_json ("client/types/" ^ record ^ ".json") with
+          | None ->
+              [
+                refusal at
+                  (Printf.sprintf "names %s, which is no client type" record);
+              ]
+          | Some json ->
+              let properties =
+                match field "properties" json with
+                | Some (`Assoc members) -> List.map fst members
+                | _ -> []
+              in
+              let first =
+                List.filteri
+                  (fun j _ -> j < List.length properties)
+                  (items (field "members" handed))
+              in
+              if
+                List.filter_map
+                  (fun member ->
+                    match field "member" member with
+                    | Some (`String name) -> Some name
+                    | _ -> None)
+                  first
+                = properties
+                && List.for_all
+                     (fun member -> field "takes" member = None)
+                     first
+              then []
+              else
+                [
+                  refusal at
+                    (Printf.sprintf
+                       "names %s, whose properties are not, in its order, the \
+                        first members, taking nothing"
+                       record);
+                ])
+      | _ -> [])
+    (indexed (items (field "worker" surface)))
+
 let refusals ~ids ~read_json ~schema_at ~registry
     (surface : Tables.Client_surface.t) =
   let each f =
@@ -249,7 +301,8 @@ let refusals ~ids ~read_json ~schema_at ~registry
   in
   each (returns_refusals ~registry)
   @ (match (read_json file, read_json "bus/registry.json") with
-    | Some json, Some registry_json -> names_refusals ~registry_json json
+    | Some json, Some registry_json ->
+        names_refusals ~registry_json json @ record_refusals ~read_json json
     | _ -> [])
   @
   match Option.bind (read_json file) (Decode.at_pointer "/fixtures") with

@@ -261,6 +261,27 @@ let () =
     "/namespaces/1/methods/0/returns/$ref: names \
      https://xynolog.org/protocol/WorkerConfig.json, worker/WorkerConfig.json, \
      which is not a component or a client type";
+  surface specs ~why:"has a handed name a record no client type is"
+    "worker/1/record"
+    (fun _ -> `String "Nowhere")
+    "/worker/1/record: names Nowhere, which is no client type";
+  surface specs ~why:"has a handed's members out of its record's order"
+    "worker/1/members"
+    (function
+      | `List (first :: second :: rest) -> `List (second :: first :: rest)
+      | _ -> failwith "worker/1/members is no list of two")
+    "/worker/1/record: names HeldJobRecord, whose properties are not, in its \
+     order, the first members, taking nothing";
+  surface specs ~why:"has a member of a handed's record take what a verb takes"
+    "worker/1/members/7"
+    (function
+      | `Assoc members ->
+          `Assoc
+            (members
+            @ [ ("takes", `Assoc [ ("mark", `String "MarkJobResult") ]) ])
+      | _ -> failwith "worker/1/members/7 is no member")
+    "/worker/1/record: names HeldJobRecord, whose properties are not, in its \
+     order, the first members, taking nothing";
   changed specs ~why:"has a query's value name an $id no schema states"
     "client/refresh.json" "queries/0/value/$ref"
     (fun _ -> `String (id "Nowhere.json"))

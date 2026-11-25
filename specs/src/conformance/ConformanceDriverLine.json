@@ -332,10 +332,7 @@
       "type": "object",
       "properties": {
         "claimed": {
-          "type": "object",
-          "additionalProperties": {
-            "$comment": "A member of the job's record, as the worker read it: JSON by nature."
-          },
+          "$ref": "https://xynolog.org/protocol/HeldJobRecord.json",
           "description": "The job, as the worker read the record."
         }
       },

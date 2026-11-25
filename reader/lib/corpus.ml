@@ -12,7 +12,10 @@
    - a case of the live directory states its tier, and no other case does;
    - each step is one of its directory's layer: a live case accounts for the
      wire with fetches and the stream's scopes, never a wire step, and alone
-     observes and fetches; a worker case alone hears what a worker reports.
+     observes and fetches; a worker case alone hears what a worker reports;
+   - each row a worker case expects claimed has every member of the record
+     a driver's claimed line carries and no other, each value with no
+     operator in it as that member's schema says.
 
    A harness reads the corpus with [load]; the reader's check holds it with
    [refusals]. *)
@@ -111,9 +114,58 @@ let layer_of directory =
   | "wire" -> Wire
   | _ -> Worker
 
+(* A value a step expects with an operator of conformance/sdk/README.md's
+   "Values" in it, which no schema can hold it to. *)
+let rec patterned : Yojson.Safe.t -> bool = function
+  | `Assoc [ (("$var" | "$fresh" | "$join"), _) ] -> true
+  | `Assoc members -> List.exists (fun (_, value) -> patterned value) members
+  | `List items -> List.exists patterned items
+  | _ -> false
+
+(* The record a driver's claimed line carries (Places.driver_line): its name,
+   and each of its members with the place of its schema. *)
+let claimed_record ~root (spec : Spec.t) =
+  let specs = Filename.concat root "specs/src" in
+  let json file =
+    match Decode.parse_file ~root:specs file with
+    | Ok json -> json
+    | Error error -> invalid_arg (Decode.error_to_string error)
+  in
+  let line = json Places.driver_line in
+  let branch =
+    match Decode.at_pointer "/oneOf" line with
+    | Some (`List branches) ->
+        List.find_index
+          (fun branch ->
+            Decode.at_pointer "/title" branch = Some (`String "Claimed"))
+          branches
+    | _ -> None
+  in
+  let pointer =
+    match branch with
+    | Some i -> "/oneOf" / string_of_int i / "properties" / "claimed"
+    | None -> invalid_arg (Places.driver_line ^ " states no Claimed line")
+  in
+  match Decode.at_pointer (pointer / "$ref") line with
+  | Some (`String target) -> (
+      let file, fragment =
+        Decode.resolve spec.ids { target; file = Places.driver_line; pointer }
+      in
+      match Decode.at_pointer (fragment / "properties") (json file) with
+      | Some (`Assoc members) ->
+          ( Filename.remove_extension (Filename.basename file),
+            List.map
+              (fun (member, _) ->
+                ( member,
+                  { Validate.file; pointer = fragment / "properties" / member }
+                ))
+              members )
+      | _ -> invalid_arg (target ^ " states no properties"))
+  | _ -> invalid_arg (Places.driver_line ^ pointer ^ " is no $ref")
+
 (* What [case] names of the spec that the spec must have, and how its steps
    fit its layer, at [file]. *)
-let held ~operations ~channels ~requests ~layer { file; case; _ } =
+let held ~operations ~channels ~requests ~layer ~claimed_as { file; case; _ } =
   let refuse pointer message = refusal file pointer message in
   let operation pointer what named =
     if List.mem named operations then []
@@ -225,7 +277,10 @@ let held ~operations ~channels ~requests ~layer { file; case; _ } =
            | Observe _ -> only_live "an observation"
            | Leave _ | Reaches _ | Holds _ | Completes _ ->
                only_live "an observer's"
-           | Claimed _ | Refused _ | Signalled _ | Stalled _ ->
+           | Claimed { claimed } ->
+               only_worker "what a worker reports"
+               @ claimed_as refuse (at / "claimed") claimed
+           | Refused _ | Signalled _ | Stalled _ ->
                only_worker "what a worker reports"
            | _ -> [])
          case.steps)
@@ -272,6 +327,44 @@ let of_json ~root spec ~name json = validated spec (case_schema ~root) name json
 (* How the corpus at the repository's [root] is not what the spec says. *)
 let refusals ~root (spec : Spec.t) =
   let schema = case_schema ~root in
+  let record, members = claimed_record ~root spec in
+  let claimed_as refuse at : Yojson.Safe.t -> _ = function
+    | `Assoc row ->
+        List.filter_map
+          (fun (member, _) ->
+            if List.mem_assoc member row then None
+            else
+              Some
+                (refuse at
+                   (Printf.sprintf "lacks %s, a member of %s" member record)))
+          members
+        @ List.concat_map
+            (fun (member, value) ->
+              match List.assoc_opt member members with
+              | None ->
+                  [
+                    refuse (at / member)
+                      (Printf.sprintf "is no member of %s" record);
+                  ]
+              | Some _ when patterned value -> []
+              | Some place -> (
+                  match fst schema place with
+                  | None ->
+                      [
+                        refuse (at / member)
+                          (Printf.sprintf
+                             "is a member of %s, whose schema the reader \
+                              cannot read"
+                             record);
+                      ]
+                  | Some stated ->
+                      List.map
+                        (fun (pointer, message) -> refuse pointer message)
+                        (Validate.errors spec.ids (fst schema) stated value
+                           (at / member))))
+            row
+    | _ -> [ refuse at (Printf.sprintf "is no object: it is a %s" record) ]
+  in
   let operations = gateway_operations spec in
   let channels = channels spec.tables.bus_registry in
   let requests = requests spec.tables.bus_registry in
@@ -294,6 +387,7 @@ let refusals ~root (spec : Spec.t) =
                 Result.bind (parsed ~root file) (validated spec schema file)
               with
               | Error e -> e
-              | Ok case -> held ~operations ~channels ~requests ~layer case)
+              | Ok case ->
+                  held ~operations ~channels ~requests ~layer ~claimed_as case)
             listed)
     Places.corpus
