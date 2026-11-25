@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/FrameRefusal.json",
+  "title": "FrameRefusal",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A frame refused, given to its readers in its place: by its transport, for its first fault as BusFrame, or by its channel's typed read, for its payload's first fault as its channel's (contract/TRANSPORT-CONTRACT.md § Frames). A transport's own, never on the wire.",
+  "properties": {
+    "channel": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The channel the frame names."
+    },
+    "member": {
+      "$ref": "https://xynolog.org/protocol/Fault.json#/properties/member",
+      "description": "The way from the frame to its first fault; a fault of its payload is within `payload`."
+    },
+    "reason": {
+      "$ref": "https://xynolog.org/protocol/Fault.json#/properties/reason"
+    },
+    "payload": {
+      "$comment": "The frame's payload as it came, the gateway's stamps and all; absent when the frame carried none: JSON, as it is given."
+    },
+    "scope": {
+      "$ref": "https://xynolog.org/protocol/ResourceId.json",
+      "description": "The resource whose scope it was delivered on; absent when it names none."
+    },
+    "correlationId": {
+      "$ref": "https://xynolog.org/protocol/BusFrame.json#/properties/correlationId",
+      "description": "The frame's correlation id, when it carries one BusFrame allows: a request awaiting the reply it names is told of the refusal at once."
+    }
+  },
+  "required": [
+    "channel",
+    "member",
+    "reason"
+  ]
+}

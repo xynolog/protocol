@@ -53,12 +53,11 @@
                 ]
               },
               "member": {
-                "type": "string",
-                "pattern": "^([A-Za-z]+(\\.[A-Za-z]+)*)?$",
+                "$ref": "https://xynolog.org/protocol/Fault.json#/properties/member",
                 "description": "The first fault's way from the frame: the names of the members it is within, and its own, joined by dots; empty for the frame itself."
               },
               "reason": {
-                "$ref": "https://xynolog.org/protocol/FrameRefusalReason.json"
+                "$ref": "https://xynolog.org/protocol/Fault.json#/properties/reason"
               },
               "told": {
                 "type": "string",
