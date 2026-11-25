@@ -18,7 +18,7 @@
       "description": "Whether a stack of it is recorded. When none is, its services are found by name."
     },
     "placement": {
-      "$ref": "https://xynolog.org/protocol/DiscoveredKB.json#/properties/placement"
+      "$ref": "https://xynolog.org/protocol/KbPlacement.json"
     },
     "root": {
       "type": "string",
