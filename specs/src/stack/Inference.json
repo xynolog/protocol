@@ -23,7 +23,7 @@
           "type": "object",
           "description": "Each provider an engine names, and how it is reached.",
           "propertyNames": {
-            "$ref": "https://xynolog.org/protocol/Engine.json#/properties/provider"
+            "$ref": "https://xynolog.org/protocol/InferenceProvider.json"
           },
           "additionalProperties": {
             "$ref": "https://xynolog.org/protocol/Provider.json"

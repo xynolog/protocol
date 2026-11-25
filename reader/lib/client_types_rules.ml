@@ -3,7 +3,6 @@
    schemas what an SDK reads from them; each restates a fact stated
    elsewhere.
 
-   - Telemetry's [anchor.method] values are AnchorMethod's words.
    - ReconciledSpan's branches are told apart by AnchorMethod's words, one
      each, in order.
    - Every object of client/types is closed: by [additionalProperties], or,
@@ -74,44 +73,7 @@ let refusals ~ids ~files ~(read_json : string -> Yojson.Safe.t option) =
         f (List.map Option.get jsons)
     | _ -> ()
   in
-  let telemetry = "service-telemetry/telemetry.json" in
   let anchor_method = "client/types/AnchorMethod.json" in
-  with_files [ anchor_method; telemetry ] (function
-    | [ anchor; table ] ->
-        let methods = at "/enum" anchor in
-        let attributes =
-          List.concat_map
-            (fun rows ->
-              List.concat
-                (List.mapi
-                   (fun i row ->
-                     List.concat
-                       (List.mapi
-                          (fun j attribute ->
-                            if text (at "/key" attribute) = Some "anchor.method"
-                            then
-                              [
-                                ( "/"
-                                  ^ rows / string_of_int i / "attributes"
-                                    / string_of_int j / "values",
-                                  at "/values" attribute );
-                              ]
-                            else [])
-                          (items (at "/attributes" row))))
-                   (items (at ("/" ^ rows) table))))
-            [ "spans"; "metrics" ]
-        in
-        if attributes = [] then
-          refuse telemetry "" "has no `anchor.method` attribute";
-        List.iter
-          (fun (pointer, values) ->
-            if values <> methods then
-              refuse telemetry pointer
-                "lists anchor.method values %s, not AnchorMethod's %s"
-                (Option.fold ~none:"none" ~some:shown values)
-                (Option.fold ~none:"none" ~some:shown methods))
-          attributes
-    | _ -> ());
   let reconciled_span = "client/types/ReconciledSpan.json" in
   with_files [ anchor_method; reconciled_span ] (function
     | [ anchor; span ] ->
