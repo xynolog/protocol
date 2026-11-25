@@ -3,7 +3,10 @@
 One standalone contract: the schema for `<stateDir>/discovery/kbs.json`,
 which the Xynolog CLI (`xynolog/cli`) regenerates on every stack
 mutation and consumers read from disk (Node) or fetch same-origin via the
-Browser's static server (web browsers).
+Browser's static server (web browsers). The path, `/discovery/kbs.json`
+under the state home and as the URL a browser fetches, is
+[`client/surface.json`](../client/surface.json)'s `discovery` constant
+`discoveryUrlPath`.
 
 ## Why this lives outside `components/schemas/`
 

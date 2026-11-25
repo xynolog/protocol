@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/System.json",
+  "title": "System",
+  "type": "string",
+  "description": "What a state home differs by (sign-in-store/README.md): macOS, Windows, and every other system.",
+  "enum": [
+    "macos",
+    "windows",
+    "other"
+  ]
+}

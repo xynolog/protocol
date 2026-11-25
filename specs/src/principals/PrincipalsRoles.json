@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/PrincipalsRoles.json",
+  "description": "principals/roles.json: the claims a token carries for the gateway to read its holder's roles and kind by, and each role.",
+  "type": "object",
+  "properties": {
+    "$comment": {
+      "$ref": "https://xynolog.org/protocol/CaseTable.json#/properties/$comment"
+    },
+    "rolesClaim": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The claim whose value is a flat array of the account's roles."
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Each role the gateway reads.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "pattern": "^[a-z]+(-[a-z]+)*$",
+            "description": "The role, as the token carries it."
+          },
+          "docs": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What it grants, in prose."
+          }
+        },
+        "required": [
+          "role",
+          "docs"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "kindClaim": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The claim that says what kind of account the token's is."
+    },
+    "agentKind": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What the kind claim holds on an agent's account. A person's account carries any other value, or none."
+    }
+  },
+  "required": [
+    "$comment",
+    "rolesClaim",
+    "roles",
+    "kindClaim",
+    "agentKind"
+  ],
+  "additionalProperties": false
+}
