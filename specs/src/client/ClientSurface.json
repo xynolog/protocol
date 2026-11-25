@@ -904,6 +904,9 @@
                         "channels"
                       ],
                       "additionalProperties": false
+                    },
+                    "value": {
+                      "$comment": "The constant's value, where Protocol states it, which every SDK that has the constant holds: JSON by nature, of whatever type the constant is."
                     }
                   },
                   "required": [

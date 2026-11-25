@@ -5,6 +5,11 @@
 
    - ReconciledSpan's branches are told apart by AnchorMethod's words, one
      each, in order.
+   - The driver line's emission states are told apart by CacheStatus's
+     words, one each, in order.
+   - discovery/DiscoveredKB.json's port is bounded as HttpEndpoint's is: the
+     gateway's document refers to whole files only, so the bounds are stated
+     twice, and held so.
    - Every object of client/types is closed: by [additionalProperties], or,
      where it is composed, by [unevaluatedProperties] at or around it. A
      [$defs] entry holds open members, and whatever names one closes it.
@@ -95,6 +100,54 @@ let refusals ~ids ~files ~(read_json : string -> Yojson.Safe.t option) =
              order, AnchorMethod's %s"
             (shown (`List tags))
             (shown (`List methods))
+    | _ -> ());
+  let discovered_kb = "discovery/DiscoveredKB.json" in
+  let http_endpoint = "components/schemas/HttpEndpoint.json" in
+  with_files [ discovered_kb; http_endpoint ] (function
+    | [ kb; endpoint ] ->
+        List.iter
+          (fun bound ->
+            let pointer = "/properties/port/" ^ bound in
+            if at pointer kb <> at pointer endpoint then
+              refuse discovered_kb pointer "is %s, where %s states %s"
+                (Option.fold ~none:"nothing" ~some:shown (at pointer kb))
+                http_endpoint
+                (Option.fold ~none:"nothing" ~some:shown (at pointer endpoint)))
+          [ "type"; "minimum"; "maximum" ]
+    | _ -> ());
+  let cache_status = "client/types/CacheStatus.json" in
+  let driver_line = "conformance/ConformanceDriverLine.json" in
+  with_files [ cache_status; driver_line ] (function
+    | [ status; line ] -> (
+        match
+          List.find_map
+            (fun (i, branch) ->
+              Option.map
+                (fun state -> (i, state))
+                (at "/properties/emission/properties/state" branch))
+            (List.mapi (fun i branch -> (i, branch)) (items (at "/oneOf" line)))
+        with
+        | None ->
+            refuse driver_line "/oneOf"
+              "has no line with an emission's state, which CacheStatus's words \
+               tell apart"
+        | Some (i, state) ->
+            let tags =
+              List.map
+                (fun branch ->
+                  Option.value ~default:`Null
+                    (at "/properties/status/const" branch))
+                (items (at "/oneOf" state))
+            in
+            let statuses = items (at "/enum" status) in
+            if tags <> statuses then
+              refuse driver_line
+                ("" / "oneOf" / string_of_int i / "properties" / "emission"
+               / "properties" / "state" / "oneOf")
+                "is told apart by status %s, not, one branch each and in \
+                 order, CacheStatus's %s"
+                (shown (`List tags))
+                (shown (`List statuses)))
     | _ -> ());
   List.iter
     (fun file ->

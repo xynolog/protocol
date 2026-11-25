@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/DiscoveryDiff.json",
+  "title": "DiscoveryDiff",
+  "type": "object",
+  "description": "How one poll's knowledge bases changed since the last state it gave.",
+  "properties": {
+    "added": {
+      "type": "array",
+      "items": {
+        "$ref": "https://xynolog.org/protocol/DiscoveredKB.json"
+      },
+      "description": "Each knowledge base the last state did not have."
+    },
+    "updated": {
+      "type": "array",
+      "items": {
+        "$ref": "https://xynolog.org/protocol/DiscoveredKB.json"
+      },
+      "description": "Each knowledge base the last state had at the same address, now otherwise."
+    },
+    "removed": {
+      "type": "array",
+      "items": {
+        "$ref": "https://xynolog.org/protocol/DiscoveredKB.json"
+      },
+      "description": "Each knowledge base the last state had, and this one does not."
+    }
+  },
+  "required": [
+    "added",
+    "updated",
+    "removed"
+  ],
+  "additionalProperties": false
+}
