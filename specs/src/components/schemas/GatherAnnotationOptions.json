@@ -6,16 +6,19 @@
   "properties": {
     "includeSourceContext": {
       "type": "boolean",
+      "default": true,
       "description": "Whether to include source context in the gathered result"
     },
     "includeTargetContext": {
       "type": "boolean",
+      "default": true,
       "description": "Whether to include target context in the gathered result"
     },
     "contextWindow": {
       "type": "integer",
       "minimum": 100,
       "maximum": 5000,
+      "default": 1000,
       "description": "How much of the text on each side of the annotation to include, counted in Unicode code points"
     }
   }

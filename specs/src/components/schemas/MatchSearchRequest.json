@@ -24,6 +24,7 @@
     },
     "useSemanticScoring": {
       "type": "boolean",
+      "default": true,
       "description": "Enable semantic similarity scoring in addition to keyword matching"
     }
   },

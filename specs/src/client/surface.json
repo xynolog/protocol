@@ -211,12 +211,9 @@
           },
           "cases": [
             {
-              "why": "no filters: the first hundred",
+              "why": "no filters: the page is the Archivist's",
               "args": {},
-              "sends": {
-                "limit": 100,
-                "offset": 0
-              }
+              "sends": {}
             },
             {
               "args": {
@@ -229,8 +226,7 @@
               "sends": {
                 "archived": false,
                 "entityType": "Person",
-                "limit": 5,
-                "offset": 0
+                "limit": 5
               }
             },
             {
@@ -1406,17 +1402,14 @@
           },
           "cases": [
             {
-              "why": "no options: a window of two thousand characters",
+              "why": "no options: the window and the contexts are the Librarian's",
               "args": {
                 "resourceId": "res-1",
                 "annotationId": "ann-1"
               },
               "sends": {
                 "annotationId": "ann-1",
-                "resourceId": "res-1",
-                "options": {
-                  "contextWindow": 2000
-                }
+                "resourceId": "res-1"
               }
             },
             {
@@ -1436,7 +1429,7 @@
               }
             },
             {
-              "why": "a context asked for or left out is sent as stated, false as well as true; the window not stated is two thousand",
+              "why": "a context asked for or left out is sent as stated, false as well as true; the window not stated is not sent",
               "args": {
                 "resourceId": "res-1",
                 "annotationId": "ann-1",
@@ -1450,8 +1443,7 @@
                 "resourceId": "res-1",
                 "options": {
                   "includeSourceContext": false,
-                  "includeTargetContext": true,
-                  "contextWindow": 2000
+                  "includeTargetContext": true
                 }
               }
             }
@@ -1620,7 +1612,7 @@
           },
           "cases": [
             {
-              "why": "no options: ten candidates, scored semantically",
+              "why": "no options: ten candidates, scored as the Librarian scores unasked",
               "args": {
                 "resourceId": "res-1",
                 "referenceId": "ann-1",
@@ -1634,8 +1626,7 @@
                 "context": {
                   "$fixture": "context"
                 },
-                "limit": 10,
-                "useSemanticScoring": true
+                "limit": 10
               }
             },
             {
@@ -1736,14 +1727,12 @@
           },
           "cases": [
             {
-              "why": "no filters: the first hundred",
+              "why": "no filters: the page is the Librarian's",
               "args": {
                 "search": "cat"
               },
               "sends": {
-                "search": "cat",
-                "limit": 100,
-                "offset": 0
+                "search": "cat"
               }
             },
             {
@@ -1759,8 +1748,7 @@
                 "search": "cat",
                 "archived": false,
                 "entityType": "Person",
-                "limit": 5,
-                "offset": 0
+                "limit": 5
               }
             },
             {
