@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/Binary.json",
+  "type": "string",
+  "format": "binary",
+  "description": "Bytes held whole. They can be read more than once, and sent again when an upload is retried."
+}

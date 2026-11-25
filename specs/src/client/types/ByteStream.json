@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/ByteStream.json",
+  "title": "ByteStream",
+  "type": "string",
+  "format": "binary",
+  "description": "Bytes read once, in order, as they arrive, released by whoever holds them."
+}
