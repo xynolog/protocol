@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/SessionEnded.json",
+  "title": "SessionEnded",
+  "type": "object",
+  "description": "A session ended, and why. What the session's signals raise (client/surface.json's `sessionSignals`).",
+  "additionalProperties": false,
+  "properties": {
+    "reason": {
+      "$ref": "https://xynolog.org/protocol/SessionEndReason.json",
+      "description": "Why it ended."
+    }
+  },
+  "required": [
+    "reason"
+  ]
+}

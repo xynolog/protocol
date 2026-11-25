@@ -22,8 +22,9 @@
    - session/SessionCacheCases.json's loads are, in order, of
      client/refresh.json's persisted queries, each keeping its query's
      value.
-   - A parameter of client/surface.json, and what a method of it returns,
-     names, by its [$id], a component or a client type of client/types, and
+   - A parameter of client/surface.json, what a method of it returns, and
+     what a member's [gives] holds, takes and returns, names, by its [$id], a
+     component or a client type of client/types, and
      a query's value in
      client/refresh.json a component: an [$id] does not say where its
      schema is.
@@ -357,32 +358,57 @@ let refusals ~ids ~files ~(read_json : string -> Yojson.Safe.t option) =
   in
   with_files [ "client/surface.json" ] (function
     | [ surface ] ->
+        let names place node =
+          match at "/$ref" node with
+          | Some (`String target) ->
+              names_one_of "client/surface.json" (place / "$ref") target
+                ~places:[ Places.components; "client/types/" ]
+                ~what:"a component or a client type"
+          | _ -> ()
+        in
+        (* What a method, or a member's [gives], takes and returns. *)
+        let typed place node =
+          List.iteri
+            (fun k parameter ->
+              Option.iter
+                (names (place / "parameters" / string_of_int k / "schema"))
+                (at "/schema" parameter))
+            (items (at "/parameters" node));
+          Option.iter (names (place / "returns")) (at "/returns" node)
+        in
         List.iteri
           (fun n namespace ->
             List.iteri
               (fun m method_ ->
-                let method_at =
-                  "/namespaces" / string_of_int n / "methods" / string_of_int m
-                in
-                let names place target =
-                  names_one_of "client/surface.json" (place / "$ref") target
-                    ~places:[ Places.components; "client/types/" ]
-                    ~what:"a component or a client type"
-                in
-                List.iteri
-                  (fun k parameter ->
-                    match at "/schema/$ref" parameter with
-                    | Some (`String target) ->
-                        names
-                          (method_at / "parameters" / string_of_int k / "schema")
-                          target
-                    | _ -> ())
-                  (items (at "/parameters" method_));
-                match at "/returns/$ref" method_ with
-                | Some (`String target) -> names (method_at / "returns") target
-                | _ -> ())
+                typed
+                  ("/namespaces" / string_of_int n / "methods" / string_of_int m)
+                  method_)
               (items (at "/methods" namespace)))
-          (items (at "/namespaces" surface))
+          (items (at "/namespaces" surface));
+        let gives place members =
+          List.iteri
+            (fun k member ->
+              Option.iter
+                (fun gives ->
+                  let place = place / string_of_int k / "gives" in
+                  Option.iter (names (place / "schema")) (at "/schema" gives);
+                  typed place gives)
+                (at "/gives" member))
+            (items members)
+        in
+        List.iteri
+          (fun i handed ->
+            gives
+              ("/worker" / string_of_int i / "members")
+              (at "/members" handed))
+          (items (at "/worker" surface));
+        List.iteri
+          (fun i unit ->
+            gives
+              ("/stateUnits" / string_of_int i / "members")
+              (at "/members" unit))
+          (items (at "/stateUnits" surface));
+        gives "/wire/members" (at "/wire/members" surface)
     | _ -> ());
   with_files [ "client/refresh.json" ] (function
     | [ refresh ] ->

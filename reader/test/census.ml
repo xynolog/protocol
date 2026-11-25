@@ -318,6 +318,65 @@ let () =
       | _ -> failwith "worker/1/members/7 is no member")
     "/worker/1/record: names HeldJobRecord, whose properties are not, in its \
      order, the first members, taking nothing";
+  surface specs ~why:"has a state unit's member give nothing"
+    "stateUnits/0/members/7"
+    (fun _ -> `Assoc [ ("member", `String "cancelPending") ])
+    "/stateUnits/0/members/7: lacks the member \"gives\"";
+  surface specs ~why:"has a member of a handed's record give what it is not"
+    "worker/1/members/0/gives/form"
+    (fun _ -> `String "watched")
+    "/worker/1/members/0/gives: is not \
+     {\"form\":\"value\",\"schema\":{\"$ref\":\"https://xynolog.org/protocol/HeldJobRecord.json#/properties/jobId\"}}, \
+     what HeldJobRecord's jobId is";
+  surface specs
+    ~why:"has a member that takes what a verb takes state what it takes"
+    "worker/1/members/17/gives"
+    (fun _ ->
+      `Assoc
+        [
+          ("form", `String "function");
+          ("parameters", `List []);
+          ("returns", `Null);
+        ])
+    "/worker/1/members/17/gives: is not a function and no more, and the member \
+     takes what a verb takes: its takes says what";
+  surface specs
+    ~why:"has a function state what it takes and not what it returns"
+    "stateUnits/0/members/7/gives"
+    (fun _ -> `Assoc [ ("form", `String "function"); ("parameters", `List []) ])
+    "/stateUnits/0/members/7/gives: states one of what it takes and what it \
+     returns: a function states both, or neither";
+  surface specs
+    ~why:"has a member's gives name what is no component or client type"
+    "worker/0/members/3/gives/schema/$ref"
+    (fun _ -> `String (id "WorkerConfig.json"))
+    "/worker/0/members/3/gives/schema/$ref: names \
+     https://xynolog.org/protocol/WorkerConfig.json, worker/WorkerConfig.json, \
+     which is not a component or a client type";
+  refused specs ~why:"has a member a case expects null of always hold one"
+    (fun copied ->
+      rewrite
+        (Filename.concat copied "client/surface.json")
+        (update [ "stateUnits"; "4"; "members"; "0"; "gives"; "absent" ]
+           (fun _ -> `Bool false)))
+    "client/state-units.json: \
+     /cases/4/steps/0/expect/unit/hoveredAnnotationId: is null, and beckon's \
+     hoveredAnnotationId always holds one";
+  changed specs ~why:"expects a member to hold what its gives does not"
+    "client/state-units.json" "cases/34/steps/0/expect/unit/isGenerating"
+    (fun _ -> `String "no")
+    "/cases/34/steps/0/expect/unit/isGenerating: is \"no\", which is no boolean";
+  changed specs ~why:"expects a member its unit does not have"
+    "client/state-units.json" "cases/34/steps/0/expect/unit"
+    (function
+      | `Assoc members -> `Assoc (members @ [ ("isGoing", `Bool true) ])
+      | _ -> failwith "cases/34/steps/0/expect/unit is no object")
+    "/cases/34/steps/0/expect/unit/isGoing: is no member of yield";
+  changed specs ~why:"has a case of a unit the surface has not"
+    "client/state-units.json" "cases/34/unit"
+    (fun _ -> `String "nowhere")
+    "/cases/34/unit: names nowhere, which is no state unit of \
+     client/surface.json";
   changed specs ~why:"has a query's value name an $id no schema states"
     "client/refresh.json" "queries/0/value/$ref"
     (fun _ -> `String (id "Nowhere.json"))

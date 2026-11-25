@@ -312,6 +312,13 @@
                                     "type": "integer",
                                     "description": "The least an integer may be."
                                   },
+                                  "format": {
+                                    "type": "string",
+                                    "enum": [
+                                      "date-time"
+                                    ],
+                                    "description": "The string's format, where it has one: `date-time` is an RFC 3339 time."
+                                  },
                                   "description": {
                                     "type": "string",
                                     "pattern": "\\S",
@@ -539,10 +546,140 @@
                   "additionalProperties": {
                     "$ref": "https://xynolog.org/protocol/BusRegistry.json#/properties/channels/items/oneOf/0/properties/schema"
                   }
+                },
+                "gives": {
+                  "description": "What the member gives its reader, whatever the SDK spells it as: a property or a call, a promise or a callback, a watched value or an observable. The schema it names is Protocol's; the form, the type each SDK holds it in.",
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "form": {
+                          "type": "string",
+                          "enum": [
+                            "value"
+                          ],
+                          "description": "Read when asked."
+                        },
+                        "schema": {
+                          "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema",
+                          "$comment": "What it holds. Absent when it is the SDK's own: its client, its error."
+                        },
+                        "absent": {
+                          "type": "boolean",
+                          "description": "Whether it may hold nothing yet: the SDK's null, or its absent value. Left out when it always holds one."
+                        }
+                      },
+                      "required": [
+                        "form"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "form": {
+                          "type": "string",
+                          "enum": [
+                            "watched"
+                          ],
+                          "description": "A current value, and each change told to its readers."
+                        },
+                        "schema": {
+                          "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema",
+                          "$comment": "What it holds. Absent when it is the SDK's own: its client, its error."
+                        },
+                        "absent": {
+                          "type": "boolean",
+                          "description": "Whether it may hold nothing yet: the SDK's null, or its absent value. Left out when it always holds one."
+                        }
+                      },
+                      "required": [
+                        "form"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "form": {
+                          "type": "string",
+                          "enum": [
+                            "stream"
+                          ],
+                          "description": "Each of what it tells, as it tells it, with no current value."
+                        },
+                        "schema": {
+                          "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema",
+                          "$comment": "Each of what it tells. Absent when it is the SDK's own: its error."
+                        }
+                      },
+                      "required": [
+                        "form"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "form": {
+                          "type": "string",
+                          "enum": [
+                            "settles"
+                          ],
+                          "description": "Settles once, giving nothing."
+                        }
+                      },
+                      "required": [
+                        "form"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "form": {
+                          "type": "string",
+                          "enum": [
+                            "cancels"
+                          ],
+                          "description": "Tells its reader a cancellation, in the SDK's own type of one."
+                        }
+                      },
+                      "required": [
+                        "form"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "form": {
+                          "type": "string",
+                          "enum": [
+                            "function"
+                          ],
+                          "description": "A call that takes what it is given."
+                        },
+                        "parameters": {
+                          "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters",
+                          "$comment": "What it takes, as a method's parameters are stated. Stated with `returns`, or neither is: then what it takes is the SDK's to type (a cache's key and value, a channel's payload, a verb's result), and stated nowhere."
+                        },
+                        "returns": {
+                          "$ref": "#/properties/namespaces/items/properties/methods/items/properties/returns",
+                          "$comment": "What it gives back, as a method's returns are stated; null when it gives nothing."
+                        }
+                      },
+                      "required": [
+                        "form"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
                 }
               },
               "required": [
-                "member"
+                "member",
+                "gives"
               ],
               "additionalProperties": false
             }
@@ -601,10 +738,14 @@
                   "type": "string",
                   "minLength": 1,
                   "description": "The member, by its name."
+                },
+                "gives": {
+                  "$ref": "#/properties/worker/items/properties/members/items/properties/gives"
                 }
               },
               "required": [
-                "member"
+                "member",
+                "gives"
               ],
               "additionalProperties": false
             }
@@ -649,10 +790,14 @@
                 "type": "string",
                 "minLength": 1,
                 "description": "The member, by its name."
+              },
+              "gives": {
+                "$ref": "#/properties/worker/items/properties/members/items/properties/gives"
               }
             },
             "required": [
-              "member"
+              "member",
+              "gives"
             ],
             "additionalProperties": false
           }

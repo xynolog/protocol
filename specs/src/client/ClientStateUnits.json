@@ -1,20 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://xynolog.org/protocol/ClientStateUnits.json",
-  "description": "client/state-units.json: what a client's state units do, case by case, over a scripted transport; and the notices the session's signals raise.",
+  "description": "client/state-units.json: what a client's state units do, case by case, over a scripted transport.",
   "type": "object",
   "properties": {
     "$comment": {
       "$ref": "https://xynolog.org/protocol/CaseTable.json#/properties/$comment"
-    },
-    "notices": {
-      "type": "object",
-      "minProperties": 1,
-      "description": "Each notice, by its name.",
-      "additionalProperties": {
-        "$ref": "https://xynolog.org/protocol/JsonSchema.json",
-        "$comment": "The notice's JSON Schema: JSON, as it is given."
-      }
     },
     "fixtures": {
       "description": "The values a case names by `{\"$fixture\": name}`.",
@@ -558,7 +549,6 @@
   },
   "required": [
     "$comment",
-    "notices",
     "fixtures",
     "cases"
   ],

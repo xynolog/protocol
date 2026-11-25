@@ -2647,16 +2647,37 @@
               "name": "All",
               "why": "The claims are ranged over, `for job, err := range claims.All()`, and Go's standard library names the method that gives a sequence of every element `All` (`maps.All`, `slices.All`)."
             }
+          },
+          "gives": {
+            "form": "function"
           }
         },
         {
-          "member": "refused"
+          "member": "refused",
+          "gives": {
+            "form": "stream",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/ClaimRefusal.json"
+            }
+          }
         },
         {
-          "member": "stalled"
+          "member": "stalled",
+          "gives": {
+            "form": "stream",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/HeldJobStall.json"
+            }
+          }
         },
         {
-          "member": "vitals"
+          "member": "vitals",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/WorkerVitals.json"
+            }
+          }
         },
         {
           "member": "stop",
@@ -2669,6 +2690,11 @@
               "name": "Close",
               "why": "Go stops what is held with `Close`, the name `io.Closer` gives it and what a `defer` calls."
             }
+          },
+          "gives": {
+            "form": "function",
+            "parameters": [],
+            "returns": null
           }
         }
       ]
@@ -2679,68 +2705,213 @@
       "record": "HeldJobRecord",
       "members": [
         {
-          "member": "jobId"
+          "member": "jobId",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/HeldJobRecord.json#/properties/jobId"
+            }
+          }
         },
         {
-          "member": "jobType"
+          "member": "jobType",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/HeldJobRecord.json#/properties/jobType"
+            }
+          }
         },
         {
-          "member": "resourceId"
+          "member": "resourceId",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/HeldJobRecord.json#/properties/resourceId"
+            }
+          }
         },
         {
-          "member": "params"
+          "member": "params",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/HeldJobRecord.json#/properties/params"
+            }
+          }
         },
         {
-          "member": "completedUnits"
+          "member": "completedUnits",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/HeldJobRecord.json#/properties/completedUnits"
+            }
+          }
         },
         {
-          "member": "unitCursors"
+          "member": "unitCursors",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/HeldJobRecord.json#/properties/unitCursors"
+            }
+          }
         },
         {
-          "member": "retryCount"
+          "member": "retryCount",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/HeldJobRecord.json#/properties/retryCount"
+            }
+          }
         },
         {
-          "member": "maxRetries"
+          "member": "maxRetries",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/HeldJobRecord.json#/properties/maxRetries"
+            }
+          }
         },
         {
-          "member": "attempt"
+          "member": "attempt",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/JobStartCommand.json#/properties/attempt"
+            }
+          }
         },
         {
-          "member": "annotationId"
+          "member": "annotationId",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/AnnotationId.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "trace"
+          "member": "trace",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/TraceCarrier.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "cancelled"
+          "member": "cancelled",
+          "gives": {
+            "form": "cancels"
+          }
         },
         {
-          "member": "settled"
+          "member": "settled",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "type": "boolean",
+              "description": "Whether the job has settled: completed, failed or cancelled."
+            }
+          }
         },
         {
-          "member": "start"
+          "member": "start",
+          "gives": {
+            "form": "function",
+            "parameters": [],
+            "returns": null
+          }
         },
         {
-          "member": "progress"
+          "member": "progress",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "progress",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/JobProgress.json"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
+          }
         },
         {
-          "member": "checkpoint"
+          "member": "checkpoint",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "commit"
+          "member": "commit",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "resourceId",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/MarkCommitCommand.json#/properties/resourceId"
+                },
+                "required": true
+              },
+              {
+                "parameter": "annotations",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/MarkCommitCommand.json#/properties/annotations"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
+          }
         },
         {
           "member": "complete",
           "takes": {
             "mark": "MarkJobResult",
             "yield": "YieldJobResult"
+          },
+          "gives": {
+            "form": "function"
           }
         },
         {
-          "member": "fail"
+          "member": "fail",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "error",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/JobFailCommand.json#/properties/error"
+                },
+                "required": true
+              },
+              {
+                "parameter": "failure",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/JobFailure.json"
+                },
+                "required": false
+              }
+            ],
+            "returns": null
+          }
         },
         {
-          "member": "cancel"
+          "member": "cancel",
+          "gives": {
+            "form": "function"
+          }
         }
       ]
     }
@@ -2767,31 +2938,93 @@
       },
       "members": [
         {
-          "member": "pendingAnnotation"
+          "member": "pendingAnnotation",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/PendingAnnotation.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "delegatingMotivation"
+          "member": "delegatingMotivation",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/Motivation.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "progress"
+          "member": "progress",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/JobProgress.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "progressMotivation"
+          "member": "progressMotivation",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/Motivation.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "failure"
+          "member": "failure",
+          "gives": {
+            "form": "watched",
+            "absent": true
+          }
         },
         {
-          "member": "jobId"
+          "member": "jobId",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/JobId.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "requestDelegate"
+          "member": "requestDelegate",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "params",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/MarkJobParams.json"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
+          }
         },
         {
-          "member": "cancelPending"
+          "member": "cancelPending",
+          "gives": {
+            "form": "function",
+            "parameters": [],
+            "returns": null
+          }
         },
         {
-          "member": "dismissProgress"
+          "member": "dismissProgress",
+          "gives": {
+            "form": "function",
+            "parameters": [],
+            "returns": null
+          }
         }
       ]
     },
@@ -2816,25 +3049,84 @@
       },
       "members": [
         {
-          "member": "isGenerating"
+          "member": "isGenerating",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "type": "boolean",
+              "description": "Whether a generation is on its way."
+            }
+          }
         },
         {
-          "member": "progress"
+          "member": "progress",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/JobProgress.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "outcome"
+          "member": "outcome",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/YieldJobDone.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "failure"
+          "member": "failure",
+          "gives": {
+            "form": "watched",
+            "absent": true
+          }
         },
         {
-          "member": "jobId"
+          "member": "jobId",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/JobId.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "generate"
+          "member": "generate",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "params",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/GenerationJobParams.json"
+                },
+                "required": true
+              },
+              {
+                "parameter": "stallDeadlineMs",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "How long the followed generation may say nothing, in milliseconds, before it is given up on. The follower's own, never sent: left out, it grows with the generation's `maxTokens` as client/timing.json's generationStall timings say."
+                },
+                "required": false
+              }
+            ],
+            "returns": null
+          }
         },
         {
-          "member": "dismissProgress"
+          "member": "dismissProgress",
+          "gives": {
+            "form": "function",
+            "parameters": [],
+            "returns": null
+          }
         }
       ]
     },
@@ -2859,31 +3151,114 @@
       },
       "members": [
         {
-          "member": "context"
+          "member": "context",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/GatheredContext.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "loading"
+          "member": "loading",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "type": "boolean",
+              "description": "Whether an annotation's gather is on its way."
+            }
+          }
         },
         {
-          "member": "error"
+          "member": "error",
+          "gives": {
+            "form": "watched",
+            "absent": true
+          }
         },
         {
-          "member": "annotationId"
+          "member": "annotationId",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/AnnotationId.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "resourceContext"
+          "member": "resourceContext",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/GatheredContext.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "resourceLoading"
+          "member": "resourceLoading",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "type": "boolean",
+              "description": "Whether a resource's gather is on its way."
+            }
+          }
         },
         {
-          "member": "resourceError"
+          "member": "resourceError",
+          "gives": {
+            "form": "watched",
+            "absent": true
+          }
         },
         {
-          "member": "gatherAnnotation"
+          "member": "gatherAnnotation",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "annotationId",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/AnnotationId.json"
+                },
+                "required": true
+              },
+              {
+                "parameter": "options",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/GatherAnnotationOptions.json"
+                },
+                "required": false
+              }
+            ],
+            "returns": null
+          }
         },
         {
-          "member": "gatherResource"
+          "member": "gatherResource",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "resourceId",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/ResourceId.json"
+                },
+                "required": true
+              },
+              {
+                "parameter": "options",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/GatherResourceOptions.json"
+                },
+                "required": false
+              }
+            ],
+            "returns": null
+          }
         }
       ]
     },
@@ -2929,10 +3304,30 @@
       },
       "members": [
         {
-          "member": "hoveredAnnotationId"
+          "member": "hoveredAnnotationId",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/AnnotationId.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "focus"
+          "member": "focus",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "annotationId",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/AnnotationId.json"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
+          }
         }
       ]
     },
@@ -2957,10 +3352,28 @@
       },
       "members": [
         {
-          "member": "enter"
+          "member": "enter",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "annotationId",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/AnnotationId.json"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
+          }
         },
         {
-          "member": "leave"
+          "member": "leave",
+          "gives": {
+            "form": "function",
+            "parameters": [],
+            "returns": null
+          }
         }
       ]
     },
@@ -2985,13 +3398,40 @@
       },
       "members": [
         {
-          "member": "query"
+          "member": "query",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "type": "string",
+              "description": "The query as last set."
+            }
+          }
         },
         {
-          "member": "state"
+          "member": "state",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/SearchState.json"
+            }
+          }
         },
         {
-          "member": "setQuery"
+          "member": "setQuery",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "value",
+                "schema": {
+                  "type": "string",
+                  "description": "The query."
+                },
+                "required": true
+              }
+            ],
+            "returns": null
+          }
         }
       ]
     },
@@ -3016,31 +3456,106 @@
       },
       "members": [
         {
-          "member": "sessionEnded"
+          "member": "sessionEnded",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/SessionEnded.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "permissionDenied"
+          "member": "permissionDenied",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/PermissionDenied.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "kbIdentityConflict"
+          "member": "kbIdentityConflict",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/KbIdentityConflict.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "notifySessionEnded"
+          "member": "notifySessionEnded",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "reason",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/SessionEnded.json#/properties/reason"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
+          }
         },
         {
-          "member": "notifyPermissionDenied"
+          "member": "notifyPermissionDenied",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "detail",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/PermissionDenied.json#/properties/detail"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
+          }
         },
         {
-          "member": "notifyKbIdentityConflict"
+          "member": "notifyKbIdentityConflict",
+          "gives": {
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "conflict",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/KbIdentityConflict.json"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
+          }
         },
         {
-          "member": "acknowledgeSessionEnded"
+          "member": "acknowledgeSessionEnded",
+          "gives": {
+            "form": "function",
+            "parameters": [],
+            "returns": null
+          }
         },
         {
-          "member": "acknowledgePermissionDenied"
+          "member": "acknowledgePermissionDenied",
+          "gives": {
+            "form": "function",
+            "parameters": [],
+            "returns": null
+          }
         },
         {
-          "member": "acknowledgeKbIdentityConflict"
+          "member": "acknowledgeKbIdentityConflict",
+          "gives": {
+            "form": "function",
+            "parameters": [],
+            "returns": null
+          }
         }
       ]
     },
@@ -3065,46 +3580,88 @@
       },
       "members": [
         {
-          "member": "observe"
+          "member": "observe",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "fetch"
+          "member": "fetch",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "get"
+          "member": "get",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "known"
+          "member": "known",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "keys"
+          "member": "keys",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "invalidate"
+          "member": "invalidate",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "invalidateAll"
+          "member": "invalidateAll",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "remove"
+          "member": "remove",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "set"
+          "member": "set",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "patch"
+          "member": "patch",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "persistencePending"
+          "member": "persistencePending",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "keptFetching"
+          "member": "keptFetching",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "attach"
+          "member": "attach",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "query"
+          "member": "query",
+          "gives": {
+            "form": "function"
+          }
         }
       ]
     },
@@ -3131,37 +3688,94 @@
       },
       "members": [
         {
-          "member": "id"
+          "member": "id",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "type": "string",
+              "description": "The session's own id: a session made again for the same knowledge base has another."
+            }
+          }
         },
         {
-          "member": "kb"
+          "member": "kb",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/KbTarget.json"
+            }
+          }
         },
         {
-          "member": "client"
+          "member": "client",
+          "gives": {
+            "form": "value"
+          }
         },
         {
-          "member": "token"
+          "member": "token",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/AccessToken.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "user"
+          "member": "user",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/UserResponse.json"
+            },
+            "absent": true
+          }
         },
         {
-          "member": "streamState"
+          "member": "streamState",
+          "gives": {
+            "form": "watched",
+            "schema": {
+              "$ref": "https://xynolog.org/protocol/ConnectionState.json"
+            }
+          }
         },
         {
-          "member": "errors"
+          "member": "errors",
+          "gives": {
+            "form": "stream"
+          }
         },
         {
-          "member": "ready"
+          "member": "ready",
+          "gives": {
+            "form": "settles"
+          }
         },
         {
-          "member": "expiresAt"
+          "member": "expiresAt",
+          "gives": {
+            "form": "value",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When the session's token stops working, as the token states it."
+            },
+            "absent": true
+          }
         },
         {
-          "member": "refresh"
+          "member": "refresh",
+          "gives": {
+            "form": "function"
+          }
         },
         {
-          "member": "renewer"
+          "member": "renewer",
+          "gives": {
+            "form": "function"
+          }
         }
       ]
     }
@@ -3181,25 +3795,46 @@
     },
     "members": [
       {
-        "member": "emit"
+        "member": "emit",
+        "gives": {
+          "form": "function"
+        }
       },
       {
-        "member": "frames"
+        "member": "frames",
+        "gives": {
+          "form": "function"
+        }
       },
       {
-        "member": "framesOf"
+        "member": "framesOf",
+        "gives": {
+          "form": "function"
+        }
       },
       {
-        "member": "request"
+        "member": "request",
+        "gives": {
+          "form": "function"
+        }
       },
       {
-        "member": "emitOn"
+        "member": "emitOn",
+        "gives": {
+          "form": "function"
+        }
       },
       {
-        "member": "framesOn"
+        "member": "framesOn",
+        "gives": {
+          "form": "function"
+        }
       },
       {
-        "member": "requestOf"
+        "member": "requestOf",
+        "gives": {
+          "form": "function"
+        }
       }
     ]
   },
@@ -4001,7 +4636,7 @@
     },
     {
       "module": "sessionNotices",
-      "docs": "What a session's signals raise: that a session ended and why, that a request was refused for lack of permission, and that a different knowledge base answers at a registered address. specs/src/client/state-units.json's `notices` states each one.",
+      "docs": "What a session's signals raise: that a session ended and why, that a request was refused for lack of permission, and that a different knowledge base answers at a registered address. Each is a client type of specs/src/client/types.",
       "where": {
         "ocaml": [
           "sdk/ocaml/sdk/lib/session_notices.ml"
