@@ -48,30 +48,15 @@
       "description": "When it was last active, or null."
     },
     "activeJob": {
-      "type": [
-        "object",
-        "null"
-      ],
       "description": "The job it holds, or null.",
-      "properties": {
-        "jobId": {
-          "$ref": "https://xynolog.org/protocol/JobId.json"
+      "anyOf": [
+        {
+          "$ref": "https://xynolog.org/protocol/WorkerActiveJob.json"
         },
-        "type": {
-          "$ref": "https://xynolog.org/protocol/JobType.json"
-        },
-        "since": {
-          "type": "string",
-          "format": "date-time",
-          "description": "When it was handed the job."
+        {
+          "type": "null"
         }
-      },
-      "required": [
-        "jobId",
-        "type",
-        "since"
-      ],
-      "additionalProperties": false
+      ]
     },
     "jobsCompleted": {
       "type": "integer",

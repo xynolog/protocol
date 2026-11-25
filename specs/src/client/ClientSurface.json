@@ -891,9 +891,8 @@
                         },
                         "channels": {
                           "type": "array",
-                          "minItems": 1,
                           "uniqueItems": true,
-                          "description": "Each other channel it names.",
+                          "description": "Each other channel it names; none when it names only replies.",
                           "items": {
                             "type": "string",
                             "minLength": 1
@@ -901,7 +900,8 @@
                         }
                       },
                       "required": [
-                        "repliesOf"
+                        "repliesOf",
+                        "channels"
                       ],
                       "additionalProperties": false
                     }

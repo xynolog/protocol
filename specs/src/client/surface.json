@@ -3479,31 +3479,38 @@
       "docs": "What a worker's stream names, and whether a failed job is run again: the channels claiming reads and the channels committing reads, each constant's `names`, and whether a failed attempt is retried, which a held job reports on `job:fail`. Held by specs/src/jobs/retry-cases.json.",
       "where": {
         "csharp": [
-          "sdk/csharp/sdk/src/Xynolog/Jobs"
+          "sdk/csharp/sdk/src/Xynolog/Jobs",
+          "sdk/csharp/sdk/src/Xynolog/Generated/WorkerRules.g.cs"
         ],
         "swift": [
-          "sdk/swift/sdk/Sources/Xynolog/Worker/Claims.swift"
+          "sdk/swift/sdk/Sources/Xynolog/Worker/Claims.swift",
+          "sdk/swift/sdk/Sources/Xynolog/Generated/WorkerChannels.swift"
         ],
         "typescript": [
-          "sdk/typescript/sdk/src/claims.ts"
+          "sdk/typescript/sdk/src/claims.ts",
+          "sdk/typescript/sdk/src/worker-channels.ts"
         ],
         "rust": [
-          "sdk/rust/sdk/src/claims.rs"
+          "sdk/rust/sdk/src/claims.rs",
+          "sdk/rust/sdk/src/generated/worker_channels.rs"
         ],
         "python": [
-          "sdk/python/sdk/src/xynolog/claims.py"
+          "sdk/python/sdk/src/xynolog/claims.py",
+          "sdk/python/sdk/src/xynolog/_worker_channels.py"
         ],
         "go": [
           "sdk/go"
         ],
         "kotlin": [
-          "sdk/kotlin/sdk/src/main/kotlin/xynolog/jobs"
+          "sdk/kotlin/sdk/src/main/kotlin/xynolog/jobs",
+          "sdk/kotlin/sdk/src/generated/kotlin/xynolog/jobs/WorkerChannels.kt"
         ],
         "haskell": [
           "sdk/haskell/sdk/src/Xynolog/Claims.hs"
         ],
         "ocaml": [
-          "sdk/ocaml/sdk/lib/claims.mli"
+          "sdk/ocaml/sdk/lib/claims.mli",
+          "sdk/ocaml/sdk/lib/worker_facts.ml"
         ]
       },
       "whole": [
@@ -3530,7 +3537,8 @@
             "repliesOf": [
               "mark:commit",
               "browse:annotation-requested"
-            ]
+            ],
+            "channels": []
           }
         },
         {
