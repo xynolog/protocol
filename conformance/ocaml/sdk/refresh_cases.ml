@@ -219,22 +219,14 @@ let held () =
     unkeyed "list" "resources"
       [ ("query", `String "resources") ]
       [
-        asked "browse:resources-requested"
-          (Some (`Assoc [ ("limit", `Int 100); ("offset", `Int 0) ]))
-          list;
+        asked "browse:resources-requested" (Some (`Assoc [])) list;
       ]
       list;
     unkeyed "found" "matchedResources"
       [ ("query", `String "matchedResources"); ("search", `String "cat") ]
       [
         asked "match:resources-requested"
-          (Some
-             (`Assoc
-                [
-                  ("search", `String "cat");
-                  ("limit", `Int 100);
-                  ("offset", `Int 0);
-                ]))
+          (Some (`Assoc [ ("search", `String "cat") ]))
           found;
       ]
       found;
