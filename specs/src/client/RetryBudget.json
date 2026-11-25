@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/RetryBudget.json",
+  "title": "RetryBudget",
+  "type": "object",
+  "description": "A retry budget: how many `attempts` are allowed, with a backoff that starts at `initialDelayMs` and doubles to `maxDelayMs`.",
+  "properties": {
+    "attempts": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many attempts the budget allows."
+    },
+    "initialDelayMs": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The delay before the second attempt, in milliseconds."
+    },
+    "maxDelayMs": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "The longest delay between attempts, in milliseconds."
+    }
+  },
+  "required": [
+    "attempts",
+    "initialDelayMs",
+    "maxDelayMs"
+  ],
+  "additionalProperties": false
+}

@@ -27,31 +27,7 @@
                 "description": "A duration in milliseconds, or a count."
               },
               {
-                "description": "A retry budget.",
-                "type": "object",
-                "properties": {
-                  "attempts": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "description": "How many attempts the budget allows."
-                  },
-                  "initialDelayMs": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "description": "The delay before the second attempt, in milliseconds."
-                  },
-                  "maxDelayMs": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "description": "The longest delay between attempts, in milliseconds."
-                  }
-                },
-                "required": [
-                  "attempts",
-                  "initialDelayMs",
-                  "maxDelayMs"
-                ],
-                "additionalProperties": false
+                "$ref": "https://xynolog.org/protocol/RetryBudget.json"
               }
             ]
           },
