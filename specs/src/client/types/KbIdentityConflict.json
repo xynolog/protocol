@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/KbIdentityConflict.json",
+  "title": "KbIdentityConflict",
+  "type": "object",
+  "description": "A different knowledge base answers at a registered address. Both dids, because neither alone says what to do: a person has to recognise which knowledge base they registered and which one answers. What the session's signals raise (client/surface.json's `sessionSignals`).",
+  "additionalProperties": false,
+  "properties": {
+    "expectedDid": {
+      "type": "string",
+      "description": "The did the entry records."
+    },
+    "observedDid": {
+      "type": "string",
+      "description": "The did the knowledge base that answered reported."
+    }
+  },
+  "required": [
+    "expectedDid",
+    "observedDid"
+  ]
+}

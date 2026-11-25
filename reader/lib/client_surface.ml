@@ -14,7 +14,11 @@
 
    And each [record] a worker's handed names: a client type of client/types,
    whose properties are, in its order, the handed's first members, none of
-   which takes anything. *)
+   which takes anything.
+
+   And each member's [gives] against its handed's record, its [takes] and
+   itself; and each [expect] of client/state-units.json against the
+   [gives] of the members it names. *)
 
 let file = "client/surface.json"
 let ( / ) pointer token = pointer ^ "/" ^ Decode.escape token
@@ -24,7 +28,9 @@ let indexed items = List.mapi (fun index item -> (index, item)) items
 let name : Tables.Client_surface.parameters_item -> string = function
   | Value { parameter; _ } | Callback { parameter; _ } -> parameter
 
-let rec with_fixtures fixtures at (value : Yojson.Safe.t) =
+(* [value], at [at] in [file], with each [{"$fixture": name}] read as the
+   fixture of that name in [fixtures]. *)
+let rec with_fixtures ~file fixtures at (value : Yojson.Safe.t) =
   match value with
   | `Assoc [ ("$fixture", `String fixture) ] -> (
       match Decode.at_pointer ("" / fixture) fixtures with
@@ -32,9 +38,13 @@ let rec with_fixtures fixtures at (value : Yojson.Safe.t) =
       | None ->
           ( value,
             [
-              refusal at
-                (Printf.sprintf "names the fixture %s, which the table has not"
-                   fixture);
+              {
+                Decode.file;
+                pointer = at;
+                message =
+                  Printf.sprintf "names the fixture %s, which the table has not"
+                    fixture;
+              };
             ] ))
   | `Assoc members ->
       let members, refusals =
@@ -42,7 +52,7 @@ let rec with_fixtures fixtures at (value : Yojson.Safe.t) =
           (List.map
              (fun (key, member) ->
                let member, refusals =
-                 with_fixtures fixtures (at / key) member
+                 with_fixtures ~file fixtures (at / key) member
                in
                ((key, member), refusals))
              members)
@@ -53,7 +63,7 @@ let rec with_fixtures fixtures at (value : Yojson.Safe.t) =
         List.split
           (List.map
              (fun (index, item) ->
-               with_fixtures fixtures (at / string_of_int index) item)
+               with_fixtures ~file fixtures (at / string_of_int index) item)
              (indexed items))
       in
       (`List items, List.concat refusals)
@@ -89,7 +99,7 @@ let method_refusals ~ids ~schema_at ~fixtures ~at ~called
     | Some (_, Callback _) ->
         [ refusal at_argument "is a callback, which a case cannot give" ]
     | Some (k, Value _) -> (
-        let value, unnamed = with_fixtures fixtures at_argument value in
+        let value, unnamed = with_fixtures ~file fixtures at_argument value in
         let place : Validate.place =
           { file; pointer = at / "parameters" / string_of_int k / "schema" }
         in
@@ -107,8 +117,9 @@ let method_refusals ~ids ~schema_at ~fixtures ~at ~called
     match case.args with
     | `Assoc args ->
         List.filter_map
-          (function
-            | Tables.Client_surface.Value { parameter; required = true; _ }
+          (fun (parameter : Tables.Client_surface.parameters_item) ->
+            match parameter with
+            | Value { parameter; required = true; _ }
               when not (List.mem_assoc parameter args) ->
                 Some
                   (refusal args_at
@@ -283,6 +294,223 @@ let record_refusals ~read_json surface =
       | _ -> [])
     (indexed (items (field "worker" surface)))
 
+let text name json =
+  match field name json with Some (`String s) -> Some s | _ -> None
+
+let named name rows =
+  List.find_opt (fun (_, row) -> text "member" row = Some name) rows
+
+(* How a member's [gives] is not what the rest of the surface says of it: a
+   member of its handed's [record] is a value of the record's property, a
+   member that [takes] what a verb takes is a function and no more, and a
+   function states its parameters and what it returns together, or neither. *)
+let gives_refusals ~read_json surface =
+  let member_refusals ~record place (j, member) =
+    let at = place / string_of_int j / "gives" in
+    let gives = field "gives" member in
+    let of_record =
+      match (record, text "member" member) with
+      | Some (record, properties), Some name when List.mem name properties ->
+          let expected =
+            `Assoc
+              [
+                ("form", `String "value");
+                ( "schema",
+                  `Assoc
+                    [
+                      ( "$ref",
+                        `String
+                          (Decode.base ^ record ^ ".json#/properties/" ^ name)
+                      );
+                    ] );
+              ]
+          in
+          if gives = Some expected then []
+          else
+            [
+              refusal at
+                (Printf.sprintf "is not %s, what %s's %s is"
+                   (Yojson.Safe.to_string expected)
+                   record name);
+            ]
+      | _ -> []
+    in
+    let taking =
+      if
+        field "takes" member <> None
+        && gives <> Some (`Assoc [ ("form", `String "function") ])
+      then
+        [
+          refusal at
+            "is not a function and no more, and the member takes what a verb \
+             takes: its takes says what";
+        ]
+      else []
+    in
+    let together =
+      match gives with
+      | Some gives when text "form" gives = Some "function" -> (
+          match (field "parameters" gives, field "returns" gives) with
+          | Some _, None | None, Some _ ->
+              [
+                refusal at
+                  "states one of what it takes and what it returns: a function \
+                   states both, or neither";
+              ]
+          | _ -> [])
+      | _ -> []
+    in
+    of_record @ taking @ together
+  in
+  let members ~record place row =
+    List.concat_map
+      (member_refusals ~record place)
+      (indexed (items (field "members" row)))
+  in
+  List.concat_map
+    (fun (i, handed) ->
+      let record =
+        Option.bind (text "record" handed) (fun record ->
+            match read_json ("client/types/" ^ record ^ ".json") with
+            | Some json -> (
+                match field "properties" json with
+                | Some (`Assoc properties) ->
+                    Some (record, List.map fst properties)
+                | _ -> None)
+            | None -> None)
+      in
+      members ~record ("" / "worker" / string_of_int i / "members") handed)
+    (indexed (items (field "worker" surface)))
+  @ List.concat_map
+      (fun (i, unit) ->
+        members ~record:None
+          ("" / "stateUnits" / string_of_int i / "members")
+          unit)
+      (indexed (items (field "stateUnits" surface)))
+  @ Option.fold ~none:[]
+      ~some:(members ~record:None ("" / "wire" / "members"))
+      (field "wire" surface)
+
+(* Each [expect] of client/state-units.json against client/surface.json: a
+   case's unit is a row of [stateUnits], each member it expects one of the
+   row's, and each value what the member's [gives] holds, with each
+   [{"$fixture": name}] read as the cases' fixture of that name. A member may
+   hold null only where it may hold nothing; one whose [gives] names no
+   schema holds the SDK's own (an error), which no schema checks, and a
+   [{"$has": …}] states only some of what is held, so it is not checked
+   whole. *)
+let expect_refusals ~ids ~read_json ~schema_at surface =
+  let cases_file = "client/state-units.json" in
+  let refuse pointer message = { Decode.file = cases_file; pointer; message } in
+  match read_json cases_file with
+  | None -> [ refuse "" "is missing: its expects are checked against it" ]
+  | Some table -> (
+      match field "fixtures" table with
+      | None -> [ refuse "" "has no fixtures" ]
+      | Some fixtures ->
+          let units = indexed (items (field "stateUnits" surface)) in
+          let held ~unit_name ~u at (m, member) value =
+            let gives = field "gives" member in
+            let schema_place : Validate.place =
+              {
+                file;
+                pointer =
+                  "" / "stateUnits" / string_of_int u / "members"
+                  / string_of_int m / "gives" / "schema";
+              }
+            in
+            let name = Option.value ~default:"" (text "member" member) in
+            match
+              ( Option.bind gives (text "form"),
+                Option.bind gives (field "schema"),
+                value )
+            with
+            | Some ("value" | "watched"), _, `Null ->
+                if Option.bind gives (field "absent") = Some (`Bool true) then
+                  []
+                else
+                  [
+                    refuse at
+                      (Printf.sprintf "is null, and %s's %s always holds one"
+                         unit_name name);
+                  ]
+            | Some ("value" | "watched"), None, _ -> []
+            | Some ("value" | "watched"), Some _, `Assoc [ ("$has", _) ] -> []
+            | Some ("value" | "watched"), Some _, value -> (
+                let value, unnamed =
+                  with_fixtures ~file:cases_file fixtures at value
+                in
+                unnamed
+                @
+                match schema_at schema_place with
+                | None ->
+                    [
+                      refusal schema_place.pointer
+                        "is no schema the reader can read";
+                    ]
+                | Some schema ->
+                    List.map
+                      (fun (pointer, message) -> refuse pointer message)
+                      (Validate.errors ids schema_at schema value at))
+            | _ ->
+                [
+                  refuse at
+                    (Printf.sprintf
+                       "is what %s's %s holds, and it holds nothing: what a \
+                        unit holds is a value or a watched value"
+                       unit_name name);
+                ]
+          in
+          List.concat_map
+            (fun (c, case) ->
+              let case_at = "" / "cases" / string_of_int c in
+              let unit_name = Option.value ~default:"" (text "unit" case) in
+              match
+                List.find_opt
+                  (fun (_, row) -> text "unit" row = Some unit_name)
+                  units
+              with
+              | None ->
+                  [
+                    refuse (case_at / "unit")
+                      (Printf.sprintf
+                         "names %s, which is no state unit of \
+                          client/surface.json"
+                         unit_name);
+                  ]
+              | Some (u, row) ->
+                  let members = indexed (items (field "members" row)) in
+                  List.concat_map
+                    (fun (s, step) ->
+                      match field "expect" step with
+                      | Some (`Assoc made) ->
+                          List.concat_map
+                            (fun (made_name, expected) ->
+                              let at =
+                                case_at / "steps" / string_of_int s / "expect"
+                                / made_name
+                              in
+                              match expected with
+                              | `Assoc expected ->
+                                  List.concat_map
+                                    (fun (member_name, value) ->
+                                      let at = at / member_name in
+                                      match named member_name members with
+                                      | None ->
+                                          [
+                                            refuse at
+                                              (Printf.sprintf
+                                                 "is no member of %s" unit_name);
+                                          ]
+                                      | Some member ->
+                                          held ~unit_name ~u at member value)
+                                    expected
+                              | _ -> [ refuse at "is no object of members" ])
+                            made
+                      | _ -> [])
+                    (indexed (items (field "steps" case))))
+            (indexed (items (field "cases" table))))
+
 let refusals ~ids ~read_json ~schema_at ~registry
     (surface : Tables.Client_surface.t) =
   let each f =
@@ -302,7 +530,10 @@ let refusals ~ids ~read_json ~schema_at ~registry
   each (returns_refusals ~registry)
   @ (match (read_json file, read_json "bus/registry.json") with
     | Some json, Some registry_json ->
-        names_refusals ~registry_json json @ record_refusals ~read_json json
+        names_refusals ~registry_json json
+        @ record_refusals ~read_json json
+        @ gives_refusals ~read_json json
+        @ expect_refusals ~ids ~read_json ~schema_at json
     | _ -> [])
   @
   match Option.bind (read_json file) (Decode.at_pointer "/fixtures") with

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/PermissionDenied.json",
+  "title": "PermissionDenied",
+  "type": "object",
+  "description": "A request was refused for lack of permission. What the session's signals raise (client/surface.json's `sessionSignals`).",
+  "additionalProperties": false,
+  "properties": {
+    "detail": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The refusal's own message, untranslated; null when it gave none."
+    }
+  },
+  "required": [
+    "detail"
+  ]
+}
