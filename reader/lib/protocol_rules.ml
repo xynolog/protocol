@@ -31,7 +31,8 @@
    - a stream is a [oneOf] of its messages, each requiring a one-value
      [event] and a [data], and each [id] format has a pattern;
    - a limit is a positive integer, or a baseline with coefficients by role,
-     each coefficient [unlimited] or shaped like the baseline;
+     each coefficient [unlimited] or shaped like the baseline, and each role
+     one of principals/roles.json's;
    - a wait ends inside the wait around it: the Archivist's hold on a read
      of anchored text inside its [readSeconds], and the gateway's call of
      the Archivist inside a client's [httpRequestTimeoutMs];
@@ -50,6 +51,7 @@ let shown = Yojson.Safe.to_string
 let gateway = "openapi.json"
 let archivist = "archivist/openapi.json"
 let timing = "client/timing.json"
+let roles_table = "principals/roles.json"
 let error_response = Places.components ^ "ErrorResponse.json"
 let methods = [ "get"; "put"; "post"; "delete"; "patch"; "head"; "options" ]
 
@@ -168,6 +170,19 @@ let refusals ~ids ~(read_json : string -> Yojson.Safe.t option) =
         | _ -> false)
     | None -> false
   in
+  let known_roles =
+    match
+      Option.bind (read_json roles_table) (fun table ->
+          match member "roles" table with
+          | Some (`List rows) ->
+              Some (List.filter_map (fun row -> text (member "role" row)) rows)
+          | _ -> None)
+    with
+    | Some roles -> roles
+    | None ->
+        refuse roles_table "" "is missing: x-xynolog-limits names its roles";
+        []
+  in
   let check_limits file pointer where limits =
     List.iter
       (fun (key, value) ->
@@ -195,6 +210,11 @@ let refusals ~ids ~(read_json : string -> Yojson.Safe.t option) =
               | Some shape ->
                   List.iter
                     (fun (role, coefficient) ->
+                      if not (List.mem role known_roles) then
+                        refuse file
+                          (pointer / "roles" / role)
+                          "%s: %s.roles names %s, which is no role of %s" where
+                          label role roles_table;
                       if
                         coefficient <> `String "unlimited"
                         && shape_of coefficient <> Some shape

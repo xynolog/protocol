@@ -5008,6 +5008,11 @@
           "kind": "constant"
         },
         {
+          "member": "discoveryUrlPath",
+          "kind": "constant",
+          "value": "/discovery/kbs.json"
+        },
+        {
           "member": "DiscoveryAbsentReason",
           "kind": "type",
           "named": {

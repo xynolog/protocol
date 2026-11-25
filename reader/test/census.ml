@@ -1235,6 +1235,18 @@ let () =
      [\"unique-match\",\"context-recovered\",\"first-of-many\"], not \
      AnchorMethod's \
      [\"unique-match\",\"context-recovered\",\"first-of-many\",\"fuzzy-match\"]";
+  changed specs ~why:"bounds a discovered port otherwise than an endpoint's"
+    "discovery/DiscoveredKB.json" "properties/port/maximum"
+    (fun _ -> `Int 65536)
+    "/properties/port/maximum: is 65536, where \
+     components/schemas/HttpEndpoint.json states 65535";
+  changed specs ~why:"tells an emission's states apart by a status of its own"
+    "conformance/ConformanceDriverLine.json"
+    "oneOf/10/properties/emission/properties/state/oneOf/2/properties/status/const"
+    (fun _ -> `String "errored")
+    "/oneOf/10/properties/emission/properties/state/oneOf: is told apart by \
+     status [\"pending\",\"ready\",\"errored\"], not, one branch each and in \
+     order, CacheStatus's [\"pending\",\"ready\",\"failed\"]";
   changed specs
     ~why:"lists inference providers that are not InferenceProvider's"
     "service-telemetry/telemetry.json" "spans/12/attributes/0/values"
@@ -1418,6 +1430,13 @@ let () =
     "/post/x-xynolog-limits/emitsPerPrincipal/roles/xynolog-service: POST \
      /bus/emit: x-xynolog-limits.emitsPerPrincipal.roles.xynolog-service is 5, \
      neither \"unlimited\" nor shaped like the baseline";
+  changed specs ~why:"gives a role no token carries a coefficient"
+    "paths/subscribe-to-bus.json"
+    "post/x-xynolog-limits/streamsPerPrincipal/roles"
+    (fun _ -> `Assoc [ ("xynolog-admin", `String "unlimited") ])
+    "/post/x-xynolog-limits/streamsPerPrincipal/roles/xynolog-admin: POST \
+     /bus/subscribe: x-xynolog-limits.streamsPerPrincipal.roles names \
+     xynolog-admin, which is no role of principals/roles.json";
   changed specs ~why:"states a limit that is not positive" "openapi.json"
     "x-xynolog-limits/requestHeadSeconds"
     (fun _ -> `Int 0)

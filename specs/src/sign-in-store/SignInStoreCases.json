@@ -19,9 +19,8 @@
             "$ref": "https://xynolog.org/protocol/CaseTable.json#/properties/cases/items/properties/why"
           },
           "os": {
-            "type": "string",
-            "minLength": 1,
-            "description": "`macos`, `windows`, or any other system."
+            "$ref": "https://xynolog.org/protocol/System.json",
+            "description": "The system the state home is on."
           },
           "home": {
             "type": [

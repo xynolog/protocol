@@ -11,6 +11,8 @@
     },
     "port": {
       "type": "integer",
+      "minimum": 1,
+      "maximum": 65535,
       "description": "Local TCP port of the KB's API (the gateway port for a local stack; the allocated forward port for a codespace stack)"
     },
     "placement": {

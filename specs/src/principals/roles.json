@@ -1,0 +1,16 @@
+{
+  "$comment": "AUTHORITY for what an issuer stamps on a token for the gateway to read (openapi.json's bearerAuth): the claim that holds an account's roles, each role the gateway reads there, and the claim that marks an agent's account, with what it holds. The issuer the launcher configures stamps them, and the gateway reads them. A role is a capability, granted to people and agents alike; the kind says which an account is. Every role an x-xynolog-limits `roles` member names is one of these.",
+  "rolesClaim": "roles",
+  "roles": [
+    {
+      "role": "xynolog-service",
+      "docs": "Carried by every service's account: it marks a service's account."
+    },
+    {
+      "role": "xynolog-worker",
+      "docs": "Carried by a worker's account: it grants the right to claim jobs."
+    }
+  ],
+  "kindClaim": "kind",
+  "agentKind": "agent"
+}
