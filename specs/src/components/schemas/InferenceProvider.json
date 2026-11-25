@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/InferenceProvider.json",
+  "type": "string",
+  "description": "The inference provider: who serves the model. `anthropic`, `google`, `openai` and `together` are those companies' own APIs. `llamacpp`, `ollama` and `vllm` are servers a deployment runs or reaches, each named for the server's software.",
+  "enum": [
+    "anthropic",
+    "google",
+    "llamacpp",
+    "ollama",
+    "openai",
+    "together",
+    "vllm"
+  ]
+}

@@ -716,6 +716,7 @@ let load root =
   let jobs_rules = Jobs_rules.refusals ~ids ~read_json in
   let archivist_rules = Archivist_rules.refusals ~ids ~read_json in
   let smelter_rules = Smelter_rules.refusals ~read_json in
+  let telemetry_rules = Telemetry_rules.refusals ~read_json in
   let worker_rules = Worker_rules.refusals ~read_json in
   let graph_rules = Graph_rules.refusals ~read_json in
   let identifiers_rules =
@@ -871,7 +872,7 @@ let load root =
     @ offset_units @ registry_rules @ jobs_rules @ archivist_rules
     @ smelter_rules @ identifiers_rules @ client_types_rules @ protocol_rules
     @ control_rules @ retry_rules @ worker_rules @ graph_rules @ shape_rules
-    @ codes_rules
+    @ codes_rules @ telemetry_rules
   in
   match (schemas, census) with
   | Ok schemas, [] ->
