@@ -15,7 +15,10 @@ and the schema of its params and of its result, each schema by its `$id`
 schemas beside it are the shapes, and each it names is one of them; the
 `control` group of
 [`specs/src/errors/codes.json`](../specs/src/errors/codes.json) is
-why a request failed. `the consumer-owned generator`
+why a request failed, the JSON-RPC code each is answered under, and whether
+it is retryable; and
+[`specs/src/control/rpc-codes.json`](../specs/src/control/rpc-codes.json)
+is each JSON-RPC code the API answers with. `the consumer-owned generator`
 generates the launcher's Go types and Desktop's TypeScript types from them,
 and the schemas both sides validate against.
 
@@ -125,7 +128,10 @@ checks that a path named here exists.
   - `supported`, the versions the launcher speaks;
   - `mayStillRun`, for a start that was cancelled.
 
-  The message is the command line's own refusal, as it would print it.
+  The message is the command line's own refusal, as it would print it. Each
+  control code is answered under the code its `rpc` names: -32602 for
+  `control.invalid-params` and `control.unsupported-api-version`, -32000 for
+  every other.
   *Held by `cli/internal/launcher/control_census_test.go`.*
 - **E3.** A request is `retryable` when it can succeed if it is sent again,
   unchanged, after something outside it changes. Examples: a stack that is not
@@ -133,13 +139,17 @@ checks that a path named here exists.
   missing, a knowledge base, issuer or forward that does not answer,
   unreadable state, a stack still
   running that must stop first, a sign-in that failed, or the launcher's own
-  failure.
-  *Held by no case.*
+  failure. Each control code's `retryable` in `codes.json` says whether it is,
+  and the data's `retryable` is that code's.
+  *Held by `specs/src/control/request-cases.json` for a refusal of params; for
+  an operation's failure, by no case.*
 - **E4.** The launcher holds each message it sends to its schema. A result or
   an error's data that does not hold is never sent. The request is answered
   with -32603 and the code `control.failed`, and stderr says what did not
   hold. A notification that does not hold is not sent, and stderr says so. A
   handler that panics is answered with -32603 and the code `control.failed`.
+  An answer under -32603 is never retryable, though `control.failed` under
+  -32000 is: the same request fails the same way.
   *Held by `cli/internal/launcher/control_ops_test.go`.*
 - **E5.** A client holds every result, every error's data and every
   notification it receives to the same schemas. On a mismatch it fails

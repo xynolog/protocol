@@ -357,6 +357,48 @@ let () =
     "/properties/inference/enum: names [anthropic,bedrock], which are not some \
      of components/schemas/InferenceProvider.json's \
      [anthropic,google,llamacpp,ollama,openai,together,vllm]";
+  changed specs ~why:"has a control code answered under no JSON-RPC code"
+    "errors/codes.json" "control/codes/23/rpc"
+    (fun _ -> `Int (-32001))
+    "/control/codes/23/rpc: is -32001, which is no code of \
+     control/rpc-codes.json";
+  changed specs ~why:"has a control API answer under no JSON-RPC code"
+    "control/request-cases.json" "cases/8/answer/error/code"
+    (fun _ -> `Int (-32099))
+    "/cases/8/answer/error/code: is -32099, which is no code of \
+     control/rpc-codes.json";
+  changed specs ~why:"has a refusal of params be retryable"
+    "control/request-cases.json" "cases/9/answer/error/data/retryable"
+    (fun _ -> `Bool true)
+    "/cases/9/answer/error/data/retryable: is true, where errors/codes.json \
+     states control.invalid-params is false (/control/codes/0/retryable)";
+  changed specs ~why:"has an operation's failure answered as invalid params"
+    "control/request-cases.json" "cases/9/answer/error/data/code"
+    (fun _ -> `String "control.invalid-value")
+    "/cases/9/answer/error/data/code: is control.invalid-value, which \
+     errors/codes.json answers under -32000, not -32602 (/control/codes/4/rpc)";
+  changed specs ~why:"has a method not found carry a control code"
+    "control/request-cases.json" "cases/8/answer/error"
+    (fun _ ->
+      `Assoc
+        [
+          ("code", `Int (-32601));
+          ( "data",
+            `Assoc
+              [ ("code", `String "control.failed"); ("retryable", `Bool true) ]
+          );
+        ])
+    "/cases/8/answer/error/data: is stated, and no control code of \
+     errors/codes.json is answered under -32601";
+  changed specs ~why:"has an internal error carry no control code"
+    "control/rpc-codes.json" "codes/4/data/code"
+    (fun _ -> `String "control.crashed")
+    "/codes/4/data/code: is \"control.crashed\", which is no control code of \
+     errors/codes.json";
+  changed specs ~why:"states one JSON-RPC code twice" "control/rpc-codes.json"
+    "codes/5/number"
+    (fun _ -> `Int (-32700))
+    "/codes/5/number: is -32700, which an earlier code states";
   changed specs ~why:"has a control method send a notification none states"
     "control/methods.json" "methods/2/sends/0"
     (fun _ -> `String "notifications/nowhere")
