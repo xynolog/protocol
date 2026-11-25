@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/TraceCarrier.json",
+  "title": "TraceCarrier",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A W3C trace context, as a relayed frame's trace field carries it (bus/registry.json `trace`) and a held job states it as its `trace`: the trace a frame was sent under, so its reader's work is recorded in the same trace.",
+  "properties": {
+    "traceparent": {
+      "type": "string",
+      "minLength": 1,
+      "description": "W3C `traceparent` (`00-<traceId>-<spanId>-<flags>`)."
+    },
+    "tracestate": {
+      "type": "string",
+      "minLength": 1,
+      "description": "W3C `tracestate`, when the trace has one."
+    }
+  },
+  "required": [
+    "traceparent"
+  ]
+}

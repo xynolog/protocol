@@ -874,6 +874,36 @@
                         "type": "string",
                         "minLength": 1
                       }
+                    },
+                    "names": {
+                      "type": "object",
+                      "description": "For a constant that is the channels a stream names: the reply channels of each operation of `repliesOf`, then each channel of `channels`, each of bus/registry.json.",
+                      "properties": {
+                        "repliesOf": {
+                          "type": "array",
+                          "minItems": 1,
+                          "uniqueItems": true,
+                          "description": "Each operation, by its request channel, whose reply channels it names.",
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        },
+                        "channels": {
+                          "type": "array",
+                          "minItems": 1,
+                          "uniqueItems": true,
+                          "description": "Each other channel it names.",
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        }
+                      },
+                      "required": [
+                        "repliesOf"
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": [

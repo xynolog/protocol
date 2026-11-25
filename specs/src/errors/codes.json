@@ -49,7 +49,13 @@
       {
         "code": "unauthorized",
         "status": 401,
-        "docs": "Authentication is required: the token is missing, expired, or refused. A 429 whose `code` is `refusal-rate` refuses the token too, and is reported as this code with its own status."
+        "limitRefusals": [
+          {
+            "status": 429,
+            "code": "refusal-rate"
+          }
+        ],
+        "docs": "Authentication is required: the token is missing, expired, or refused. A refusal of `limitRefusals` refuses the token too (contract/TRANSPORT-CONTRACT.md § A refused credential), and is reported as this code with its own status."
       },
       {
         "code": "forbidden",

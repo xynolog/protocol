@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/ClaimRefusal.json",
+  "title": "ClaimRefusal",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A claim refused for a reason other than that nothing is pending, which is no fault: what a worker's claims say on `refused` (contract/WORKER-CONTRACT.md § Claiming). `bus.unauthorized` means the credential cannot claim, and will not be able to later.",
+  "properties": {
+    "code": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "x-xynolog-codes": "busRequest",
+      "description": "The bus code the reply was read as, or null when the refusal was the worker's own: a reply its schema does not allow. Never a code the reply did not state, and never `bus.none-pending`."
+    },
+    "message": {
+      "type": "string",
+      "description": "What the refusal said."
+    }
+  },
+  "required": [
+    "code",
+    "message"
+  ]
+}

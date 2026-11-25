@@ -3476,7 +3476,7 @@
     },
     {
       "module": "claims",
-      "docs": "What a worker's stream names, and whether a failed job is run again: the channels claiming reads (the replies of `job:claim`, and the announcements and cancellations a worker hears), the channels committing reads (the replies of `mark:commit`, and of the question whether a batch is recorded), and whether a failed attempt is retried, which a held job reports on `job:fail`. Held by specs/src/jobs/retry-cases.json.",
+      "docs": "What a worker's stream names, and whether a failed job is run again: the channels claiming reads and the channels committing reads, each constant's `names`, and whether a failed attempt is retried, which a held job reports on `job:fail`. Held by specs/src/jobs/retry-cases.json.",
       "where": {
         "csharp": [
           "sdk/csharp/sdk/src/Xynolog/Jobs"
@@ -3512,11 +3512,26 @@
       "members": [
         {
           "member": "jobClaimChannels",
-          "kind": "constant"
+          "kind": "constant",
+          "names": {
+            "repliesOf": [
+              "job:claim"
+            ],
+            "channels": [
+              "job:queued",
+              "job:cancel-requested"
+            ]
+          }
         },
         {
           "member": "jobCommitChannels",
-          "kind": "constant"
+          "kind": "constant",
+          "names": {
+            "repliesOf": [
+              "mark:commit",
+              "browse:annotation-requested"
+            ]
+          }
         },
         {
           "member": "willRetryAfter",

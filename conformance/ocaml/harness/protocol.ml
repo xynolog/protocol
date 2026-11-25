@@ -37,6 +37,14 @@ let rec at json = function
 
 let tables () = (spec ()).tables
 
+(* The members of a trace as the wire carries it: client/types/TraceCarrier's
+   properties, in order. *)
+let trace_members () =
+  match List.assoc_opt "client/types/TraceCarrier.json" (spec ()).schemas with
+  | Some (Schema.Schema { properties = Some properties; _ }) ->
+      List.map fst properties
+  | _ -> failwith "client/types/TraceCarrier.json states no members"
+
 (* ── Schemas ─────────────────────────────────────────────────────────── *)
 
 let files = Hashtbl.create 64

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/WorkerVitals.json",
+  "title": "WorkerVitals",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "What a worker can say of itself at any moment (contract/WORKER-CONTRACT.md V1): what a worker's claims hand it as `vitals`, and what the worker service answers of each engine beside the engine and its jobs (worker/WorkerEngineHealth.json).",
+  "properties": {
+    "lastQueuedEventAt": {
+      "$ref": "https://xynolog.org/protocol/WorkerEngineHealth.json#/properties/lastQueuedEventAt"
+    },
+    "lastClaimAt": {
+      "$ref": "https://xynolog.org/protocol/WorkerEngineHealth.json#/properties/lastClaimAt"
+    },
+    "lastFinishedAt": {
+      "$ref": "https://xynolog.org/protocol/WorkerEngineHealth.json#/properties/lastFinishedAt"
+    },
+    "lastActivityAt": {
+      "$ref": "https://xynolog.org/protocol/WorkerEngineHealth.json#/properties/lastActivityAt"
+    },
+    "activeJob": {
+      "$ref": "https://xynolog.org/protocol/WorkerEngineHealth.json#/properties/activeJob"
+    },
+    "jobsCompleted": {
+      "$ref": "https://xynolog.org/protocol/WorkerEngineHealth.json#/properties/jobsCompleted"
+    }
+  },
+  "required": [
+    "lastQueuedEventAt",
+    "lastClaimAt",
+    "lastFinishedAt",
+    "lastActivityAt",
+    "activeJob",
+    "jobsCompleted"
+  ]
+}

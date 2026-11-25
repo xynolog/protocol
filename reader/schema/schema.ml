@@ -56,6 +56,9 @@ type 'a layer = {
   not_ : 'a option;
   discriminator : discriminator option;
   defs : (string * 'a) list option;
+  codes : string option;
+      (** [x-xynolog-codes]: a string that is a code of the vocabulary of
+          errors/codes.json it names. *)
 }
 
 type t = Boolean_schema of bool | Schema of schema
@@ -98,6 +101,7 @@ let empty : schema =
     not_ = None;
     discriminator = None;
     defs = None;
+    codes = None;
   }
 
 (* The schemas [layer] holds, in the order its keywords are written here. A
@@ -140,6 +144,7 @@ let children
       not_;
       discriminator = _;
       defs;
+      codes = _;
     } =
   let one = Option.to_list and each = Option.value ~default:[] in
   List.concat
@@ -297,6 +302,7 @@ let keywords
       not_;
       discriminator;
       defs;
+      codes;
     } =
   let is name value = if Option.is_some value then [ name ] else [] in
   List.concat
@@ -335,6 +341,7 @@ let keywords
       is "not" not_;
       is "discriminator" discriminator;
       is "$defs" defs;
+      is "x-xynolog-codes" codes;
     ]
 
 let literal_json : literal -> Yojson.Safe.t = function
@@ -537,6 +544,10 @@ and schema cursor =
       let not_ = Decode.optional o "not" decode in
       let discriminator = Decode.optional o "discriminator" discriminator in
       let defs = Decode.optional o "$defs" (Decode.map decode) in
+      let codes =
+        Decode.optional o "x-xynolog-codes"
+          (only_under type_ String "x-xynolog-codes" Decode.non_empty_string)
+      in
       {
         schema;
         id;
@@ -572,5 +583,6 @@ and schema cursor =
         not_;
         discriminator;
         defs;
+        codes;
       })
     cursor
