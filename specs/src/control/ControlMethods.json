@@ -73,11 +73,7 @@
             "description": "A notification's name."
           },
           "from": {
-            "type": "string",
-            "enum": [
-              "client",
-              "launcher"
-            ],
+            "$ref": "https://xynolog.org/protocol/ControlSender.json",
             "description": "Which side sends it."
           },
           "params": {
