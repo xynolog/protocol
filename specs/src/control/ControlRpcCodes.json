@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/ControlRpcCodes.json",
+  "description": "control/rpc-codes.json: the JSON-RPC error codes the control API answers with.",
+  "type": "object",
+  "properties": {
+    "$comment": {
+      "$ref": "https://xynolog.org/protocol/CaseTable.json#/properties/$comment"
+    },
+    "codes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "description": "The JSON-RPC error's code."
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z]+(-[a-z]+)*$",
+            "description": "Its name, as every SDK names it."
+          },
+          "docs": {
+            "type": "string",
+            "pattern": "\\S",
+            "description": "When the launcher answers with it, in prose, by the contract's rules."
+          },
+          "data": {
+            "$ref": "https://xynolog.org/protocol/ErrorData.json",
+            "description": "The data every answer under it carries, whatever failed."
+          }
+        },
+        "required": [
+          "number",
+          "name",
+          "docs"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "$comment",
+    "codes"
+  ],
+  "additionalProperties": false
+}

@@ -11,7 +11,17 @@
 
    control/RootsInitParams.json's [inference], the providers a local stack
    is generated for, names some of components/schemas/InferenceProvider.json's,
-   each once: it is a subset stated by hand, and held to the vocabulary. *)
+   each once: it is a subset stated by hand, and held to the vocabulary.
+
+   control/rpc-codes.json states each JSON-RPC code the API answers with,
+   each once. Each control code of errors/codes.json is answered under one
+   of them, its [rpc]. A request-cases.json answer's code is one of them,
+   and its data is what the code's row says:
+   - under a code with [data] (-32603, E4), that data, of a control code;
+   - under a code some control code is answered under (-32602, -32000: V1,
+     P1, E2), a control code answered under it, retryable as that code is
+     (E3);
+   - under any other, none. *)
 
 let file = "control/methods.json"
 let area = "control/"
@@ -133,6 +143,164 @@ let named_refusals ~ids (table : Tables.Control_methods.t) =
              notification.params)
          table.notifications)
 
+let rpc_table = "control/rpc-codes.json"
+let codes_table = "errors/codes.json"
+let request_cases = "control/request-cases.json"
+
+let rpc_codes ~(read_json : string -> Yojson.Safe.t option) =
+  let at = Decode.at_pointer in
+  let items = function Some (`List items) -> items | _ -> [] in
+  let found = ref [] in
+  let refuse file pointer fmt =
+    Printf.ksprintf
+      (fun message -> found := { Decode.file; pointer; message } :: !found)
+      fmt
+  in
+  (match (read_json rpc_table, read_json codes_table) with
+  | None, _ -> refuse rpc_table "" "is missing"
+  | _, None ->
+      refuse codes_table "" "is missing: control/rpc-codes.json names it"
+  | Some rpc, Some codes ->
+      let rows = List.mapi (fun i row -> (i, row)) (items (at "/codes" rpc)) in
+      let number row =
+        match at "/number" row with Some (`Int n) -> Some n | _ -> None
+      in
+      let row_of n = List.find_opt (fun (_, row) -> number row = Some n) rows in
+      List.iter
+        (fun (i, row) ->
+          List.iter
+            (fun key ->
+              let value = at ("/" ^ key) row in
+              if
+                List.exists
+                  (fun (j, other) -> j < i && at ("/" ^ key) other = value)
+                  rows
+              then
+                refuse rpc_table
+                  ("" / "codes" / string_of_int i / key)
+                  "is %s, which an earlier code states"
+                  (Option.fold ~none:"nothing" ~some:Yojson.Safe.to_string value))
+            [ "number"; "name" ])
+        rows;
+      let control =
+        List.mapi (fun i code -> (i, code)) (items (at "/control/codes" codes))
+      in
+      let control_code name =
+        List.find_opt
+          (fun (_, code) -> at "/code" code = Some (`String name))
+          control
+      in
+      List.iter
+        (fun (i, code) ->
+          match at "/rpc" code with
+          | Some (`Int n) when row_of n <> None -> ()
+          | stated ->
+              refuse codes_table
+                ("" / "control" / "codes" / string_of_int i / "rpc")
+                "is %s, which is no code of %s"
+                (Option.fold ~none:"nothing" ~some:Yojson.Safe.to_string stated)
+                rpc_table)
+        control;
+      List.iter
+        (fun (i, row) ->
+          match at "/data/code" row with
+          | None -> ()
+          | Some (`String name) when control_code name <> None -> ()
+          | Some stated ->
+              refuse rpc_table
+                ("" / "codes" / string_of_int i / "data" / "code")
+                "is %s, which is no control code of %s"
+                (Yojson.Safe.to_string stated)
+                codes_table)
+        rows;
+      let cases = Option.value ~default:`Null (read_json request_cases) in
+      List.iteri
+        (fun c case ->
+          let error = "" / "cases" / string_of_int c / "answer" / "error" in
+          match at "/answer/error/code" case with
+          | None -> ()
+          | Some stated -> (
+              let data = at "/answer/error/data" case in
+              let data_at = error / "data" in
+              let shown = Yojson.Safe.to_string stated in
+              match
+                Option.bind
+                  (match stated with `Int n -> Some n | _ -> None)
+                  row_of
+              with
+              | None ->
+                  refuse request_cases (error / "code")
+                    "is %s, which is no code of %s" shown rpc_table
+              | Some (r, row) -> (
+                  let answered =
+                    List.filter
+                      (fun (_, code) -> at "/rpc" code = Some stated)
+                      control
+                  in
+                  match (at "/data" row, answered, data) with
+                  | Some fixed, _, Some data ->
+                      List.iter
+                        (fun key ->
+                          if at ("/" ^ key) data <> at ("/" ^ key) fixed then
+                            refuse request_cases (data_at / key)
+                              "is %s, where %s states every answer under %s \
+                               carries %s (/codes/%d/data)"
+                              (Option.fold ~none:"nothing"
+                                 ~some:Yojson.Safe.to_string
+                                 (at ("/" ^ key) data))
+                              rpc_table shown
+                              (Option.fold ~none:"nothing"
+                                 ~some:Yojson.Safe.to_string
+                                 (at ("/" ^ key) fixed))
+                              r)
+                        [ "code"; "retryable" ]
+                  | Some _, _, None | None, _ :: _, None ->
+                      refuse request_cases error
+                        "carries no data, and every answer under %s carries a \
+                         control code"
+                        shown
+                  | None, [], Some _ ->
+                      refuse request_cases data_at
+                        "is stated, and no control code of %s is answered \
+                         under %s"
+                        codes_table shown
+                  | None, _ :: _, Some data -> (
+                      match at "/code" data with
+                      | Some (`String name) -> (
+                          match control_code name with
+                          | None ->
+                              refuse request_cases (data_at / "code")
+                                "is %s, which is no control code of %s" name
+                                codes_table
+                          | Some (k, code) ->
+                              if at "/rpc" code <> Some stated then
+                                refuse request_cases (data_at / "code")
+                                  "is %s, which %s answers under %s, not %s \
+                                   (/control/codes/%d/rpc)"
+                                  name codes_table
+                                  (Option.fold ~none:"nothing"
+                                     ~some:Yojson.Safe.to_string
+                                     (at "/rpc" code))
+                                  shown k
+                              else if
+                                at "/retryable" data <> at "/retryable" code
+                              then
+                                refuse request_cases (data_at / "retryable")
+                                  "is %s, where %s states %s is %s \
+                                   (/control/codes/%d/retryable)"
+                                  (Option.fold ~none:"nothing"
+                                     ~some:Yojson.Safe.to_string
+                                     (at "/retryable" data))
+                                  codes_table name
+                                  (Option.fold ~none:"nothing"
+                                     ~some:Yojson.Safe.to_string
+                                     (at "/retryable" code))
+                                  k)
+                      | _ -> ())
+                  | None, [], None -> ())))
+        (items (at "/cases" cases)));
+  List.rev !found
+
 let refusals ~ids ~read_json table =
-  run_services ~read_json @ local_providers ~read_json
+  run_services ~read_json @ local_providers ~read_json @ rpc_codes ~read_json
   @ named_refusals ~ids table

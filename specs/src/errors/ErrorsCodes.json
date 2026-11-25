@@ -211,7 +211,48 @@
       "$ref": "#/properties/job"
     },
     "control": {
-      "$ref": "#/properties/job"
+      "description": "Why a request of the launcher's control API failed: each code, the JSON-RPC code an answer carries it under, and whether a request that fails with it is retryable.",
+      "type": "object",
+      "properties": {
+        "docs": {
+          "$ref": "#/properties/job/properties/docs"
+        },
+        "codes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "$ref": "#/properties/job/properties/codes/items/properties/code"
+              },
+              "docs": {
+                "$ref": "#/properties/job/properties/docs"
+              },
+              "rpc": {
+                "$ref": "https://xynolog.org/protocol/ControlRpcCodes.json#/properties/codes/items/properties/number",
+                "description": "The JSON-RPC error's code an answer carries it under: a number of control/rpc-codes.json."
+              },
+              "retryable": {
+                "type": "boolean",
+                "description": "Whether the same request can succeed sent again unchanged, once something outside it changes (contract/LAUNCHER-CONTROL.md E3): what ErrorData's retryable says of it when it is answered under its rpc. Under a code of control/rpc-codes.json that states its data, the data is that row's."
+              }
+            },
+            "required": [
+              "code",
+              "docs",
+              "rpc",
+              "retryable"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "docs",
+        "codes"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [

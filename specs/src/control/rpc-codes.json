@@ -1,0 +1,39 @@
+{
+  "$comment": "AUTHORITY for the JSON-RPC error codes the launcher's control API answers with (contract/LAUNCHER-CONTROL.md). A request-cases.json answer's code is one of these. An answer under a code that a control code of errors/codes.json names as its `rpc` carries that code in its data, retryable as that code is; an answer under a code with `data` carries that data; an answer under any other code carries none.",
+  "codes": [
+    {
+      "number": -32700,
+      "name": "parse-error",
+      "docs": "The line is not JSON, or holds more than one JSON value. Answered under a null id (F2)."
+    },
+    {
+      "number": -32600,
+      "name": "invalid-request",
+      "docs": "The message is a batch, does not state `\"jsonrpc\": \"2.0\"` and a method, has a member JSON-RPC does not define, or its id is null, a fraction or one in flight. Answered under a null id (F2, F3)."
+    },
+    {
+      "number": -32601,
+      "name": "method-not-found",
+      "docs": "The API has no method of the request's name (F4)."
+    },
+    {
+      "number": -32602,
+      "name": "invalid-params",
+      "docs": "The request's params are not what its method's schema admits, or are written to a version of the API this launcher does not speak (V1, P1)."
+    },
+    {
+      "number": -32603,
+      "name": "internal-error",
+      "docs": "The launcher would send a result or error data that does not hold to its schema, or the handler panicked. Never retryable: the same request fails the same way (E4).",
+      "data": {
+        "code": "control.failed",
+        "retryable": false
+      }
+    },
+    {
+      "number": -32000,
+      "name": "operation-failed",
+      "docs": "The operation the request ran failed. The data's code says why, and whether the request is retryable (E2)."
+    }
+  ]
+}
