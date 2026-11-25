@@ -364,6 +364,9 @@
       "DiscoveryDocument": {
         "$ref": "https://xynolog.org/protocol/DiscoveryDocument.json"
       },
+      "KbPlacement": {
+        "$ref": "https://xynolog.org/protocol/KbPlacement.json"
+      },
       "EnrichedResourceEvent": {
         "$ref": "https://xynolog.org/protocol/EnrichedResourceEvent.json"
       },
