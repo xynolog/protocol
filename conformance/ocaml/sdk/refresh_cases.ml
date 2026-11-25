@@ -218,9 +218,7 @@ let held () =
       (`List []);
     unkeyed "list" "resources"
       [ ("query", `String "resources") ]
-      [
-        asked "browse:resources-requested" (Some (`Assoc [])) list;
-      ]
+      [ asked "browse:resources-requested" (Some (`Assoc [])) list ]
       list;
     unkeyed "found" "matchedResources"
       [ ("query", `String "matchedResources"); ("search", `String "cat") ]
