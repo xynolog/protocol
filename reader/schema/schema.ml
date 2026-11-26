@@ -57,9 +57,9 @@ type 'a layer = {
   discriminator : discriminator option;
   defs : (string * 'a) list option;
   codes : string option;
-      (** [x-xynolog-codes]: a string that is a code of the vocabulary it
-          names: a member of errors/codes.json that lists codes, or a table
-          of words, by its file. *)
+      (** [x-xynolog-codes]: a string that is a code of the vocabulary it names:
+          a member of errors/codes.json that lists codes, or a table of words,
+          by its file. *)
 }
 
 type t = Boolean_schema of bool | Schema of schema
