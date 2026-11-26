@@ -4086,43 +4086,166 @@
       {
         "member": "emit",
         "gives": {
-          "form": "function"
+          "form": "function",
+          "signature": {
+            "parameters": [
+              {
+                "parameter": "channel",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/ChannelName.json"
+                },
+                "required": true
+              },
+              {
+                "parameter": "payload",
+                "schema": {
+                  "decided": {
+                    "by": {
+                      "parameter": "channel"
+                    },
+                    "in": "channels"
+                  }
+                },
+                "required": true
+              },
+              {
+                "parameter": "envelope",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/Envelope.json"
+                },
+                "required": false
+              }
+            ],
+            "returns": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "How many subscribers the emit reached."
+            },
+            "absent": true
+          }
         }
       },
       {
         "member": "frames",
         "gives": {
-          "form": "function"
+          "form": "function",
+          "signature": {
+            "parameters": [
+              {
+                "parameter": "channel",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/UnscopedChannelName.json"
+                },
+                "required": true
+              }
+            ],
+            "returns": {
+              "stream": {
+                "$ref": "https://xynolog.org/protocol/Delivered.json",
+                "typeArguments": {
+                  "P": {
+                    "decided": {
+                      "by": {
+                        "parameter": "channel"
+                      },
+                      "in": "channels"
+                    }
+                  }
+                }
+              },
+              "refused": {
+                "$ref": "https://xynolog.org/protocol/FrameRefusal.json"
+              }
+            }
+          }
         }
       },
       {
         "member": "framesOf",
         "gives": {
-          "form": "function"
+          "form": "function",
+          "signature": {
+            "parameters": [
+              {
+                "parameter": "channel",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/ScopedChannelName.json"
+                },
+                "required": true
+              },
+              {
+                "parameter": "resource",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/ResourceId.json"
+                },
+                "required": true
+              }
+            ],
+            "returns": {
+              "stream": {
+                "$ref": "https://xynolog.org/protocol/Delivered.json",
+                "typeArguments": {
+                  "P": {
+                    "decided": {
+                      "by": {
+                        "parameter": "channel"
+                      },
+                      "in": "channels"
+                    }
+                  }
+                }
+              },
+              "refused": {
+                "$ref": "https://xynolog.org/protocol/FrameRefusal.json"
+              }
+            }
+          }
         }
       },
       {
         "member": "request",
         "gives": {
-          "form": "function"
-        }
-      },
-      {
-        "member": "emitOn",
-        "gives": {
-          "form": "function"
-        }
-      },
-      {
-        "member": "framesOn",
-        "gives": {
-          "form": "function"
-        }
-      },
-      {
-        "member": "requestOf",
-        "gives": {
-          "form": "function"
+          "form": "function",
+          "signature": {
+            "parameters": [
+              {
+                "parameter": "operation",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/OperationName.json"
+                },
+                "required": true
+              },
+              {
+                "parameter": "payload",
+                "schema": {
+                  "decided": {
+                    "by": {
+                      "parameter": "operation"
+                    },
+                    "in": "request"
+                  }
+                },
+                "required": true
+              },
+              {
+                "parameter": "timeoutMs",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "How long the request has, from the call, to be answered. Left out, it is client/timing.json's busRequestTimeoutMs, as the client keeps it."
+                },
+                "required": false
+              }
+            ],
+            "returns": {
+              "decided": {
+                "by": {
+                  "parameter": "operation"
+                },
+                "in": "result"
+              }
+            }
+          }
         }
       }
     ]

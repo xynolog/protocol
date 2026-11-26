@@ -292,9 +292,16 @@
                                   "typeArguments": {
                                     "type": "object",
                                     "minProperties": 1,
-                                    "description": "What each of the client type's type parameters is here, by its name: a type parameter of the unit it is given in, one for each the client type's x-xynolog-typeParameters states, and only where it states any.",
+                                    "description": "What each of the client type's type parameters is here, by its name: a type parameter of the unit it is given in, or a schema a value decides; one for each the client type's x-xynolog-typeParameters states, and only where it states any.",
                                     "additionalProperties": {
-                                      "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/2"
+                                      "oneOf": [
+                                        {
+                                          "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/2"
+                                        },
+                                        {
+                                          "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/3"
+                                        }
+                                      ]
                                     }
                                   }
                                 },
@@ -363,26 +370,49 @@
                                     "description": "What a value decides: the schema a table names for it.",
                                     "properties": {
                                       "by": {
-                                        "type": "object",
                                         "description": "What decides it.",
-                                        "properties": {
-                                          "member": {
-                                            "type": "string",
-                                            "minLength": 1,
-                                            "description": "A member beside the function, whose value is of an enum."
+                                        "oneOf": [
+                                          {
+                                            "title": "ByMember",
+                                            "type": "object",
+                                            "properties": {
+                                              "member": {
+                                                "type": "string",
+                                                "minLength": 1,
+                                                "description": "A member beside the function, whose value is of an enum: the schema is what the function's `takes` names for it."
+                                              }
+                                            },
+                                            "required": [
+                                              "member"
+                                            ],
+                                            "additionalProperties": false
+                                          },
+                                          {
+                                            "title": "ByParameter",
+                                            "type": "object",
+                                            "properties": {
+                                              "parameter": {
+                                                "type": "string",
+                                                "pattern": "^[a-z][A-Za-z]*$",
+                                                "description": "Another parameter of the function, whose value names a channel or an operation of bus/registry.json: the schema is what the registry states the channel, or the operation's request or result, carries."
+                                              }
+                                            },
+                                            "required": [
+                                              "parameter"
+                                            ],
+                                            "additionalProperties": false
                                           }
-                                        },
-                                        "required": [
-                                          "member"
-                                        ],
-                                        "additionalProperties": false
+                                        ]
                                       },
                                       "in": {
                                         "type": "string",
                                         "enum": [
-                                          "takes"
+                                          "takes",
+                                          "channels",
+                                          "request",
+                                          "result"
                                         ],
-                                        "description": "The table that names the schema: `takes`, the function's own, by each of the enum's values in its order."
+                                        "description": "The table that names the schema: `takes`, the function's own, by each of the enum's values in its order; `channels`, what bus/registry.json states a channel carries; `request` and `result`, what it states an operation's request or its result carries."
                                       }
                                     },
                                     "required": [
@@ -743,7 +773,7 @@
                         },
                         "signature": {
                           "type": "object",
-                          "description": "What it takes and what it gives back. Left out, both are the SDK's to type (a cache's key and value, a channel's payload, a verb's result), and stated nowhere.",
+                          "description": "What it takes and what it gives back. Left out, both are the SDK's to type (a cache's persister and its queries), and stated nowhere.",
                           "properties": {
                             "parameters": {
                               "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters",
@@ -760,6 +790,9 @@
                                 },
                                 {
                                   "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/2"
+                                },
+                                {
+                                  "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/3"
                                 },
                                 {
                                   "title": "Handed",
@@ -798,6 +831,10 @@
                                     "stream": {
                                       "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema",
                                       "$comment": "Each of what it tells, as a member's stream tells it."
+                                    },
+                                    "refused": {
+                                      "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/0",
+                                      "$comment": "What a frame refused is given as, in place of the one it would have been. Left out, the stream refuses nothing."
                                     }
                                   },
                                   "required": [

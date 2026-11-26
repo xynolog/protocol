@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/ScopedChannelName.json",
+  "title": "ScopedChannelName",
+  "type": "string",
+  "description": "A channel a resource's scope carries, by its name: each of bus/registry.json's channels that its `audience.scoped` lists, in the registry's order. One is read for a resource.",
+  "enum": [
+    "yield:representation-added",
+    "yield:representation-removed",
+    "mark:added",
+    "mark:removed",
+    "mark:body-updated",
+    "mark:entity-tag-added",
+    "mark:entity-tag-removed",
+    "mark:archived",
+    "mark:unarchived",
+    "job:started",
+    "job:assigned",
+    "job:completed",
+    "job:failed"
+  ]
+}
