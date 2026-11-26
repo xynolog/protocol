@@ -146,6 +146,14 @@ type reports = {
   mutable stalled : int;
 }
 
+(* An operation started with [as]: its id, the operation, and the arguments
+   it was sent. *)
+type started = {
+  operation : int;
+  op : string;
+  sent : (string * Yojson.Safe.t) list;
+}
+
 type run = {
   layer : Corpus.layer;
   world : World.t;
@@ -169,7 +177,7 @@ type run = {
   reports : reports;
       (** In a worker case: how many of each thing the worker reported the case
           has read. *)
-  mutable pending : (string * (int * string)) list;
+  mutable pending : (string * started) list;
       (** Operations started with [as], by name, in the order started. *)
   named : (string, Client_proxy.request) Hashtbl.t;
   listening : (string * int) Dynarray.t;
@@ -998,7 +1006,9 @@ let operate run (step : Conformance.driver) =
   match step.as_ with
   | Some name ->
       if List.mem_assoc name run.pending then failf "%s is already started" name;
-      run.pending <- run.pending @ [ (name, (id, step.driver)) ];
+      run.pending <-
+        run.pending
+        @ [ (name, { operation = id; op = step.driver; sent = args }) ];
       (* A driver says at once that it has no such operation, so the case
          learns it here and not at whatever it would have waited for
          next. *)
@@ -1297,11 +1307,11 @@ let step run (step : Conformance.conformance_step) =
         let_
   | Driver driver -> operate run driver
   | Abandon { abandon } ->
-      let id, _ = started run abandon in
+      let { operation = id; _ } = started run abandon in
       let sent = Driver.send run.driver "abandon" [ ("request", `Int id) ] in
       judge run "abandon" (outcome run sent "abandon") nothing_expected
   | Settles { settles; returns; fails; abandoned } ->
-      let id, op = started run settles in
+      let { operation = id; op; _ } = started run settles in
       run.pending <- List.remove_assoc settles run.pending;
       judge run op
         (outcome run id (Printf.sprintf "%s (%s)" op settles))
@@ -1336,20 +1346,53 @@ let step run (step : Conformance.conformance_step) =
            reaching the client"
           closed (Option.get r.status)
   | Progress { progress } ->
-      let id, _ = started run progress in
+      let { operation = id; op; sent = arguments } = started run progress in
       let reports () = Driver.progress run.driver id in
+      (* An [upload] states its length, so every report says how many bytes
+         there are; an [upload-unsized] states none, so no report says, and
+         all of it is the bytes the case gave it. *)
+      let stated =
+        match op with
+        | "upload" -> true
+        | "upload-unsized" -> false
+        | other -> failf "%s is a %s, which reports no progress" progress other
+      in
+      let total =
+        if stated then (
+          let total =
+            driver_until run (progress ^ " to report its total") (fun () ->
+                match reports () with
+                | (_, Some total) :: _ -> Some total
+                | (_, None) :: _ ->
+                    failf "%s states its length, and reported no total" progress
+                | [] -> None)
+          in
+          if total <= 0 then
+            failf "%s reported a total of %d bytes" progress total;
+          total)
+        else
+          match List.assoc_opt "bytes" arguments with
+          | Some (`String bytes) -> String.length (Base64.decode_exn bytes)
+          | _ -> failf "%s was given no bytes" progress
+      in
       driver_until run (progress ^ " to report all of it sent") (fun () ->
           match List.rev (reports ()) with
-          | (sent, total) :: _ when sent = total -> Some ()
+          | (sent, _) :: _ when sent = total -> Some ()
           | _ -> None);
-      let total = snd (List.hd (reports ())) in
-      if total <= 0 then failf "%s reported a total of %d bytes" progress total;
       ignore
         (List.fold_left
            (fun before (sent, of_) ->
-             if of_ <> total then
-               failf "%s reported a total of %d bytes, then of %d" progress
-                 total of_;
+             (match of_ with
+             | Some of_ when not stated ->
+                 failf "%s states no length, and reported a total of %d bytes"
+                   progress of_
+             | Some of_ when of_ <> total ->
+                 failf "%s reported a total of %d bytes, then of %d" progress
+                   total of_
+             | None when stated ->
+                 failf "%s reported a total of %d bytes, then none" progress
+                   total
+             | _ -> ());
              if sent < before || sent > total then
                failf "%s reported %d of %d bytes after %d" progress sent total
                  before;
