@@ -1594,4 +1594,5 @@ let () =
      a malformed or ambiguous path, a path parameter undeclared or unnamed, a \
      parameter or an operationId twice, a response keyed by no status, an \
      operation without the 2xx or the 4xx it owes, a timing overridden where \
-     nothing is or where another is, or a protocol fact left to the code; and it reads each value as the type its schema states"
+     nothing is or where another is, or a protocol fact left to the code; and \
+     it reads each value as the type its schema states"

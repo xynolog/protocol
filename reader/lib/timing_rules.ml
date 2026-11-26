@@ -32,8 +32,7 @@ let refusals ~(read_json : string -> Yojson.Safe.t option) =
   let found = ref [] in
   let refuse pointer fmt =
     Printf.ksprintf
-      (fun message ->
-        found := { Decode.file; pointer; message } :: !found)
+      (fun message -> found := { Decode.file; pointer; message } :: !found)
       fmt
   in
   (match (read_json file, read_json surface_file) with

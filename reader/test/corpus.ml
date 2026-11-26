@@ -210,5 +210,6 @@ let () =
      steps, an outcome both returned and failed, a settling of two kinds; and \
      to the spec, refusing an operation the gateway does not declare, a \
      channel or a request the registry does not have, a live case without its \
-     tier or another with one, a step of another layer, a timing overridden that no caller may, and a claimed row that \
-     is not the record a driver's claimed line carries"
+     tier or another with one, a step of another layer, a timing overridden \
+     that no caller may, and a claimed row that is not the record a driver's \
+     claimed line carries"

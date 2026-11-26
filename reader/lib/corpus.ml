@@ -266,7 +266,9 @@ let held ~operations ~channels ~requests ~overridable ~layer ~claimed_as
            | Driver { driver = "listen"; with_; _ } ->
                literal at with_ "channel" channel
            | Driver { driver = "open"; with_; _ } -> (
-               match List.assoc_opt "timing" (Option.value ~default:[] with_) with
+               match
+                 List.assoc_opt "timing" (Option.value ~default:[] with_)
+               with
                | Some (`Assoc timing) ->
                    List.filter_map
                      (fun (name, _) ->
@@ -387,7 +389,9 @@ let refusals ~root (spec : Spec.t) =
   let operations = gateway_operations spec in
   let channels = channels spec.tables.bus_registry in
   let requests = requests spec.tables.bus_registry in
-  let overridable = List.map fst (Timing_rules.overridable spec.tables.client_timing) in
+  let overridable =
+    List.map fst (Timing_rules.overridable spec.tables.client_timing)
+  in
   List.concat_map
     (fun directory ->
       let layer = layer_of directory in
