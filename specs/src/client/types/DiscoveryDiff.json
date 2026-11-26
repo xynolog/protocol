@@ -5,6 +5,10 @@
   "type": "object",
   "description": "How one poll's knowledge bases changed since the last state it gave.",
   "properties": {
+    "state": {
+      "$ref": "https://xynolog.org/protocol/DiscoveryState.json",
+      "description": "The state the poll found."
+    },
     "added": {
       "type": "array",
       "items": {
@@ -25,12 +29,22 @@
         "$ref": "https://xynolog.org/protocol/DiscoveredKB.json"
       },
       "description": "Each knowledge base the last state had, and this one does not."
+    },
+    "duplicated": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Each address, as host:port, that more than one of the state's knowledge bases is at. At most one of them is true: `added` and `removed` count each address once, and every one is in `state`."
     }
   },
   "required": [
+    "state",
     "added",
     "updated",
-    "removed"
+    "removed",
+    "duplicated"
   ],
   "additionalProperties": false
 }

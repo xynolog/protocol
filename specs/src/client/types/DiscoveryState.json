@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/DiscoveryState.json",
+  "title": "DiscoveryState",
+  "description": "What a launcher's discovery document says, told apart by `kind`: no launcher was found, or the knowledge bases one manages. A launcher that manages none is not an absent one.",
+  "oneOf": [
+    {
+      "$ref": "https://xynolog.org/protocol/DiscoveryAbsent.json"
+    },
+    {
+      "$ref": "https://xynolog.org/protocol/DiscoveryManaged.json"
+    }
+  ],
+  "discriminator": {
+    "propertyName": "kind",
+    "mapping": {
+      "absent": "https://xynolog.org/protocol/DiscoveryAbsent.json",
+      "managed": "https://xynolog.org/protocol/DiscoveryManaged.json"
+    }
+  }
+}

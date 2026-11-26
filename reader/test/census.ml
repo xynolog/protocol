@@ -1276,6 +1276,12 @@ let () =
     (fun _ -> `Int 65536)
     "/properties/port/maximum: is 65536, where \
      components/schemas/HttpEndpoint.json states 65535";
+  changed specs ~why:"names a vocabulary errors/codes.json does not state"
+    "control/ErrorData.json" "properties/code/x-xynolog-codes"
+    (fun _ -> `String "controls")
+    "/properties/code: x-xynolog-codes names \"controls\", which is no \
+     vocabulary of errors/codes.json (busRequest, transport, job, session, \
+     signIn, kbIdentity, spanRefusal, control)";
   changed specs ~why:"tells an emission's states apart by a status of its own"
     "conformance/ConformanceDriverLine.json"
     "oneOf/10/properties/emission/properties/state/oneOf/2/properties/status/const"

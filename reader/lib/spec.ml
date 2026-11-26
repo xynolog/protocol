@@ -738,9 +738,9 @@ let load root =
       ~schema_files:
         (List.filter
            (fun file ->
-             Filename.check_suffix file ".json"
-             && (not (Hashtbl.mem decoded file))
-             && not (is_fixture file))
+             match Hashtbl.find_opt decoded file with
+             | Some (Schema_file, _) -> true
+             | _ -> false)
            files)
   in
   let path_item_names =
