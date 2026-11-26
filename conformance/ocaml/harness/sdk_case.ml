@@ -1349,15 +1349,17 @@ let step run (step : Conformance.conformance_step) =
       let { operation = id; op; sent = arguments } = started run progress in
       let reports () = Driver.progress run.driver id in
       (* An [upload] states its length, so every report says how many bytes
-         there are; an [upload-unsized] states none, so no report says, and
-         all of it is the bytes the case gave it. *)
+         there are, and all of it is that many. An [upload-unsized] states
+         none, so no report says, and all of it is at least the bytes the case
+         gave it: what an SDK counts is the body it sends, which holds them
+         with the other fields. *)
       let stated =
         match op with
         | "upload" -> true
         | "upload-unsized" -> false
         | other -> failf "%s is a %s, which reports no progress" progress other
       in
-      let total =
+      let total, all_sent =
         if stated then (
           let total =
             driver_until run (progress ^ " to report its total") (fun () ->
@@ -1369,33 +1371,38 @@ let step run (step : Conformance.conformance_step) =
           in
           if total <= 0 then
             failf "%s reported a total of %d bytes" progress total;
-          total)
+          (Some total, fun sent -> sent = total))
         else
           match List.assoc_opt "bytes" arguments with
-          | Some (`String bytes) -> String.length (Base64.decode_exn bytes)
+          | Some (`String bytes) ->
+              let given = String.length (Base64.decode_exn bytes) in
+              (None, fun sent -> sent >= given)
           | _ -> failf "%s was given no bytes" progress
       in
       driver_until run (progress ^ " to report all of it sent") (fun () ->
           match List.rev (reports ()) with
-          | (sent, _) :: _ when sent = total -> Some ()
+          | (sent, _) :: _ when all_sent sent -> Some ()
           | _ -> None);
       ignore
         (List.fold_left
            (fun before (sent, of_) ->
-             (match of_ with
-             | Some of_ when not stated ->
+             (match (total, of_) with
+             | None, Some of_ ->
                  failf "%s states no length, and reported a total of %d bytes"
                    progress of_
-             | Some of_ when of_ <> total ->
+             | Some total, Some of_ when of_ <> total ->
                  failf "%s reported a total of %d bytes, then of %d" progress
                    total of_
-             | None when stated ->
+             | Some total, None ->
                  failf "%s reported a total of %d bytes, then none" progress
                    total
              | _ -> ());
-             if sent < before || sent > total then
-               failf "%s reported %d of %d bytes after %d" progress sent total
-                 before;
+             if sent < before then
+               failf "%s reported %d bytes sent after %d" progress sent before;
+             (match total with
+             | Some total when sent > total ->
+                 failf "%s reported %d of %d bytes" progress sent total
+             | _ -> ());
              sent)
            0 (reports ())
           : int)

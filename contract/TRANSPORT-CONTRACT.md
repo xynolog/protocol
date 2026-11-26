@@ -547,11 +547,9 @@ Bytes do not ride the bus.
   resolves with the id the gateway answers.
   *Held by `sdk/wire/content-upload`.*
 - An upload's bytes are a source the client opens afresh for each sending
-  of them, and reads as it sends
-  ([`ByteSource`](../specs/src/client/types/ByteSource.json)): the client
-  does not read an upload whole before it sends it, so a file larger than
-  memory can be sent, and an upload sent again has its bytes to send. A source may state its length or
-  not; the upload is the same either way.
+  of them ([`ByteSource`](../specs/src/client/types/ByteSource.json)), so
+  an upload sent again has all of its bytes to send. A source may state its
+  length or not; the upload carries the same bytes either way.
   *Held by `sdk/wire/upload-unsized-progress`, `sdk/wire/upload-unsized-unanswered`.*
 - An upload carries an `Idempotency-Key` header of the client's making: a
   new key for each upload, and the same on every sending of it, the one
