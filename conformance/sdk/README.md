@@ -199,7 +199,9 @@ Its `timing` overrides `busRequestTimeoutMs`, `invalidationWindowMs`,
 
 `open`'s `timing` overrides entries of
 [`specs/src/client/timing.json`](../../specs/src/client/timing.json) by
-name, so a case does not wait out a production delay. The wire cases override
+name, so a case does not wait out a production delay. Only a row with an
+`override` there can be named: the reader refuses a case that names another.
+The wire cases override
 `reconnectMs`, `lazyRemoveMs`, `lingerMs` and `emitRetry`; a driver must honour
 all four, and answers `misuse` to a name it cannot override.
 
