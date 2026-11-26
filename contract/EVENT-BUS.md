@@ -417,9 +417,9 @@ treat it), while "global-bridged vs resource-scoped" is the *transport's* choice
 of which SSE subscription carries a wire event to a client. Related, not the
 same axis.
 
-Nothing regenerates automatically. The `Generated Artifacts (drift)` CI job
-and `make local-build` both fail if the committed output disagrees
-with the registry, naming the command to run.
+Nothing regenerates automatically. The sdk repository's `make check-generated`,
+which its CI runs, fails when a committed generated file differs from what the
+generator writes from the registry.
 
 ## Adding a new channel
 
