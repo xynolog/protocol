@@ -2651,11 +2651,13 @@
           },
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": {
-              "handed": "heldJob"
-            },
-            "absent": true
+            "signature": {
+              "parameters": [],
+              "returns": {
+                "handed": "heldJob"
+              },
+              "absent": true
+            }
           }
         },
         {
@@ -2699,8 +2701,10 @@
           },
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": null
+            "signature": {
+              "parameters": [],
+              "returns": null
+            }
           }
         }
       ]
@@ -2831,63 +2835,71 @@
           "member": "start",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": null
+            "signature": {
+              "parameters": [],
+              "returns": null
+            }
           }
         },
         {
           "member": "progress",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "progress",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/JobProgress.json"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "progress",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/JobProgress.json"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "checkpoint",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "checkpoint",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/JobCheckpoint.json"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "checkpoint",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/JobCheckpoint.json"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "commit",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "resourceId",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/MarkCommitCommand.json#/properties/resourceId"
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "resourceId",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/MarkCommitCommand.json#/properties/resourceId"
+                  },
+                  "required": true
                 },
-                "required": true
-              },
-              {
-                "parameter": "annotations",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/MarkCommitCommand.json#/properties/annotations"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+                {
+                  "parameter": "annotations",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/MarkCommitCommand.json#/properties/annotations"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
@@ -2898,60 +2910,66 @@
           },
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "result",
-                "schema": {
-                  "decided": {
-                    "by": {
-                      "member": "jobType"
-                    },
-                    "in": "takes"
-                  }
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "result",
+                  "schema": {
+                    "decided": {
+                      "by": {
+                        "member": "jobType"
+                      },
+                      "in": "takes"
+                    }
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "fail",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "error",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/JobFailCommand.json#/properties/error"
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "error",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/JobFailCommand.json#/properties/error"
+                  },
+                  "required": true
                 },
-                "required": true
-              },
-              {
-                "parameter": "failure",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/JobFailure.json"
-                },
-                "required": false
-              }
-            ],
-            "returns": null
+                {
+                  "parameter": "failure",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/JobFailure.json"
+                  },
+                  "required": false
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "cancel",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "reached",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/JobReached.json"
-                },
-                "required": false
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "reached",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/JobReached.json"
+                  },
+                  "required": false
+                }
+              ],
+              "returns": null
+            }
           }
         }
       ]
@@ -3039,32 +3057,38 @@
           "member": "requestDelegate",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "params",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/MarkJobParams.json"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "params",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/MarkJobParams.json"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "cancelPending",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": null
+            "signature": {
+              "parameters": [],
+              "returns": null
+            }
           }
         },
         {
           "member": "dismissProgress",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": null
+            "signature": {
+              "parameters": [],
+              "returns": null
+            }
           }
         }
       ]
@@ -3140,33 +3164,37 @@
           "member": "generate",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "params",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/GenerationJobParams.json"
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "params",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/GenerationJobParams.json"
+                  },
+                  "required": true
                 },
-                "required": true
-              },
-              {
-                "parameter": "stallDeadlineMs",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "description": "How long the followed generation may say nothing, in milliseconds, before it is given up on. The follower's own, never sent: left out, it grows with the generation's `maxTokens` as client/timing.json's generationStall timings say."
-                },
-                "required": false
-              }
-            ],
-            "returns": null
+                {
+                  "parameter": "stallDeadlineMs",
+                  "schema": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "How long the followed generation may say nothing, in milliseconds, before it is given up on. The follower's own, never sent: left out, it grows with the generation's `maxTokens` as client/timing.json's generationStall timings say."
+                  },
+                  "required": false
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "dismissProgress",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": null
+            "signature": {
+              "parameters": [],
+              "returns": null
+            }
           }
         }
       ]
@@ -3259,46 +3287,50 @@
           "member": "gatherAnnotation",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "annotationId",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/AnnotationId.json"
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "annotationId",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/AnnotationId.json"
+                  },
+                  "required": true
                 },
-                "required": true
-              },
-              {
-                "parameter": "options",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/GatherAnnotationOptions.json"
-                },
-                "required": false
-              }
-            ],
-            "returns": null
+                {
+                  "parameter": "options",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/GatherAnnotationOptions.json"
+                  },
+                  "required": false
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "gatherResource",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "resourceId",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/ResourceId.json"
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "resourceId",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/ResourceId.json"
+                  },
+                  "required": true
                 },
-                "required": true
-              },
-              {
-                "parameter": "options",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/GatherResourceOptions.json"
-                },
-                "required": false
-              }
-            ],
-            "returns": null
+                {
+                  "parameter": "options",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/GatherResourceOptions.json"
+                  },
+                  "required": false
+                }
+              ],
+              "returns": null
+            }
           }
         }
       ]
@@ -3358,16 +3390,18 @@
           "member": "focus",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "annotationId",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/AnnotationId.json"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "annotationId",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/AnnotationId.json"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         }
       ]
@@ -3396,24 +3430,28 @@
           "member": "enter",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "annotationId",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/AnnotationId.json"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "annotationId",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/AnnotationId.json"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "leave",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": null
+            "signature": {
+              "parameters": [],
+              "returns": null
+            }
           }
         }
       ]
@@ -3472,17 +3510,19 @@
           "member": "setQuery",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "value",
-                "schema": {
-                  "type": "string",
-                  "description": "The query."
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "value",
+                  "schema": {
+                    "type": "string",
+                    "description": "The query."
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         }
       ]
@@ -3541,72 +3581,84 @@
           "member": "notifySessionEnded",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "reason",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/SessionEnded.json#/properties/reason"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "reason",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/SessionEnded.json#/properties/reason"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "notifyPermissionDenied",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "detail",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/PermissionDenied.json#/properties/detail"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "detail",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/PermissionDenied.json#/properties/detail"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "notifyKbIdentityConflict",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "conflict",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/KbIdentityConflict.json"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "conflict",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/KbIdentityConflict.json"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "acknowledgeSessionEnded",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": null
+            "signature": {
+              "parameters": [],
+              "returns": null
+            }
           }
         },
         {
           "member": "acknowledgePermissionDenied",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": null
+            "signature": {
+              "parameters": [],
+              "returns": null
+            }
           }
         },
         {
           "member": "acknowledgeKbIdentityConflict",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": null
+            "signature": {
+              "parameters": [],
+              "returns": null
+            }
           }
         }
       ]
@@ -3645,21 +3697,23 @@
           "member": "observe",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "key",
-                "schema": {
-                  "typeParameter": "K"
-                },
-                "required": true
-              }
-            ],
-            "returns": {
-              "stream": {
-                "$ref": "https://xynolog.org/protocol/CacheState.json",
-                "typeArguments": {
-                  "V": {
-                    "typeParameter": "V"
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "key",
+                  "schema": {
+                    "typeParameter": "K"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": {
+                "stream": {
+                  "$ref": "https://xynolog.org/protocol/CacheState.json",
+                  "typeArguments": {
+                    "V": {
+                      "typeParameter": "V"
+                    }
                   }
                 }
               }
@@ -3670,17 +3724,19 @@
           "member": "fetch",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "key",
-                "schema": {
-                  "typeParameter": "K"
-                },
-                "required": true
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "key",
+                  "schema": {
+                    "typeParameter": "K"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": {
+                "typeParameter": "V"
               }
-            ],
-            "returns": {
-              "typeParameter": "V"
             }
           }
         },
@@ -3688,37 +3744,41 @@
           "member": "get",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "key",
-                "schema": {
-                  "typeParameter": "K"
-                },
-                "required": true
-              }
-            ],
-            "returns": {
-              "typeParameter": "V"
-            },
-            "absent": true
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "key",
+                  "schema": {
+                    "typeParameter": "K"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": {
+                "typeParameter": "V"
+              },
+              "absent": true
+            }
           }
         },
         {
           "member": "known",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "key",
-                "schema": {
-                  "typeParameter": "K"
-                },
-                "required": true
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "key",
+                  "schema": {
+                    "typeParameter": "K"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": {
+                "type": "boolean",
+                "description": "Whether anything has asked for the key and not let go of it: it holds a value or a failure, or a fetch for it is on its way."
               }
-            ],
-            "returns": {
-              "type": "boolean",
-              "description": "Whether anything has asked for the key and not let go of it: it holds a value or a failure, or a fetch for it is on its way."
             }
           }
         },
@@ -3726,10 +3786,12 @@
           "member": "keys",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": {
-              "list": {
-                "typeParameter": "K"
+            "signature": {
+              "parameters": [],
+              "returns": {
+                "list": {
+                  "typeParameter": "K"
+                }
               }
             }
           }
@@ -3738,103 +3800,115 @@
           "member": "invalidate",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "key",
-                "schema": {
-                  "typeParameter": "K"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "key",
+                  "schema": {
+                    "typeParameter": "K"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "invalidateAll",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": null
+            "signature": {
+              "parameters": [],
+              "returns": null
+            }
           }
         },
         {
           "member": "remove",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "key",
-                "schema": {
-                  "typeParameter": "K"
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "key",
+                  "schema": {
+                    "typeParameter": "K"
+                  },
+                  "required": true
                 },
-                "required": true
-              },
-              {
-                "parameter": "gone",
-                "required": true
-              }
-            ],
-            "returns": null
+                {
+                  "parameter": "gone",
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "set",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "key",
-                "schema": {
-                  "typeParameter": "K"
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "key",
+                  "schema": {
+                    "typeParameter": "K"
+                  },
+                  "required": true
                 },
-                "required": true
-              },
-              {
-                "parameter": "value",
-                "schema": {
-                  "typeParameter": "V"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+                {
+                  "parameter": "value",
+                  "schema": {
+                    "typeParameter": "V"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "patch",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "key",
-                "schema": {
-                  "typeParameter": "K"
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "key",
+                  "schema": {
+                    "typeParameter": "K"
+                  },
+                  "required": true
                 },
-                "required": true
-              },
-              {
-                "parameter": "change",
-                "calls": {
-                  "typeParameter": "V"
-                },
-                "returns": {
-                  "typeParameter": "V"
-                },
-                "required": true
-              }
-            ],
-            "returns": null
+                {
+                  "parameter": "change",
+                  "calls": {
+                    "typeParameter": "V"
+                  },
+                  "returns": {
+                    "typeParameter": "V"
+                  },
+                  "required": true
+                }
+              ],
+              "returns": null
+            }
           }
         },
         {
           "member": "persistencePending",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": {
-              "type": "boolean",
-              "description": "Whether the cache's content may be ahead of what it has persisted: a fetch on its way, or a save owed."
+            "signature": {
+              "parameters": [],
+              "returns": {
+                "type": "boolean",
+                "description": "Whether the cache's content may be ahead of what it has persisted: a fetch on its way, or a save owed."
+              }
             }
           }
         },
@@ -3962,29 +4036,33 @@
           "member": "refresh",
           "gives": {
             "form": "function",
-            "parameters": [
-              {
-                "parameter": "refused",
-                "schema": {
-                  "$ref": "https://xynolog.org/protocol/AccessToken.json"
-                },
-                "required": true,
-                "absent": true
-              }
-            ],
-            "returns": {
-              "$ref": "https://xynolog.org/protocol/AccessToken.json"
-            },
-            "absent": true
+            "signature": {
+              "parameters": [
+                {
+                  "parameter": "refused",
+                  "schema": {
+                    "$ref": "https://xynolog.org/protocol/AccessToken.json"
+                  },
+                  "required": true,
+                  "absent": true
+                }
+              ],
+              "returns": {
+                "$ref": "https://xynolog.org/protocol/AccessToken.json"
+              },
+              "absent": true
+            }
           }
         },
         {
           "member": "renewer",
           "gives": {
             "form": "function",
-            "parameters": [],
-            "returns": {
-              "function": "refresh"
+            "signature": {
+              "parameters": [],
+              "returns": {
+                "function": "refresh"
+              }
             }
           }
         }

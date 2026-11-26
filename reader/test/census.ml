@@ -335,16 +335,15 @@ let () =
       `Assoc
         [
           ("form", `String "function");
-          ("parameters", `List []);
-          ("returns", `Null);
+          ("signature", `Assoc [ ("parameters", `List []); ("returns", `Null) ]);
         ])
     "/worker/1/members/17/gives: is no function one of whose parameters is \
      decided in its takes, and the member takes what a verb takes";
   surface specs ~why:"names a type parameter its unit does not declare"
-    "stateUnits/8/members/1/gives/returns/typeParameter"
+    "stateUnits/8/members/1/gives/signature/returns/typeParameter"
     (fun _ -> `String "W")
-    "/stateUnits/8/members/1/gives/returns: names the type parameter W, which \
-     cache does not declare";
+    "/stateUnits/8/members/1/gives/signature/returns: names the type parameter \
+     W, which cache does not declare";
   surface specs ~why:"has a unit declare a type parameter none of it names"
     "stateUnits/6/typeParameters"
     (function
@@ -362,32 +361,33 @@ let () =
     "/stateUnits/8/typeParameters: declares [\"V\",\"K\"]: a cache declares K, \
      what a query is keyed by, and V, what it holds, in that order";
   surface specs ~why:"names a type parameter outside a state unit"
-    "worker/1/members/15/gives/parameters/0/schema"
+    "worker/1/members/15/gives/signature/parameters/0/schema"
     (fun _ -> `Assoc [ ("typeParameter", `String "V") ])
-    "/worker/1/members/15/gives/parameters/0/schema: names the type parameter \
-     V, and only a state unit's members name one, which their unit declares";
+    "/worker/1/members/15/gives/signature/parameters/0/schema: names the type \
+     parameter V, and only a state unit's members name one, which their unit \
+     declares";
   surface specs ~why:"gives a generic client type other type arguments"
     "stateUnits/6/members/1/gives/schema/typeArguments"
     (fun _ -> `Assoc [ ("S", `Assoc [ ("typeParameter", `String "R") ]) ])
     "/stateUnits/6/members/1/gives/schema: gives SearchState the type \
      arguments [\"S\"], and it is generic over [\"R\"]";
   surface specs ~why:"has a schema decided by no member beside it"
-    "worker/1/members/17/gives/parameters/0/schema/decided/by/member"
+    "worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member"
     (fun _ -> `String "verb")
-    "/worker/1/members/17/gives/parameters/0/schema/decided/by/member: names \
-     verb, which is no member beside it";
+    "/worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member: \
+     names verb, which is no member beside it";
   surface specs ~why:"has a schema decided by a member that holds no enum's"
-    "worker/1/members/17/gives/parameters/0/schema/decided/by/member"
+    "worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member"
     (fun _ -> `String "attempt")
-    "/worker/1/members/17/gives/parameters/0/schema/decided/by/member: names \
-     attempt, which holds no enum's value";
+    "/worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member: \
+     names attempt, which holds no enum's value";
   surface specs ~why:"has takes miss a value of what decides it"
     "worker/1/members/17/takes"
     (fun _ -> `Assoc [ ("mark", `String "MarkJobResult") ])
     "/worker/1/members/17/takes: states [\"mark\"], not, each once and in \
      order, the values of jobType, [\"mark\",\"yield\"]";
   surface specs ~why:"has a schema decided outside a handed's function"
-    "stateUnits/8/members/1/gives/parameters/0/schema"
+    "stateUnits/8/members/1/gives/signature/parameters/0/schema"
     (fun _ ->
       `Assoc
         [
@@ -398,8 +398,8 @@ let () =
                 ("in", `String "takes");
               ] );
         ])
-    "/stateUnits/8/members/1/gives/parameters/0/schema: is decided by a member \
-     beside it, and only a parameter of a handed's function is";
+    "/stateUnits/8/members/1/gives/signature/parameters/0/schema: is decided \
+     by a member beside it, and only a parameter of a handed's function is";
   surface specs ~why:"has a method take what is the SDK's own"
     "namespaces/0/methods/0/parameters/0"
     (members (List.remove_assoc "schema"))
@@ -426,12 +426,6 @@ let () =
     "client/types/SearchState.json" "x-xynolog-typeParameters"
     (fun _ -> `List [ `String "R"; `String "S" ])
     "/x-xynolog-typeParameters/1: declares S, which nothing in it names";
-  surface specs
-    ~why:"has a function state what it takes and not what it returns"
-    "stateUnits/0/members/7/gives"
-    (fun _ -> `Assoc [ ("form", `String "function"); ("parameters", `List []) ])
-    "/stateUnits/0/members/7/gives: states one of what it takes and what it \
-     returns: a function states both, or neither";
   surface specs
     ~why:"has a member's gives name what is no component or client type"
     "worker/0/members/3/gives/schema/$ref"
@@ -786,21 +780,21 @@ let () =
      document alone, not by a gateway route or the bus: it is Archivist's own, \
      so its place is archivist/";
   surface specs ~why:"may return nothing, and returns nothing at all"
-    "stateUnits/9/members/9/gives/returns"
+    "stateUnits/9/members/9/gives/signature/returns"
     (fun _ -> `Null)
-    "/stateUnits/9/members/9/gives/absent: says it may return nothing, and it \
-     returns nothing at all: a function that may return nothing returns \
-     something when it does";
+    "/stateUnits/9/members/9/gives/signature/absent: says it may return \
+     nothing, and it returns nothing at all: a function that may return \
+     nothing returns something when it does";
   surface specs ~why:"returns a handed worker has not"
-    "worker/0/members/0/gives/returns/handed"
+    "worker/0/members/0/gives/signature/returns/handed"
     (fun _ -> `String "nobody")
-    "/worker/0/members/0/gives/returns/handed: names nobody, which is no \
-     handed of worker";
+    "/worker/0/members/0/gives/signature/returns/handed: names nobody, which \
+     is no handed of worker";
   surface specs ~why:"returns a function as a member that is none"
-    "stateUnits/9/members/10/gives/returns/function"
+    "stateUnits/9/members/10/gives/signature/returns/function"
     (fun _ -> `String "token")
-    "/stateUnits/9/members/10/gives/returns/function: names token, which is no \
-     function";
+    "/stateUnits/9/members/10/gives/signature/returns/function: names token, \
+     which is no function";
   surface specs ~why:"gives a method an argument it does not take"
     "namespaces/8/methods/4/cases/0/args"
     (members (fun args -> args @ [ ("jobID", `String "job-1") ]))
@@ -857,7 +851,16 @@ let () =
       rewrite
         (Filename.concat copied "client/surface.json")
         (update
-           [ "stateUnits"; "4"; "members"; "1"; "gives"; "parameters"; "0" ]
+           [
+             "stateUnits";
+             "4";
+             "members";
+             "1";
+             "gives";
+             "signature";
+             "parameters";
+             "0";
+           ]
            (members (List.remove_assoc "schema"))))
     "client/state-units.json: /cases/7/steps/0/args/annotationId: is the SDK's \
      own, which a case cannot give";
