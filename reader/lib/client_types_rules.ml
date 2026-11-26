@@ -35,6 +35,8 @@
      schema is.
    - client/connection-states.json states each of ConnectionState's values
      once, in its order, and each row's moves in that order.
+   - client/discovery-absent.json states each of DiscoveryAbsentReason's
+     values once, in its order.
    - CacheState's branches are told apart by CacheStatus's words, one each,
      in order.
    - A client type names, as [x-xynolog-typeParameter], only a type parameter
@@ -479,22 +481,26 @@ let refusals ~ids ~files ~(read_json : string -> Yojson.Safe.t option) =
             | _ -> ())
           (items (at "/queries" refresh))
     | _ -> ());
+  let each_once_in_order ~vocabulary ~name table_file ~rows ~key =
+    let order = texts (at "/enum" vocabulary) in
+    let stated = List.map (fun row -> text (at ("/" ^ key) row)) rows in
+    if stated <> List.map Option.some order then
+      refuse table_file
+        ("/" ^ key ^ "s")
+        "states %s, not, each once and in order, %s's %s"
+        (shown
+           (`List
+              (List.map (function Some s -> `String s | None -> `Null) stated)))
+        name (words order)
+  in
   let connection_state = "client/types/ConnectionState.json" in
   let connection_states = "client/connection-states.json" in
   with_files [ connection_state; connection_states ] (function
     | [ state; table ] ->
         let order = texts (at "/enum" state) in
         let rows = items (at "/states" table) in
-        let stated = List.map (fun row -> text (at "/state" row)) rows in
-        if stated <> List.map Option.some order then
-          refuse connection_states "/states"
-            "states %s, not, each once and in order, ConnectionState's %s"
-            (shown
-               (`List
-                  (List.map
-                     (function Some s -> `String s | None -> `Null)
-                     stated)))
-            (words order);
+        each_once_in_order ~vocabulary:state ~name:"ConnectionState"
+          connection_states ~rows ~key:"state";
         List.iteri
           (fun i row ->
             let moves = texts (at "/moves" row) in
@@ -505,6 +511,15 @@ let refusals ~ids ~files ~(read_json : string -> Yojson.Safe.t option) =
                 "lists %s, not in ConnectionState's order (%s)" (words moves)
                 (words ordered))
           rows
+    | _ -> ());
+  let discovery_absent_reason = "client/types/DiscoveryAbsentReason.json" in
+  let discovery_absent = "client/discovery-absent.json" in
+  with_files [ discovery_absent_reason; discovery_absent ] (function
+    | [ reason; table ] ->
+        each_once_in_order ~vocabulary:reason ~name:"DiscoveryAbsentReason"
+          discovery_absent
+          ~rows:(items (at "/reasons" table))
+          ~key:"reason"
     | _ -> ());
   let cache_state = "client/types/CacheState.json" in
   with_files [ cache_status; cache_state ] (function

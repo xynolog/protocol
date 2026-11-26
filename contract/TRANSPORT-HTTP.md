@@ -441,6 +441,27 @@ own.
   more ([TRANSPORT-CONTRACT.md § Failures](./TRANSPORT-CONTRACT.md#failures)).
   *Held by `specs/src/client/clock-cases.json`.*
 
+### An agent's sign-in
+
+An agent signs in once: one grant of its account's token at its issuer, and
+one `GET /api/users/me` with that token, whose answer's `did` is the agent's
+DID ([WORKER-SERVICE.md G1](./WORKER-SERVICE.md#the-agent)). Neither is made
+again. A naming request that got no answer is not sent once more, and one
+whose token is refused is not sent again with a renewed one:
+[TRANSPORT-CONTRACT.md § Failures](./TRANSPORT-CONTRACT.md#failures) and
+[§ A refused credential](./TRANSPORT-CONTRACT.md#a-refused-credential) are a
+signed-in client's, and the sign-in is how a client comes to be signed in.
+Whatever fails the sign-in is thrown to its caller, and starting it again is
+the caller's: a Worker service starts that knowledge base again
+([WORKER-SERVICE.md R3](./WORKER-SERVICE.md#knowledge-bases)), and the
+Archivist ends with status 1
+([ARCHIVIST.md § Boot and shutdown](./ARCHIVIST.md#boot-and-shutdown)).
+
+- An issuer that refuses the grant is asked once, and the gateway is not
+  asked. A gateway that refuses the naming request, or cannot be reached, is
+  asked once, after one grant.
+  *Held by `specs/src/client/clock-cases.json`.*
+
 ### Emitting
 
 - An emit carries the client's `clientId`, and its `scope` and

@@ -124,7 +124,8 @@ with no `job:fail`, and a driver that failed one there would fail the case.
 `heldJobStallCheckMs` and `markCommitTimeoutMs` of
 [`specs/src/client/timing.json`](../../specs/src/client/timing.json)
 beside the transport's `reconnectMs`, `lazyRemoveMs` and `lingerMs`, so a
-case does not wait out ten seconds or fifteen minutes.
+case does not wait out ten seconds or fifteen minutes. Only a row with an
+`override` there can be named: the reader refuses a case that names another.
 
 ## Steps a worker case adds
 

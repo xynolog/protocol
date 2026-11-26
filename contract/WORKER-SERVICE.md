@@ -183,9 +183,9 @@ again), `working` (confirmed, its engines claiming), or `refused`.
   again: its stream is closed, its engines claim nothing there, and the
   service does not sign in there again. A knowledge base is refused when its
   issuer refuses the sign-in, and when its gateway refuses to name the agent,
-  in the answers the SDK's sign-in does not try again
-  ([`specs/src/retry/rules.json`](../specs/src/retry/rules.json), the
-  `refresh` rule: the same account gets the same answer); when a claim there
+  in an answer the `refresh` rule does not try again
+  ([`specs/src/retry/rules.json`](../specs/src/retry/rules.json): the same
+  account gets the same answer); when a claim there
   is refused as `unauthorized` ([P3](#stopping)); and as R1 says. The service
   says each refusal once in its log, as
   [`messages.json`](../specs/src/worker/messages.json) states `refused`, and

@@ -29,6 +29,8 @@
               "jobFollower",
               "jobPoll",
               "jobPollTimeout",
+              "refusedAgentGrant",
+              "refusedAgentSignIn",
               "refusedBusRequest",
               "refusedStream",
               "renewal",
@@ -38,7 +40,8 @@
               "timedOutBusRequest",
               "unansweredEmit",
               "unansweredRequest",
-              "unansweredStream"
+              "unansweredStream",
+              "unreachableAgentSignIn"
             ],
             "description": "What the runner builds and what it counts."
           },
@@ -149,6 +152,12 @@
                   "pattern": "^[a-z]+(_[a-z]+)*$",
                   "description": "An OAuth error code."
                 }
+              },
+              "status": {
+                "type": "integer",
+                "minimum": 100,
+                "maximum": 599,
+                "description": "The status the server a subject names answers with."
               }
             },
             "required": [],
