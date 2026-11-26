@@ -1559,6 +1559,21 @@ let () =
            ]))
     "/get/responses: GET /api/health: takes a credential, a parameter or a \
      body and declares no 4xx";
+  changed specs ~why:"lets a client type's member be overridden that it lacks"
+    "client/timing.json" "timing/25/override"
+    (fun _ -> `String "JobPollOptions.nowhere")
+    "/timing/25/override: nowhere is no member of the client type \
+     JobPollOptions";
+  changed specs ~why:"lets an owner be overridden that surface.json lacks"
+    "client/timing.json" "timing/37/override"
+    (fun _ -> `String "nowhereUnit.delay")
+    "/timing/37/override: names nowhereUnit, which is no client type, state \
+     unit or function of client/surface.json";
+  changed specs ~why:"lets two rows be overridden at one place"
+    "client/timing.json" "timing/26/override"
+    (fun _ -> `String "JobPollOptions.everyMs")
+    "/timing/26/override: jobPollTimeoutMs is overridden where jobPollMs is: \
+     JobPollOptions.everyMs";
   if !failures > 0 then exit 1;
   print_endline
     "The model reads every file of Protocol, and refuses a copy with a stray \
@@ -1578,5 +1593,6 @@ let () =
      case its schema disagrees with, a server URL its variables disagree with, \
      a malformed or ambiguous path, a path parameter undeclared or unnamed, a \
      parameter or an operationId twice, a response keyed by no status, an \
-     operation without the 2xx or the 4xx it owes, or a protocol fact left to \
-     the code; and it reads each value as the type its schema states"
+     operation without the 2xx or the 4xx it owes, a timing overridden where \
+     nothing is or where another is, or a protocol fact left to the code; and \
+     it reads each value as the type its schema states"
