@@ -2649,7 +2649,12 @@
             }
           },
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [],
+            "returns": {
+              "handed": "heldJob"
+            },
+            "absent": true
           }
         },
         {
@@ -2848,7 +2853,17 @@
         {
           "member": "checkpoint",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "checkpoint",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/JobCheckpoint.json"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
           }
         },
         {
@@ -2910,7 +2925,17 @@
         {
           "member": "cancel",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "reached",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/JobReached.json"
+                },
+                "required": false
+              }
+            ],
+            "returns": null
           }
         }
       ]
@@ -3768,13 +3793,31 @@
         {
           "member": "refresh",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "refused",
+                "schema": {
+                  "$ref": "https://xynolog.org/protocol/AccessToken.json"
+                },
+                "required": true,
+                "absent": true
+              }
+            ],
+            "returns": {
+              "$ref": "https://xynolog.org/protocol/AccessToken.json"
+            },
+            "absent": true
           }
         },
         {
           "member": "renewer",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [],
+            "returns": {
+              "function": "refresh"
+            }
           }
         }
       ]
