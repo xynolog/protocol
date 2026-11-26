@@ -212,13 +212,12 @@
             "totalBytes": {
               "type": "integer",
               "minimum": 0,
-              "description": "How many it will send."
+              "description": "How many it will send. Absent for an upload whose source states no length."
             }
           },
           "required": [
             "upload",
-            "bytesUploaded",
-            "totalBytes"
+            "bytesUploaded"
           ],
           "additionalProperties": false,
           "description": "The report."

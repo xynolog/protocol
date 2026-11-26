@@ -113,7 +113,7 @@ when it has one, and absent otherwise.
 | `{"state": "open"}` | the transport's connection state changed |
 | `{"frame": {"channel": "...", "payload": {...}, "correlationId": "...", "scope": "..."}}` | a frame was delivered on a channel the driver listens to; `correlationId` and `scope` only when the frame has them |
 | `{"error": {"code": "...", "status": 401, "detail": "..."}}` | the error stream carried a failure |
-| `{"progress": {"upload": 7, "bytesUploaded": 4096, "totalBytes": 9000}}` | the `upload` with that `id` reported how much of it has been sent |
+| `{"progress": {"upload": 7, "bytesUploaded": 4096, "totalBytes": 9000}}` | the `upload` with that `id` reported how much of it has been sent; an `upload-unsized` reports no `totalBytes` |
 
 A driver may report every state its transport passes through or only the
 latest: a case waits for a state to be reached and never counts the ones
@@ -132,8 +132,9 @@ before it. Frames and failures are sequences: every one, in order.
 | `emit` | `channel`, `payload`, and `scope`, `correlationId` when given | `{"subscribers": n}`, or `{}` when the gateway gave no count |
 | `request` | `operation` (a request channel of the registry), `payload`, `timeoutMs` | `{"response": ...}`, or `{}` when the reply carries none |
 | `abandon` | `request`: the `id` of a `request` or an `upload` not yet settled, which its caller now abandons | `null`; that operation then settles as `abandoned` |
-| `put` | `name`, `format`, `storageUri`, `bytes` (base64), and any of `language`, `entityTypes`, `sourceResourceId`, `sourceAnnotationId`, `generationPrompt`, `jobId`, `isDraft` | `{"resourceId": "..."}` |
+| `put` | `name`, `format`, `storageUri`, `bytes` (base64), given as a source that states its length, and any of `language`, `entityTypes`, `sourceResourceId`, `sourceAnnotationId`, `generationPrompt`, `jobId`, `isDraft` | `{"resourceId": "..."}` |
 | `upload` | as `put`: the same upload, reporting its progress as it is sent, and one its caller can abandon | `{"resourceId": "..."}` |
+| `upload-unsized` | as `upload`, its `bytes` given as a source the driver opens afresh each time the SDK asks, which states no length | `{"resourceId": "..."}` |
 | `get` | `resource` | `{"contentType": "...", "bytes": "<base64>"}` |
 | `get-stream` | `resource`: read as a stream, to its end | the same |
 | `graph` | `resource` | the description the gateway answered |

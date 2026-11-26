@@ -40,8 +40,9 @@ type t = {
   failures : failure Dynarray.t;  (** What the error stream carried. *)
   emissions : (string * state Dynarray.t) Dynarray.t;  (** Per observer. *)
   mutable completed : string list;
-  progress : (int * (int * int) Dynarray.t) Dynarray.t;
-      (** Per upload: bytes uploaded and total, in order. *)
+  progress : (int * (int * int option) Dynarray.t) Dynarray.t;
+      (** Per upload: bytes uploaded and the total, when its source states one,
+          in order. *)
   claimed : Yojson.Safe.t Dynarray.t;
   refusals : failure Dynarray.t;
   signalled : string Dynarray.t;
