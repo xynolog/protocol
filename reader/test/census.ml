@@ -851,7 +851,16 @@ let () =
       rewrite
         (Filename.concat copied "client/surface.json")
         (update
-           [ "stateUnits"; "4"; "members"; "1"; "gives"; "parameters"; "0" ]
+           [
+             "stateUnits";
+             "4";
+             "members";
+             "1";
+             "gives";
+             "signature";
+             "parameters";
+             "0";
+           ]
            (members (List.remove_assoc "schema"))))
     "client/state-units.json: /cases/7/steps/0/args/annotationId: is the SDK's \
      own, which a case cannot give";
