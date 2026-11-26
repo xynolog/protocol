@@ -18,8 +18,11 @@
    which takes anything.
 
    And each member's [gives] against its handed's record, its [takes] and
-   itself; and each [expect] of client/state-units.json against the
-   [gives] of the members it names. *)
+   itself; each type parameter against the unit that declares it, each
+   reference to a client type against the type parameters it is generic over,
+   and each schema a value decides against the member that decides it; and
+   each [expect] of client/state-units.json against the [gives] of the
+   members it names. *)
 
 let file = "client/surface.json"
 let ( / ) pointer token = pointer ^ "/" ^ Decode.escape token
@@ -99,6 +102,8 @@ let method_refusals ~ids ~schema_at ~fixtures ~at ~called
         [ refusal at_argument (Printf.sprintf "is no parameter of %s" called) ]
     | Some (_, Callback _) ->
         [ refusal at_argument "is a callback, which a case cannot give" ]
+    | Some (_, Value { schema = None; _ }) ->
+        [ refusal at_argument "is the SDK's own, which a case cannot give" ]
     | Some (_, Value { absent = Some true; _ }) when value = `Null -> []
     | Some (k, Value _) -> (
         let value, unnamed = with_fixtures ~file fixtures at_argument value in
@@ -132,7 +137,20 @@ let method_refusals ~ids ~schema_at ~fixtures ~at ~called
         @ List.concat_map (argument args_at) args
     | _ -> [ refusal args_at "is no object of arguments" ]
   in
-  twice @ List.concat_map case (indexed method_.cases)
+  let own =
+    List.filter_map
+      (fun (k, (parameter : Tables.Client_surface.parameters_item)) ->
+        match parameter with
+        | Value { schema = None; _ } ->
+            Some
+              (refusal
+                 (at / "parameters" / string_of_int k)
+                 "states no schema, and a method takes only what Protocol \
+                  states")
+        | _ -> None)
+      parameters
+  in
+  twice @ own @ List.concat_map case (indexed method_.cases)
 
 (* The schema the registry states for [name], by its [$id]. *)
 let channel_schema (registry : Tables.Bus_registry.t) name =
@@ -304,8 +322,8 @@ let named name rows =
 
 (* How a member's [gives] is not what the rest of the surface says of it: a
    member of its handed's [record] is a value of the record's property, a
-   member that [takes] what a verb takes is a function and no more, and a
-   function states its parameters and what it returns together, or neither.
+   member that [takes] what a verb takes is a function one of whose
+   parameters is decided in its takes, and a function states its parameters and what it returns together, or neither.
    A function that may return nothing returns something when it does; one
    that returns a handed names one of [worker]'s, and one that returns a
    function names a function beside it that returns no function. *)
@@ -344,14 +362,20 @@ let gives_refusals ~read_json surface =
       | _ -> []
     in
     let taking =
+      let decided parameter =
+        Option.bind (field "schema" parameter) (field "decided") <> None
+      in
       if
         field "takes" member <> None
-        && gives <> Some (`Assoc [ ("form", `String "function") ])
+        && not
+             (Option.bind gives (text "form") = Some "function"
+             && List.exists decided
+                  (items (Option.bind gives (field "parameters"))))
       then
         [
           refusal at
-            "is not a function and no more, and the member takes what a verb \
-             takes: its takes says what";
+            "is no function one of whose parameters is decided in its takes, \
+             and the member takes what a verb takes";
         ]
       else []
     in
@@ -453,6 +477,245 @@ let gives_refusals ~read_json surface =
       ~some:(members ~record:None ("" / "wire" / "members"))
       (field "wire" surface)
 
+(* Every object in [json], by its pointer. *)
+let rec objects at (json : Yojson.Safe.t) =
+  match json with
+  | `Assoc members ->
+      (at, members)
+      :: List.concat_map
+           (fun (key, member) -> objects (at / key) member)
+           members
+  | `List items ->
+      List.concat_map
+        (fun (index, item) -> objects (at / string_of_int index) item)
+        (indexed items)
+  | _ -> []
+
+let starts ~prefix text =
+  String.length text >= String.length prefix
+  && String.sub text 0 (String.length prefix) = prefix
+
+let words list =
+  Yojson.Safe.to_string (`List (List.map (fun word -> `String word) list))
+
+(* How the surface's type parameters are not what their units declare: each
+   [{"typeParameter": name}] is within a state unit's members, and names one
+   its unit declares; each a unit declares, once, is named by one of its
+   members; and a cache declares K, what a query is keyed by, and V, what it
+   holds, as each method of shape [cache] binds them. *)
+let type_parameter_refusals surface =
+  let units = indexed (items (field "stateUnits" surface)) in
+  let declared row =
+    indexed (List.filter_map (text "name") (items (field "typeParameters" row)))
+  in
+  let named =
+    List.filter_map
+      (fun (pointer, members) ->
+        match members with
+        | [ ("typeParameter", `String name) ] -> Some (pointer, name)
+        | _ -> None)
+      (objects "" surface)
+  in
+  let unit_of pointer =
+    List.find_opt
+      (fun (u, _) ->
+        starts
+          ~prefix:(("" / "stateUnits" / string_of_int u / "members") ^ "/")
+          pointer)
+      units
+  in
+  List.filter_map
+    (fun (pointer, name) ->
+      match unit_of pointer with
+      | None ->
+          Some
+            (refusal pointer
+               (Printf.sprintf
+                  "names the type parameter %s, and only a state unit's \
+                   members name one, which their unit declares"
+                  name))
+      | Some (_, row) when List.mem name (List.map snd (declared row)) -> None
+      | Some (_, row) ->
+          Some
+            (refusal pointer
+               (Printf.sprintf
+                  "names the type parameter %s, which %s does not declare" name
+                  (Option.value ~default:"" (text "unit" row)))))
+    named
+  @ List.concat_map
+      (fun (u, row) ->
+        let unit_name = Option.value ~default:"" (text "unit" row) in
+        let at = "" / "stateUnits" / string_of_int u / "typeParameters" in
+        let names = declared row in
+        let members_at = "" / "stateUnits" / string_of_int u / "members" in
+        List.filter_map
+          (fun (j, name) ->
+            if List.exists (fun (k, other) -> k < j && other = name) names then
+              Some
+                (refusal
+                   (at / string_of_int j)
+                   (Printf.sprintf "declares %s twice" name))
+            else if
+              not
+                (List.exists
+                   (fun (pointer, used) ->
+                     used = name && starts ~prefix:(members_at ^ "/") pointer)
+                   named)
+            then
+              Some
+                (refusal
+                   (at / string_of_int j)
+                   (Printf.sprintf
+                      "declares %s, which none of %s's members names" name
+                      unit_name))
+            else None)
+          names
+        @
+        if unit_name = "cache" && List.map snd names <> [ "K"; "V" ] then
+          [
+            refusal at
+              (Printf.sprintf
+                 "declares %s: a cache declares K, what a query is keyed by, \
+                  and V, what it holds, in that order"
+                 (words (List.map snd names)));
+          ]
+        else [])
+      units
+
+(* How a reference to a client type gives it other type arguments than the
+   type parameters it is generic over: one each, by name, or none where it is
+   generic over nothing. *)
+let type_argument_refusals ~read_json surface =
+  List.concat_map
+    (fun (pointer, members) ->
+      match List.assoc_opt "$ref" members with
+      | Some (`String target)
+        when starts ~prefix:Decode.base target
+             && not (String.contains target '#') ->
+          let name =
+            Filename.remove_extension
+              (String.sub target
+                 (String.length Decode.base)
+                 (String.length target - String.length Decode.base))
+          in
+          let declared =
+            match read_json ("client/types/" ^ name ^ ".json") with
+            | Some json ->
+                List.filter_map
+                  (function `String word -> Some word | _ -> None)
+                  (items (field "x-xynolog-typeParameters" json))
+            | None -> []
+          in
+          let given =
+            match List.assoc_opt "typeArguments" members with
+            | Some (`Assoc arguments) -> List.map fst arguments
+            | _ -> []
+          in
+          if List.sort compare given = List.sort compare declared then []
+          else
+            [
+              refusal pointer
+                (Printf.sprintf
+                   "gives %s the type arguments %s, and it is generic over %s"
+                   name (words given) (words declared));
+            ]
+      | _ -> [])
+    (objects "" surface)
+
+(* The enum [schema] holds a value of, through each lone [$ref] it is. *)
+let rec enum_of ~ids ~read_json ~file (schema : Yojson.Safe.t) =
+  match schema with
+  | `Assoc members when List.mem_assoc "enum" members ->
+      Some
+        (List.filter_map
+           (function `String word -> Some word | _ -> None)
+           (items (List.assoc_opt "enum" members)))
+  | `Assoc (("$ref", `String target) :: _) ->
+      let file, pointer = Decode.resolve ids { target; file; pointer = "" } in
+      Option.bind (read_json file) (fun json ->
+          Option.bind
+            (Decode.at_pointer pointer json)
+            (enum_of ~ids ~read_json ~file))
+  | _ -> None
+
+(* How a [{"decided": …}] is not decided: it is a parameter of a handed's
+   function whose member [takes] what a verb takes, by a member beside it
+   that holds an enum's value, and its [takes] states each of the enum's
+   values once, in its order. *)
+let decided_refusals ~ids ~read_json surface =
+  let handeds = indexed (items (field "worker" surface)) in
+  List.concat_map
+    (fun (pointer, members) ->
+      match members with
+      | [ ("decided", decided) ] -> (
+          match String.split_on_char '/' pointer with
+          | [
+           ""; "worker"; i; "members"; j; "gives"; "parameters"; _; "schema";
+          ] -> (
+              let siblings =
+                indexed
+                  (items
+                     (field "members" (List.assoc (int_of_string i) handeds)))
+              in
+              let member = List.assoc (int_of_string j) siblings in
+              let member_name =
+                Option.value ~default:"" (text "member" member)
+              in
+              let by =
+                Option.bind (field "by" decided) (text "member")
+                |> Option.value ~default:""
+              in
+              let by_at = pointer / "decided" / "by" / "member" in
+              match (field "takes" member, named by siblings) with
+              | None, _ ->
+                  [
+                    refusal pointer
+                      (Printf.sprintf "is decided in takes, and %s states none"
+                         member_name);
+                  ]
+              | _, None ->
+                  [
+                    refusal by_at
+                      (Printf.sprintf "names %s, which is no member beside it"
+                         by);
+                  ]
+              | Some takes, Some (_, sibling) -> (
+                  match
+                    Option.bind
+                      (Option.bind (field "gives" sibling) (field "schema"))
+                      (enum_of ~ids ~read_json ~file)
+                  with
+                  | None ->
+                      [
+                        refusal by_at
+                          (Printf.sprintf
+                             "names %s, which holds no enum's value" by);
+                      ]
+                  | Some values ->
+                      let stated =
+                        match takes with
+                        | `Assoc verbs -> List.map fst verbs
+                        | _ -> []
+                      in
+                      if stated = values then []
+                      else
+                        [
+                          refusal
+                            ("" / "worker" / i / "members" / j / "takes")
+                            (Printf.sprintf
+                               "states %s, not, each once and in order, the \
+                                values of %s, %s"
+                               (words stated) by (words values));
+                        ]))
+          | _ ->
+              [
+                refusal pointer
+                  "is decided by a member beside it, and only a parameter of a \
+                   handed's function is";
+              ])
+      | _ -> [])
+    (objects "" surface)
+
 (* Each [expect] of client/state-units.json against client/surface.json: a
    case's unit is a row of [stateUnits], each member it expects one of the
    row's, and each value what the member's [gives] holds, with each
@@ -473,13 +736,27 @@ let expect_refusals ~ids ~read_json ~schema_at surface =
           let units = indexed (items (field "stateUnits" surface)) in
           let held ~unit_name ~u at (m, member) value =
             let gives = field "gives" member in
+            (* A reference with type arguments is checked against its client
+               type, whose type parameters admit any value: what they are is
+               the unit's maker's. *)
             let schema_place : Validate.place =
-              {
-                file;
-                pointer =
-                  "" / "stateUnits" / string_of_int u / "members"
-                  / string_of_int m / "gives" / "schema";
-              }
+              match Option.bind gives (field "schema") with
+              | Some (`Assoc members)
+                when List.mem_assoc "typeArguments" members -> (
+                  match List.assoc_opt "$ref" members with
+                  | Some (`String target) ->
+                      let file, pointer =
+                        Decode.resolve ids { target; file; pointer = "" }
+                      in
+                      { file; pointer }
+                  | _ -> { file; pointer = "" })
+              | _ ->
+                  {
+                    file;
+                    pointer =
+                      "" / "stateUnits" / string_of_int u / "members"
+                      / string_of_int m / "gives" / "schema";
+                  }
             in
             let name = Option.value ~default:"" (text "member" member) in
             match
@@ -595,6 +872,9 @@ let refusals ~ids ~read_json ~schema_at ~registry
         names_refusals ~registry_json json
         @ record_refusals ~read_json json
         @ gives_refusals ~read_json json
+        @ type_parameter_refusals json
+        @ type_argument_refusals ~read_json json
+        @ decided_refusals ~ids ~read_json json
         @ expect_refusals ~ids ~read_json ~schema_at json
     | _ -> [])
   @

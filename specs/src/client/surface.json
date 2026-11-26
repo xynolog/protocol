@@ -2425,6 +2425,7 @@
               "calls": {
                 "$ref": "https://xynolog.org/protocol/JobStatusResponse.json"
               },
+              "returns": null,
               "required": false
             }
           ],
@@ -2896,7 +2897,22 @@
             "yield": "YieldJobResult"
           },
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "result",
+                "schema": {
+                  "decided": {
+                    "by": {
+                      "member": "jobType"
+                    },
+                    "in": "takes"
+                  }
+                },
+                "required": true
+              }
+            ],
+            "returns": null
           }
         },
         {
@@ -3421,6 +3437,12 @@
         "go": "NewSearchPipeline",
         "haskell": "newSearchPipeline"
       },
+      "typeParameters": [
+        {
+          "name": "R",
+          "docs": "What one result is: what the search the unit is made with gives."
+        }
+      ],
       "members": [
         {
           "member": "query",
@@ -3437,7 +3459,12 @@
           "gives": {
             "form": "watched",
             "schema": {
-              "$ref": "https://xynolog.org/protocol/SearchState.json"
+              "$ref": "https://xynolog.org/protocol/SearchState.json",
+              "typeArguments": {
+                "R": {
+                  "typeParameter": "R"
+                }
+              }
             }
           }
         },
@@ -3603,71 +3630,212 @@
         "go": "NewCache",
         "haskell": "newCache"
       },
+      "typeParameters": [
+        {
+          "name": "K",
+          "docs": "What a query is keyed by: the parameters of the method it is made for, together."
+        },
+        {
+          "name": "V",
+          "docs": "What the query holds: what that method returns."
+        }
+      ],
       "members": [
         {
           "member": "observe",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "key",
+                "schema": {
+                  "typeParameter": "K"
+                },
+                "required": true
+              }
+            ],
+            "returns": {
+              "stream": {
+                "$ref": "https://xynolog.org/protocol/CacheState.json",
+                "typeArguments": {
+                  "V": {
+                    "typeParameter": "V"
+                  }
+                }
+              }
+            }
           }
         },
         {
           "member": "fetch",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "key",
+                "schema": {
+                  "typeParameter": "K"
+                },
+                "required": true
+              }
+            ],
+            "returns": {
+              "typeParameter": "V"
+            }
           }
         },
         {
           "member": "get",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "key",
+                "schema": {
+                  "typeParameter": "K"
+                },
+                "required": true
+              }
+            ],
+            "returns": {
+              "typeParameter": "V"
+            },
+            "absent": true
           }
         },
         {
           "member": "known",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "key",
+                "schema": {
+                  "typeParameter": "K"
+                },
+                "required": true
+              }
+            ],
+            "returns": {
+              "type": "boolean",
+              "description": "Whether anything has asked for the key and not let go of it: it holds a value or a failure, or a fetch for it is on its way."
+            }
           }
         },
         {
           "member": "keys",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [],
+            "returns": {
+              "list": {
+                "typeParameter": "K"
+              }
+            }
           }
         },
         {
           "member": "invalidate",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "key",
+                "schema": {
+                  "typeParameter": "K"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
           }
         },
         {
           "member": "invalidateAll",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [],
+            "returns": null
           }
         },
         {
           "member": "remove",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "key",
+                "schema": {
+                  "typeParameter": "K"
+                },
+                "required": true
+              },
+              {
+                "parameter": "gone",
+                "required": true
+              }
+            ],
+            "returns": null
           }
         },
         {
           "member": "set",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "key",
+                "schema": {
+                  "typeParameter": "K"
+                },
+                "required": true
+              },
+              {
+                "parameter": "value",
+                "schema": {
+                  "typeParameter": "V"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
           }
         },
         {
           "member": "patch",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [
+              {
+                "parameter": "key",
+                "schema": {
+                  "typeParameter": "K"
+                },
+                "required": true
+              },
+              {
+                "parameter": "change",
+                "calls": {
+                  "typeParameter": "V"
+                },
+                "returns": {
+                  "typeParameter": "V"
+                },
+                "required": true
+              }
+            ],
+            "returns": null
           }
         },
         {
           "member": "persistencePending",
           "gives": {
-            "form": "function"
+            "form": "function",
+            "parameters": [],
+            "returns": {
+              "type": "boolean",
+              "description": "Whether the cache's content may be ahead of what it has persisted: a fetch on its way, or a save owed."
+            }
           }
         },
         {
