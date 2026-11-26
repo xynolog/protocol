@@ -335,17 +335,11 @@ let () =
       `Assoc
         [
           ("form", `String "function");
-          ("parameters", `List []);
-          ("returns", `Null);
+          ( "signature",
+            `Assoc [ ("parameters", `List []); ("returns", `Null) ] );
         ])
     "/worker/1/members/17/gives: is not a function and no more, and the member \
      takes what a verb takes: its takes says what";
-  surface specs
-    ~why:"has a function state what it takes and not what it returns"
-    "stateUnits/0/members/7/gives"
-    (fun _ -> `Assoc [ ("form", `String "function"); ("parameters", `List []) ])
-    "/stateUnits/0/members/7/gives: states one of what it takes and what it \
-     returns: a function states both, or neither";
   surface specs
     ~why:"has a member's gives name what is no component or client type"
     "worker/0/members/3/gives/schema/$ref"
@@ -700,20 +694,20 @@ let () =
      document alone, not by a gateway route or the bus: it is Archivist's own, \
      so its place is archivist/";
   surface specs ~why:"may return nothing, and returns nothing at all"
-    "stateUnits/9/members/9/gives/returns"
+    "stateUnits/9/members/9/gives/signature/returns"
     (fun _ -> `Null)
-    "/stateUnits/9/members/9/gives/absent: says it may return nothing, and it \
+    "/stateUnits/9/members/9/gives/signature/absent: says it may return nothing, and it \
      returns nothing at all: a function that may return nothing returns \
      something when it does";
   surface specs ~why:"returns a handed worker has not"
-    "worker/0/members/0/gives/returns/handed"
+    "worker/0/members/0/gives/signature/returns/handed"
     (fun _ -> `String "nobody")
-    "/worker/0/members/0/gives/returns/handed: names nobody, which is no \
+    "/worker/0/members/0/gives/signature/returns/handed: names nobody, which is no \
      handed of worker";
   surface specs ~why:"returns a function as a member that is none"
-    "stateUnits/9/members/10/gives/returns/function"
+    "stateUnits/9/members/10/gives/signature/returns/function"
     (fun _ -> `String "token")
-    "/stateUnits/9/members/10/gives/returns/function: names token, which is no \
+    "/stateUnits/9/members/10/gives/signature/returns/function: names token, which is no \
      function";
   surface specs ~why:"gives a method an argument it does not take"
     "namespaces/8/methods/4/cases/0/args"

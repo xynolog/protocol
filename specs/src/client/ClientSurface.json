@@ -664,57 +664,68 @@
                           ],
                           "description": "A call that takes what it is given."
                         },
-                        "parameters": {
-                          "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters",
-                          "$comment": "What it takes, as a method's parameters are stated. Stated with `returns`, or neither is: then what it takes is the SDK's to type (a cache's key and value, a channel's payload, a verb's result), and stated nowhere."
-                        },
-                        "returns": {
-                          "$comment": "What it gives back: as a method's returns are stated, null when it gives nothing; or, where what it gives is no schema but a thing of the surface's own, a handed of `worker` or a function as a member beside it gives.",
-                          "oneOf": [
-                            {
-                              "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/0"
+                        "signature": {
+                          "type": "object",
+                          "description": "What it takes and what it gives back. Left out, both are the SDK's to type (a cache's key and value, a channel's payload, a verb's result), and stated nowhere.",
+                          "properties": {
+                            "parameters": {
+                              "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters",
+                              "$comment": "What it takes, as a method's parameters are stated."
                             },
-                            {
-                              "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/1"
-                            },
-                            {
-                              "title": "Handed",
-                              "type": "object",
-                              "properties": {
-                                "handed": {
-                                  "type": "string",
-                                  "pattern": "^[a-z][A-Za-z]*$",
-                                  "description": "The handed of `worker` it gives."
+                            "returns": {
+                              "$comment": "What it gives back: as a method's returns are stated, null when it gives nothing; or, where what it gives is no schema but a thing of the surface's own, a handed of `worker` or a function as a member beside it gives.",
+                              "oneOf": [
+                                {
+                                  "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/0"
+                                },
+                                {
+                                  "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/1"
+                                },
+                                {
+                                  "title": "Handed",
+                                  "type": "object",
+                                  "properties": {
+                                    "handed": {
+                                      "type": "string",
+                                      "pattern": "^[a-z][A-Za-z]*$",
+                                      "description": "The handed of `worker` it gives."
+                                    }
+                                  },
+                                  "required": [
+                                    "handed"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "title": "Function",
+                                  "type": "object",
+                                  "properties": {
+                                    "function": {
+                                      "type": "string",
+                                      "pattern": "^[a-z][A-Za-z]*$",
+                                      "description": "The member beside it whose function it gives, which takes and returns what that member's does."
+                                    }
+                                  },
+                                  "required": [
+                                    "function"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "null"
                                 }
-                              },
-                              "required": [
-                                "handed"
-                              ],
-                              "additionalProperties": false
+                              ]
                             },
-                            {
-                              "title": "Function",
-                              "type": "object",
-                              "properties": {
-                                "function": {
-                                  "type": "string",
-                                  "pattern": "^[a-z][A-Za-z]*$",
-                                  "description": "The member beside it whose function it gives, which takes and returns what that member's does."
-                                }
-                              },
-                              "required": [
-                                "function"
-                              ],
-                              "additionalProperties": false
-                            },
-                            {
-                              "type": "null"
+                            "absent": {
+                              "type": "boolean",
+                              "description": "Whether what it returns may be nothing. Left out, it is false: a function that returns nothing at all says so by its null returns."
                             }
-                          ]
-                        },
-                        "absent": {
-                          "type": "boolean",
-                          "description": "Whether what it returns may be nothing. Left out, it is false: a function that returns nothing at all says so by its null returns."
+                          },
+                          "required": [
+                            "parameters",
+                            "returns"
+                          ],
+                          "additionalProperties": false
                         }
                       },
                       "required": [
