@@ -386,8 +386,8 @@ let () =
     (fun _ -> `Assoc [ ("mark", `String "MarkJobResult") ])
     "/worker/1/members/17/takes: states [\"mark\"], not, each once and in \
      order, the values of jobType, [\"mark\",\"yield\"]";
-  surface specs ~why:"has a schema decided outside a handed's function"
-    "stateUnits/8/members/1/gives/parameters/0/schema"
+  surface specs ~why:"has a schema decided outside what a function takes"
+    "namespaces/0/methods/0/parameters/0/schema"
     (fun _ ->
       `Assoc
         [
@@ -398,8 +398,53 @@ let () =
                 ("in", `String "takes");
               ] );
         ])
-    "/stateUnits/8/members/1/gives/parameters/0/schema: is decided by a member \
-     beside it, and only a parameter of a handed's function is";
+    "/namespaces/0/methods/0/parameters/0/schema: is decided, and only what a \
+     function takes or returns is";
+  surface specs ~why:"has a schema decided by no other parameter"
+    "wire/members/0/gives/parameters/1/schema/decided/by/parameter"
+    (fun _ -> `String "kind")
+    "/wire/members/0/gives/parameters/1/schema/decided/by/parameter: names \
+     kind, which is no other parameter of emit";
+  surface specs ~why:"has a schema decided in channels by an operation's name"
+    "wire/members/3/gives/returns/decided/in"
+    (fun _ -> `String "channels")
+    "/wire/members/3/gives/returns/decided/by/parameter: names operation, \
+     which is no channel's name: what is decided in channels is decided by a \
+     ChannelName, an UnscopedChannelName or a ScopedChannelName";
+  surface specs ~why:"has a parameter decide in takes"
+    "wire/members/0/gives/parameters/1/schema/decided/in"
+    (fun _ -> `String "takes")
+    "/wire/members/0/gives/parameters/1/schema/decided/in: is takes, and a \
+     parameter decides only in channels, request or result";
+  surface specs ~why:"has a member beside a function decide in channels"
+    "worker/1/members/17/gives/parameters/0/schema/decided/in"
+    (fun _ -> `String "channels")
+    "/worker/1/members/17/gives/parameters/0/schema/decided/in: is channels, \
+     and a member beside the function decides only in takes";
+  surface specs
+    ~why:"has a stream give a refused frame as other than a FrameRefusal"
+    "wire/members/1/gives/returns/refused/$ref"
+    (fun _ -> `String (id "Fault.json"))
+    "/wire/members/1/gives/returns/refused: is not FrameRefusal, which a \
+     refused frame is given as";
+  changed specs ~why:"names a channel the registry does not have"
+    "client/types/ChannelName.json" "enum/0"
+    (fun _ -> `String "nowhere:here")
+    "/enum/0: is nowhere:here, where bus/registry.json's channels, each once \
+     and in its order, have yield:created";
+  changed specs ~why:"leaves out a channel a resource's scope carries"
+    "client/types/ScopedChannelName.json" "enum"
+    (function
+      | `List names ->
+          `List (List.filteri (fun i _ -> i < List.length names - 1) names)
+      | other -> other)
+    "/enum/12: is nothing, where bus/registry.json's channels audience.scoped \
+     lists, each once and in its order, have job:failed";
+  changed specs ~why:"names an operation the registry does not have"
+    "client/types/OperationName.json" "enum/0"
+    (fun _ -> `String "x:y")
+    "/enum/0: is x:y, where bus/registry.json's operations, by their requests, \
+     each once and in its order, have bind:update-body";
   surface specs ~why:"has a method take what is the SDK's own"
     "namespaces/0/methods/0/parameters/0"
     (members (List.remove_assoc "schema"))

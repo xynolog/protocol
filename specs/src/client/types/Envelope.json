@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/Envelope.json",
+  "title": "Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "What a frame carries beside its channel and its payload, as an emitter gives it: BusFrame's correlation id, and the scope it is published on, each absent when the frame carries none.",
+  "properties": {
+    "correlationId": {
+      "$ref": "https://xynolog.org/protocol/BusFrame.json#/properties/correlationId"
+    },
+    "scope": {
+      "$ref": "https://xynolog.org/protocol/ResourceId.json",
+      "description": "The resource scope to publish the frame on; absent to publish on none."
+    }
+  }
+}

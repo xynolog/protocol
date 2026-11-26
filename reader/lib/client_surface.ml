@@ -644,82 +644,199 @@ let rec enum_of ~ids ~read_json ~file (schema : Yojson.Safe.t) =
             (enum_of ~ids ~read_json ~file))
   | _ -> None
 
-(* How a [{"decided": …}] is not decided: it is a parameter of a handed's
-   function whose member [takes] what a verb takes, by a member beside it
-   that holds an enum's value, and its [takes] states each of the enum's
-   values once, in its order. *)
+(* The function [pointer] is within the [gives] of: the members beside it,
+   the member, its pointer, and the tokens after [gives]. *)
+let within_function surface pointer =
+  let member_of members j rest at =
+    let siblings = indexed (items members) in
+    Option.bind (int_of_string_opt j) (fun j ->
+        Option.map
+          (fun member -> (siblings, member, at, rest))
+          (List.assoc_opt j siblings))
+  in
+  match String.split_on_char '/' pointer with
+  | ""
+    :: (("worker" | "stateUnits") as area)
+    :: i :: "members" :: j :: "gives" :: rest ->
+      Option.bind (int_of_string_opt i) (fun i ->
+          Option.bind
+            (List.nth_opt (items (field area surface)) i)
+            (fun row ->
+              member_of (field "members" row) j rest
+                ("" / area / string_of_int i / "members" / j)))
+  | "" :: "wire" :: "members" :: j :: "gives" :: rest ->
+      Option.bind (field "wire" surface) (fun wire ->
+          member_of (field "members" wire) j rest ("" / "wire" / "members" / j))
+  | _ -> None
+
+(* How a [{"decided": …}] is not decided. It is what a function takes or
+   returns. Decided by a member beside the function, in [takes]: the member
+   holds an enum's value, and the function's [takes] states each of the
+   enum's values once, in its order. Decided by another parameter of the
+   function, in bus/registry.json: in [channels] the parameter names a
+   channel, and in [request] or [result] an operation. *)
 let decided_refusals ~ids ~read_json surface =
-  let handeds = indexed (items (field "worker" surface)) in
+  let channel_names =
+    List.map
+      (fun name -> Decode.base ^ name ^ ".json")
+      [ "ChannelName"; "UnscopedChannelName"; "ScopedChannelName" ]
+  in
+  let operation_name = Decode.base ^ "OperationName.json" in
   List.concat_map
     (fun (pointer, members) ->
       match members with
       | [ ("decided", decided) ] -> (
-          match String.split_on_char '/' pointer with
-          | [
-           ""; "worker"; i; "members"; j; "gives"; "parameters"; _; "schema";
-          ] -> (
-              let siblings =
-                indexed
-                  (items
-                     (field "members" (List.assoc (int_of_string i) handeds)))
-              in
-              let member = List.assoc (int_of_string j) siblings in
+          let by = field "by" decided in
+          let in_ = Option.value ~default:"" (text "in" decided) in
+          let by_at = pointer / "decided" / "by" in
+          let in_at = pointer / "decided" / "in" in
+          match within_function surface pointer with
+          | Some
+              ( siblings,
+                member,
+                member_at,
+                (("parameters" | "returns") :: _ as rest) ) -> (
               let member_name =
                 Option.value ~default:"" (text "member" member)
               in
-              let by =
-                Option.bind (field "by" decided) (text "member")
-                |> Option.value ~default:""
-              in
-              let by_at = pointer / "decided" / "by" / "member" in
-              match (field "takes" member, named by siblings) with
-              | None, _ ->
-                  [
-                    refusal pointer
-                      (Printf.sprintf "is decided in takes, and %s states none"
-                         member_name);
-                  ]
-              | _, None ->
-                  [
-                    refusal by_at
-                      (Printf.sprintf "names %s, which is no member beside it"
-                         by);
-                  ]
-              | Some takes, Some (_, sibling) -> (
-                  match
-                    Option.bind
-                      (Option.bind (field "gives" sibling) (field "schema"))
-                      (enum_of ~ids ~read_json ~file)
-                  with
-                  | None ->
+              match
+                ( Option.bind by (text "member"),
+                  Option.bind by (text "parameter"),
+                  in_ )
+              with
+              | Some by, _, "takes" -> (
+                  let by_at = by_at / "member" in
+                  match (field "takes" member, named by siblings) with
+                  | None, _ ->
+                      [
+                        refusal pointer
+                          (Printf.sprintf
+                             "is decided in takes, and %s states none"
+                             member_name);
+                      ]
+                  | _, None ->
                       [
                         refusal by_at
                           (Printf.sprintf
-                             "names %s, which holds no enum's value" by);
+                             "names %s, which is no member beside it" by);
                       ]
-                  | Some values ->
-                      let stated =
-                        match takes with
-                        | `Assoc verbs -> List.map fst verbs
-                        | _ -> []
+                  | Some takes, Some (_, sibling) -> (
+                      match
+                        Option.bind
+                          (Option.bind (field "gives" sibling) (field "schema"))
+                          (enum_of ~ids ~read_json ~file)
+                      with
+                      | None ->
+                          [
+                            refusal by_at
+                              (Printf.sprintf
+                                 "names %s, which holds no enum's value" by);
+                          ]
+                      | Some values ->
+                          let stated =
+                            match takes with
+                            | `Assoc verbs -> List.map fst verbs
+                            | _ -> []
+                          in
+                          if stated = values then []
+                          else
+                            [
+                              refusal (member_at / "takes")
+                                (Printf.sprintf
+                                   "states %s, not, each once and in order, \
+                                    the values of %s, %s"
+                                   (words stated) by (words values));
+                            ]))
+              | Some _, _, _ ->
+                  [
+                    refusal in_at
+                      (Printf.sprintf
+                         "is %s, and a member beside the function decides only \
+                          in takes"
+                         in_);
+                  ]
+              | _, Some _, "takes" ->
+                  [
+                    refusal in_at
+                      "is takes, and a parameter decides only in channels, \
+                       request or result";
+                  ]
+              | _, Some by, _ -> (
+                  let own =
+                    match rest with
+                    | "parameters" :: k :: _ -> int_of_string_opt k
+                    | _ -> None
+                  in
+                  let parameters =
+                    indexed
+                      (items
+                         (Option.bind (field "gives" member)
+                            (field "parameters")))
+                  in
+                  match
+                    List.find_opt
+                      (fun (k, parameter) ->
+                        text "parameter" parameter = Some by && Some k <> own)
+                      parameters
+                  with
+                  | None ->
+                      [
+                        refusal (by_at / "parameter")
+                          (Printf.sprintf
+                             "names %s, which is no other parameter of %s" by
+                             member_name);
+                      ]
+                  | Some (_, parameter) ->
+                      let names =
+                        Option.bind (field "schema" parameter) (text "$ref")
                       in
-                      if stated = values then []
+                      let channels = in_ = "channels" in
+                      let fits =
+                        match names with
+                        | Some target when channels ->
+                            List.mem target channel_names
+                        | Some target -> target = operation_name
+                        | None -> false
+                      in
+                      if fits then []
                       else
                         [
-                          refusal
-                            ("" / "worker" / i / "members" / j / "takes")
+                          refusal (by_at / "parameter")
                             (Printf.sprintf
-                               "states %s, not, each once and in order, the \
-                                values of %s, %s"
-                               (words stated) by (words values));
-                        ]))
+                               "names %s, which is no %s: what is decided in \
+                                %s is decided by %s"
+                               by
+                               (if channels then "channel's name"
+                                else "operation's name")
+                               in_
+                               (if channels then
+                                  "a ChannelName, an UnscopedChannelName or a \
+                                   ScopedChannelName"
+                                else "an OperationName"));
+                        ])
+              | _ -> [])
           | _ ->
               [
                 refusal pointer
-                  "is decided by a member beside it, and only a parameter of a \
-                   handed's function is";
+                  "is decided, and only what a function takes or returns is";
               ])
       | _ -> [])
+    (objects "" surface)
+
+(* How a stream's [refused] is not what a refused frame is given as: a
+   FrameRefusal. *)
+let refused_refusals surface =
+  let frame_refusal = Decode.base ^ "FrameRefusal.json" in
+  List.filter_map
+    (fun (pointer, members) ->
+      match
+        (List.assoc_opt "stream" members, List.assoc_opt "refused" members)
+      with
+      | Some _, Some refused when text "$ref" refused <> Some frame_refusal ->
+          Some
+            (refusal (pointer / "refused")
+               "is not FrameRefusal, which a refused frame is given as")
+      | _ -> None)
     (objects "" surface)
 
 (* Each [expect] of client/state-units.json against client/surface.json: a
@@ -995,6 +1112,7 @@ let refusals ~ids ~read_json ~schema_at ~registry
         @ type_parameter_refusals json
         @ type_argument_refusals ~read_json json
         @ decided_refusals ~ids ~read_json json
+        @ refused_refusals json
         @ expect_refusals ~ids ~read_json ~schema_at json
     | _ -> [])
   @

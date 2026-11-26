@@ -40,7 +40,11 @@
    - CacheState's branches are told apart by CacheStatus's words, one each,
      in order.
    - A client type names, as [x-xynolog-typeParameter], only a type parameter
-     its [x-xynolog-typeParameters] declares, and each it declares. *)
+     its [x-xynolog-typeParameters] declares, and each it declares.
+   - ChannelName states bus/registry.json's channels, each once and in its
+     order; ScopedChannelName those its [audience.scoped] lists, and
+     UnscopedChannelName the rest, each in that order; and OperationName its
+     operations, by their requests, in its order. *)
 
 let ( / ) pointer token = pointer ^ "/" ^ Decode.escape token
 let at = Decode.at_pointer
@@ -52,6 +56,11 @@ let texts = function
   | _ -> []
 
 let items = function Some (`List items) -> items | _ -> []
+
+(* The string [key] of each row of [rows]. *)
+let texts_of rows key =
+  List.filter_map (fun row -> text (at ("/" ^ key) row)) (items rows)
+
 let keys = function Some (`Assoc members) -> List.map fst members | _ -> []
 let shown json = Yojson.Safe.to_string json
 let words list = shown (`List (List.map (fun s -> `String s) list))
@@ -521,6 +530,52 @@ let refusals ~ids ~files ~(read_json : string -> Yojson.Safe.t option) =
           ~rows:(items (at "/reasons" table))
           ~key:"reason"
     | _ -> ());
+  let registry = "bus/registry.json" in
+  let named_by_registry = function
+    | [ registry_json; all; scoped; unscoped; operations ] ->
+        let channels = texts_of (at "/channels" registry_json) "channel" in
+        let scoped_channels = texts (at "/audience/scoped" registry_json) in
+        let held file json what expected =
+          let stated = texts (at "/enum" json) in
+          let rec first i = function
+            | [], [] -> None
+            | s :: ss, e :: es ->
+                if s = e then first (i + 1) (ss, es)
+                else Some (i, Some s, Some e)
+            | s :: _, [] -> Some (i, Some s, None)
+            | [], e :: _ -> Some (i, None, Some e)
+          in
+          match first 0 (stated, expected) with
+          | None -> ()
+          | Some (i, stated, expected) ->
+              let shown = Option.value ~default:"nothing" in
+              refuse file
+                ("/enum" / string_of_int i)
+                "is %s, where bus/registry.json's %s, each once and in its \
+                 order, have %s"
+                (shown stated) what (shown expected)
+        in
+        held "client/types/ChannelName.json" all "channels" channels;
+        held "client/types/ScopedChannelName.json" scoped
+          "channels audience.scoped lists"
+          (List.filter (fun c -> List.mem c scoped_channels) channels);
+        held "client/types/UnscopedChannelName.json" unscoped
+          "channels audience.scoped does not list"
+          (List.filter (fun c -> not (List.mem c scoped_channels)) channels);
+        held "client/types/OperationName.json" operations
+          "operations, by their requests"
+          (texts_of (at "/operations" registry_json) "request")
+    | _ -> ()
+  in
+  with_files
+    [
+      registry;
+      "client/types/ChannelName.json";
+      "client/types/ScopedChannelName.json";
+      "client/types/UnscopedChannelName.json";
+      "client/types/OperationName.json";
+    ]
+    named_by_registry;
   let cache_state = "client/types/CacheState.json" in
   with_files [ cache_status; cache_state ] (function
     | [ status; state ] ->

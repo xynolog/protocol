@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/Delivered.json",
+  "title": "Delivered",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A frame delivered on a channel, its payload a P, what the channel carries: with its envelope, who emitted it and the trace it was sent under, each absent when the frame carries none.",
+  "x-xynolog-typeParameters": [
+    "P"
+  ],
+  "properties": {
+    "payload": {
+      "x-xynolog-typeParameter": "P",
+      "description": "The frame's payload, as its channel's typed read gives it."
+    },
+    "correlationId": {
+      "$ref": "https://xynolog.org/protocol/BusFrame.json#/properties/correlationId"
+    },
+    "scope": {
+      "$ref": "https://xynolog.org/protocol/ResourceId.json",
+      "description": "The resource scope it was published on; absent when it names none."
+    },
+    "userId": {
+      "$ref": "https://xynolog.org/protocol/UserId.json",
+      "description": "Who emitted it: the user the gateway stamped on its payload (bus/registry.json `stamps`)."
+    },
+    "trace": {
+      "$ref": "https://xynolog.org/protocol/TraceCarrier.json",
+      "description": "The trace it was sent under (bus/registry.json `trace`)."
+    }
+  },
+  "required": [
+    "payload"
+  ]
+}
