@@ -60,11 +60,11 @@ type 'a layer = {
       (** [x-xynolog-codes]: a string that is a code of the vocabulary of
           errors/codes.json it names. *)
   type_parameters : string list option;
-      (** [x-xynolog-typeParameters]: the types a client type is generic
-          over, which a reference to it gives as its [typeArguments]. *)
+      (** [x-xynolog-typeParameters]: the types a client type is generic over,
+          which a reference to it gives as its [typeArguments]. *)
   type_parameter : string option;
-      (** [x-xynolog-typeParameter]: a value of one of the types its client
-          type is generic over, by its name. *)
+      (** [x-xynolog-typeParameter]: a value of one of the types its client type
+          is generic over, by its name. *)
 }
 
 type t = Boolean_schema of bool | Schema of schema
