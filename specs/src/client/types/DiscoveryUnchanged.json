@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/DiscoveryUnchanged.json",
+  "title": "DiscoveryUnchanged",
+  "description": "Nothing changed since the last read of a launcher's discovery document.",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "unchanged"
+      ]
+    }
+  },
+  "required": [
+    "kind"
+  ],
+  "additionalProperties": false
+}
