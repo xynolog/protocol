@@ -724,6 +724,26 @@ let () =
     "namespaces/6/methods/1/cases/1/args/stallDeadlineMs"
     (fun _ -> `Int (-1))
     "/namespaces/6/methods/1/cases/1/args/stallDeadlineMs: is less than 0";
+  changed specs ~why:"has a fixture name itself through another"
+    "client/state-units.json" "fixtures/context"
+    (fun _ -> `Assoc [ ("$fixture", `String "generation") ])
+    "/cases/34/steps/1/args/params/context: names the fixture generation, \
+     which names itself";
+  changed specs ~why:"invokes a unit's member with an argument it does not take"
+    "client/state-units.json" "cases/17/steps/0/args"
+    (members (fun args -> args @ [ ("contextWindow", `Int 500) ]))
+    "/cases/17/steps/0/args/contextWindow: is no parameter of \
+     gather.gatherAnnotation";
+  changed specs ~why:"invokes a unit's member without an argument it requires"
+    "client/state-units.json" "cases/17/steps/0/args"
+    (members (List.remove_assoc "annotationId"))
+    "/cases/17/steps/0/args: lacks annotationId, which gather.gatherAnnotation \
+     requires";
+  changed specs
+    ~why:"invokes a unit's member with an argument its schema refuses"
+    "client/state-units.json" "cases/17/steps/0/args/annotationId"
+    (fun _ -> `Int 5)
+    "/cases/17/steps/0/args/annotationId: is 5, which is no string";
   surface specs ~why:"names a fixture the table has not"
     "namespaces/5/methods/0/cases/0/args/context"
     (fun _ -> `Assoc [ ("$fixture", `String "nowhere") ])
@@ -1273,6 +1293,15 @@ let () =
      [\"unique-match\",\"context-recovered\",\"first-of-many\",\"fuzzy\"], \
      not, one branch each and in order, AnchorMethod's \
      [\"unique-match\",\"context-recovered\",\"first-of-many\",\"fuzzy-match\"]";
+  changed specs ~why:"states the absent reasons out of their order"
+    "client/discovery-absent.json" "reasons"
+    (function
+      | `List (a :: b :: rest) -> `List (b :: a :: rest)
+      | _ -> failwith "not a list")
+    "/reasons: states \
+     [\"not-json\",\"not-found\",\"invalid\",\"unsupported-version\",\"unreadable\"], \
+     not, each once and in order, DiscoveryAbsentReason's \
+     [\"not-found\",\"not-json\",\"invalid\",\"unsupported-version\",\"unreadable\"]";
   changed specs ~why:"opens a client type" "client/types/SearchState.json" ""
     (members (List.remove_assoc "additionalProperties"))
     "/: is an open object: a client type is closed, by additionalProperties, \

@@ -15,9 +15,8 @@
           ]
         },
         "reason": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Why: one of client/discovery-absent.json's reasons."
+          "$ref": "https://xynolog.org/protocol/DiscoveryAbsentReason.json",
+          "description": "Why."
         },
         "diagnostic": {
           "type": "string",
