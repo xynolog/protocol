@@ -3,5 +3,5 @@
   "$id": "https://xynolog.org/protocol/Binary.json",
   "type": "string",
   "format": "binary",
-  "description": "Bytes held whole. They can be read more than once, and sent again when an upload is retried."
+  "description": "Bytes held whole: all of them at once, read as often as wanted."
 }

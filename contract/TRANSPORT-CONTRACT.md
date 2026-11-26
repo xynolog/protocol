@@ -322,9 +322,11 @@ So is every line the stream carried that names no reader (§ The transport).
   connection failed or closed before its answer reached the client, and one
   answered with a status the `transport` rule retries for a keyed request
   ([`specs/src/retry/rules.json`](../specs/src/retry/rules.json)).
+  Its source is opened again and sent whole, whether it states its length
+  or not ([`ByteSource`](../specs/src/client/types/ByteSource.json)).
   The Archivist answers the repeat with the resource the first made, so the
   upload resolves with that resource's id.
-  *Held by `sdk/wire/upload-unanswered`, `sdk/wire/upload-answer-lost`, `specs/src/retry/cases.json`.*
+  *Held by `sdk/wire/upload-unanswered`, `sdk/wire/upload-unsized-unanswered`, `sdk/wire/upload-answer-lost`, `specs/src/retry/cases.json`.*
 - A gateway that cannot be reached fails an emit or a read as `unavailable`
   once its attempts are spent.
   *Held by `sdk/wire/unreachable`.*
@@ -544,15 +546,22 @@ Bytes do not ride the bus.
 - An upload carries its bytes unchanged, each field under its own name, and
   resolves with the id the gateway answers.
   *Held by `sdk/wire/content-upload`.*
+- An upload's bytes are a source the client opens afresh for each sending
+  of them ([`ByteSource`](../specs/src/client/types/ByteSource.json)), so
+  an upload sent again has all of its bytes to send. A source may state its
+  length or not; the upload carries the same bytes either way.
+  *Held by `sdk/wire/upload-unsized-progress`, `sdk/wire/upload-unsized-unanswered`.*
 - An upload carries an `Idempotency-Key` header of the client's making: a
   new key for each upload, and the same on every sending of it, the one
   sent again with a renewed credential too
   ([`specs/src/paths/upload-resource.json`](../specs/src/paths/upload-resource.json)).
   *Held by `sdk/wire/upload-keyed`, `sdk/wire/upload-credential-renewed`.*
-- An upload reports its progress as it is sent: how much has gone and how
-  much there is, never less than it last said, and all of it by the time it
-  resolves.
-  *Held by `sdk/wire/upload-progress`.*
+- An upload reports its progress as it is sent: how much has gone and, when
+  its source states its length, how much there is, never less than it last
+  said, and all of it by the time it resolves. One whose source states no
+  length says nothing of how much there is
+  ([`UploadProgress`](../specs/src/client/types/UploadProgress.json)).
+  *Held by `sdk/wire/upload-progress`, `sdk/wire/upload-unsized-progress`.*
 - An upload its caller cancels reports nothing more. Its connection is
   closed, nothing is reported on the error stream, and it is not sent again.
   *Held by `sdk/wire/upload-cancelled`.*
