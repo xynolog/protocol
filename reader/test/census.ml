@@ -335,8 +335,7 @@ let () =
       `Assoc
         [
           ("form", `String "function");
-          ( "signature",
-            `Assoc [ ("parameters", `List []); ("returns", `Null) ] );
+          ("signature", `Assoc [ ("parameters", `List []); ("returns", `Null) ]);
         ])
     "/worker/1/members/17/gives: is not a function and no more, and the member \
      takes what a verb takes: its takes says what";
@@ -696,19 +695,19 @@ let () =
   surface specs ~why:"may return nothing, and returns nothing at all"
     "stateUnits/9/members/9/gives/signature/returns"
     (fun _ -> `Null)
-    "/stateUnits/9/members/9/gives/signature/absent: says it may return nothing, and it \
-     returns nothing at all: a function that may return nothing returns \
-     something when it does";
+    "/stateUnits/9/members/9/gives/signature/absent: says it may return \
+     nothing, and it returns nothing at all: a function that may return \
+     nothing returns something when it does";
   surface specs ~why:"returns a handed worker has not"
     "worker/0/members/0/gives/signature/returns/handed"
     (fun _ -> `String "nobody")
-    "/worker/0/members/0/gives/signature/returns/handed: names nobody, which is no \
-     handed of worker";
+    "/worker/0/members/0/gives/signature/returns/handed: names nobody, which \
+     is no handed of worker";
   surface specs ~why:"returns a function as a member that is none"
     "stateUnits/9/members/10/gives/signature/returns/function"
     (fun _ -> `String "token")
-    "/stateUnits/9/members/10/gives/signature/returns/function: names token, which is no \
-     function";
+    "/stateUnits/9/members/10/gives/signature/returns/function: names token, \
+     which is no function";
   surface specs ~why:"gives a method an argument it does not take"
     "namespaces/8/methods/4/cases/0/args"
     (members (fun args -> args @ [ ("jobID", `String "job-1") ]))
