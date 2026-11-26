@@ -328,9 +328,8 @@ let named name rows =
 (* How a member's [gives] is not what the rest of the surface says of it: a
    member of its handed's [record] is a value of the record's property, a
    member that [takes] what a verb takes is a function one of whose
-   parameters is decided in its takes, and a function states its parameters
-   and what it returns together, or neither.
-   A function that may return nothing returns something when it does; one
+   parameters is decided in its takes, and a function that may return
+   nothing returns something when it does; one
    that returns a handed names one of [worker]'s, and one that returns a
    function names a function beside it that returns no function. *)
 let gives_refusals ~read_json surface =
@@ -376,7 +375,10 @@ let gives_refusals ~read_json surface =
         && not
              (Option.bind gives (text "form") = Some "function"
              && List.exists decided
-                  (items (Option.bind gives (field "parameters"))))
+                  (items
+                     (Option.bind
+                        (Option.bind gives (field "signature"))
+                        (field "parameters"))))
       then
         [
           refusal at
@@ -385,24 +387,13 @@ let gives_refusals ~read_json surface =
         ]
       else []
     in
-    let together =
-      match gives with
-      | Some gives when text "form" gives = Some "function" -> (
-          match (field "parameters" gives, field "returns" gives) with
-          | Some _, None | None, Some _ ->
-              [
-                refusal at
-                  "states one of what it takes and what it returns: a function \
-                   states both, or neither";
-              ]
-          | _ -> [])
-      | _ -> []
-    in
     let returned =
       match gives with
       | Some gives when text "form" gives = Some "function" -> (
-          let returns = field "returns" gives in
-          (match (field "absent" gives, returns) with
+          let at = at / "signature" in
+          let signature = field "signature" gives in
+          let returns = Option.bind signature (field "returns") in
+          (match (Option.bind signature (field "absent"), returns) with
             | Some (`Bool true), (None | Some `Null) ->
                 [
                   refusal (at / "absent")
@@ -427,7 +418,9 @@ let gives_refusals ~read_json surface =
                   let sibling_gives = field "gives" sibling in
                   match
                     ( Option.bind sibling_gives (text "form"),
-                      Option.bind sibling_gives (field "returns") )
+                      Option.bind
+                        (Option.bind sibling_gives (field "signature"))
+                        (field "returns") )
                   with
                   | Some "function", Some (`Assoc [ ("function", _) ]) ->
                       [
@@ -453,7 +446,7 @@ let gives_refusals ~read_json surface =
           | _ -> [])
       | _ -> []
     in
-    of_record @ taking @ together @ returned
+    of_record @ taking @ returned
   in
   let members ~record place row =
     let siblings = indexed (items (field "members" row)) in
@@ -695,7 +688,7 @@ let decided_refusals ~ids ~read_json surface =
               ( siblings,
                 member,
                 member_at,
-                (("parameters" | "returns") :: _ as rest) ) -> (
+                "signature" :: (("parameters" | "returns") :: _ as rest) ) -> (
               let member_name =
                 Option.value ~default:"" (text "member" member)
               in
@@ -770,7 +763,9 @@ let decided_refusals ~ids ~read_json surface =
                   let parameters =
                     indexed
                       (items
-                         (Option.bind (field "gives" member)
+                         (Option.bind
+                            (Option.bind (field "gives" member)
+                               (field "signature"))
                             (field "parameters")))
                   in
                   match
@@ -958,11 +953,14 @@ let expect_refusals ~ids ~read_json ~schema_at surface =
                         let called = unit_name ^ "." ^ member_name in
                         let parameters_at =
                           "" / "stateUnits" / string_of_int u / "members"
-                          / string_of_int m / "gives" / "parameters"
+                          / string_of_int m / "gives" / "signature"
+                          / "parameters"
                         in
                         let args_at = at / "args" in
                         match
-                          ( Option.bind (field "gives" member)
+                          ( Option.bind
+                              (Option.bind (field "gives" member)
+                                 (field "signature"))
                               (field "parameters"),
                             Option.value ~default:(`Assoc []) args )
                         with

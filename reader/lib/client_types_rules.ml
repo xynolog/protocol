@@ -460,7 +460,9 @@ let refusals ~ids ~files ~(read_json : string -> Yojson.Safe.t option) =
                 (fun gives ->
                   let place = place / string_of_int k / "gives" in
                   Option.iter (names (place / "schema")) (at "/schema" gives);
-                  typed place gives)
+                  Option.iter
+                    (typed (place / "signature"))
+                    (at "/signature" gives))
                 (at "/gives" member))
             (items members)
         in
