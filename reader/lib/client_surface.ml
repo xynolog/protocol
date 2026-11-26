@@ -649,7 +649,15 @@ let decided_refusals ~ids ~read_json surface =
       | [ ("decided", decided) ] -> (
           match String.split_on_char '/' pointer with
           | [
-           ""; "worker"; i; "members"; j; "gives"; "signature"; "parameters"; _;
+           "";
+           "worker";
+           i;
+           "members";
+           j;
+           "gives";
+           "signature";
+           "parameters";
+           _;
            "schema";
           ] -> (
               let siblings =

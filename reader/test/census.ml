@@ -342,8 +342,8 @@ let () =
   surface specs ~why:"names a type parameter its unit does not declare"
     "stateUnits/8/members/1/gives/signature/returns/typeParameter"
     (fun _ -> `String "W")
-    "/stateUnits/8/members/1/gives/signature/returns: names the type parameter W, which \
-     cache does not declare";
+    "/stateUnits/8/members/1/gives/signature/returns: names the type parameter \
+     W, which cache does not declare";
   surface specs ~why:"has a unit declare a type parameter none of it names"
     "stateUnits/6/typeParameters"
     (function
@@ -363,8 +363,9 @@ let () =
   surface specs ~why:"names a type parameter outside a state unit"
     "worker/1/members/15/gives/signature/parameters/0/schema"
     (fun _ -> `Assoc [ ("typeParameter", `String "V") ])
-    "/worker/1/members/15/gives/signature/parameters/0/schema: names the type parameter \
-     V, and only a state unit's members name one, which their unit declares";
+    "/worker/1/members/15/gives/signature/parameters/0/schema: names the type \
+     parameter V, and only a state unit's members name one, which their unit \
+     declares";
   surface specs ~why:"gives a generic client type other type arguments"
     "stateUnits/6/members/1/gives/schema/typeArguments"
     (fun _ -> `Assoc [ ("S", `Assoc [ ("typeParameter", `String "R") ]) ])
@@ -373,13 +374,13 @@ let () =
   surface specs ~why:"has a schema decided by no member beside it"
     "worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member"
     (fun _ -> `String "verb")
-    "/worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member: names \
-     verb, which is no member beside it";
+    "/worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member: \
+     names verb, which is no member beside it";
   surface specs ~why:"has a schema decided by a member that holds no enum's"
     "worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member"
     (fun _ -> `String "attempt")
-    "/worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member: names \
-     attempt, which holds no enum's value";
+    "/worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member: \
+     names attempt, which holds no enum's value";
   surface specs ~why:"has takes miss a value of what decides it"
     "worker/1/members/17/takes"
     (fun _ -> `Assoc [ ("mark", `String "MarkJobResult") ])
@@ -397,8 +398,8 @@ let () =
                 ("in", `String "takes");
               ] );
         ])
-    "/stateUnits/8/members/1/gives/signature/parameters/0/schema: is decided by a member \
-     beside it, and only a parameter of a handed's function is";
+    "/stateUnits/8/members/1/gives/signature/parameters/0/schema: is decided \
+     by a member beside it, and only a parameter of a handed's function is";
   surface specs ~why:"has a method take what is the SDK's own"
     "namespaces/0/methods/0/parameters/0"
     (members (List.remove_assoc "schema"))
