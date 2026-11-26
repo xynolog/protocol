@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/DiscoveryAbsentReason.json",
+  "title": "DiscoveryAbsentReason",
+  "type": "string",
+  "description": "Why a client that read a launcher's discovery document found no launcher: one of the reasons of client/discovery-absent.json, which says what each means.",
+  "enum": [
+    "not-found",
+    "not-json",
+    "invalid",
+    "unsupported-version",
+    "unreadable"
+  ]
+}

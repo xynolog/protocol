@@ -6,7 +6,7 @@
   "description": "One sign-in to a running stack's knowledge base, as the sign-in store keeps it: the tokens an issuer issued to the script client, and what a renewal and a sign-out need of that issuer, learned once at sign-in. TOKENS, never a password. An entry of <stateDir>/tokens.json (see README.md).",
   "properties": {
     "token": {
-      "type": "string",
+      "$ref": "https://xynolog.org/protocol/AccessToken.json",
       "description": "The access token: short-lived, sent as a Bearer token."
     },
     "refreshToken": {
