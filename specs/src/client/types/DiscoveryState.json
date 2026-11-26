@@ -5,58 +5,17 @@
   "description": "What a launcher's discovery document says, told apart by `kind`: no launcher was found, or the knowledge bases one manages. A launcher that manages none is not an absent one.",
   "oneOf": [
     {
-      "type": "object",
-      "description": "No launcher was found, and why.",
-      "properties": {
-        "kind": {
-          "type": "string",
-          "enum": [
-            "absent"
-          ]
-        },
-        "reason": {
-          "type": "string",
-          "x-xynolog-codes": "client/discovery-absent.json",
-          "description": "Why: one of client/discovery-absent.json's reasons."
-        },
-        "diagnostic": {
-          "type": "string",
-          "minLength": 1,
-          "description": "What was wrong, in words, when there is more to say."
-        }
-      },
-      "required": [
-        "kind",
-        "reason"
-      ],
-      "additionalProperties": false
+      "$ref": "https://xynolog.org/protocol/DiscoveryAbsent.json"
     },
     {
-      "type": "object",
-      "description": "The knowledge bases a launcher manages: none is a launcher that manages nothing.",
-      "properties": {
-        "kind": {
-          "type": "string",
-          "enum": [
-            "managed"
-          ]
-        },
-        "kbs": {
-          "type": "array",
-          "items": {
-            "$ref": "https://xynolog.org/protocol/DiscoveredKB.json"
-          },
-          "description": "Each knowledge base, as the document lists it."
-        }
-      },
-      "required": [
-        "kind",
-        "kbs"
-      ],
-      "additionalProperties": false
+      "$ref": "https://xynolog.org/protocol/DiscoveryManaged.json"
     }
   ],
   "discriminator": {
-    "propertyName": "kind"
+    "propertyName": "kind",
+    "mapping": {
+      "absent": "https://xynolog.org/protocol/DiscoveryAbsent.json",
+      "managed": "https://xynolog.org/protocol/DiscoveryManaged.json"
+    }
   }
 }

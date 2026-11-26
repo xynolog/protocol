@@ -2,29 +2,24 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://xynolog.org/protocol/DiscoveryRead.json",
   "title": "DiscoveryRead",
-  "description": "What one read of a launcher's discovery document gave: the state it found, or that nothing changed since the last read. Told apart by `kind`, as DiscoveryState's are.",
+  "description": "What one read of a launcher's discovery document gave: a DiscoveryState's absent or managed, or that nothing changed since the last read. Told apart by `kind`, as DiscoveryState's are.",
   "oneOf": [
     {
-      "$ref": "https://xynolog.org/protocol/DiscoveryState.json"
+      "$ref": "https://xynolog.org/protocol/DiscoveryAbsent.json"
     },
     {
-      "type": "object",
-      "description": "Nothing changed since the last read.",
-      "properties": {
-        "kind": {
-          "type": "string",
-          "enum": [
-            "unchanged"
-          ]
-        }
-      },
-      "required": [
-        "kind"
-      ],
-      "additionalProperties": false
+      "$ref": "https://xynolog.org/protocol/DiscoveryManaged.json"
+    },
+    {
+      "$ref": "https://xynolog.org/protocol/DiscoveryUnchanged.json"
     }
   ],
   "discriminator": {
-    "propertyName": "kind"
+    "propertyName": "kind",
+    "mapping": {
+      "absent": "https://xynolog.org/protocol/DiscoveryAbsent.json",
+      "managed": "https://xynolog.org/protocol/DiscoveryManaged.json",
+      "unchanged": "https://xynolog.org/protocol/DiscoveryUnchanged.json"
+    }
   }
 }

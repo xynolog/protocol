@@ -1241,10 +1241,9 @@ let () =
     "/properties/port/maximum: is 65536, where \
      components/schemas/HttpEndpoint.json states 65535";
   changed specs ~why:"names a vocabulary that is no table of words"
-    "client/types/DiscoveryState.json"
-    "oneOf/0/properties/reason/x-xynolog-codes"
+    "client/types/DiscoveryAbsent.json" "properties/reason/x-xynolog-codes"
     (fun _ -> `String "client/discovery-absents.json")
-    "/oneOf/0/properties/reason: x-xynolog-codes names \
+    "/properties/reason: x-xynolog-codes names \
      \"client/discovery-absents.json\", which is neither a vocabulary of \
      errors/codes.json nor a table of words (busRequest, transport, job, \
      session, signIn, kbIdentity, spanRefusal, control, \

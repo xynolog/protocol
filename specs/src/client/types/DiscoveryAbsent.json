@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/DiscoveryAbsent.json",
+  "title": "DiscoveryAbsent",
+  "description": "No launcher was found, and why.",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "absent"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "x-xynolog-codes": "client/discovery-absent.json",
+      "description": "Why: one of client/discovery-absent.json's reasons."
+    },
+    "diagnostic": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What was wrong, in words, when there is more to say."
+    }
+  },
+  "required": [
+    "kind",
+    "reason"
+  ],
+  "additionalProperties": false
+}
