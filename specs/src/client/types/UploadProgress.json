@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://xynolog.org/protocol/UploadProgress.json",
   "title": "UploadProgress",
-  "description": "What an upload reports as it goes, told apart by `phase`: its size first, then the bytes sent so far, then the resource made.",
+  "description": "What an upload reports as it goes, told apart by `phase`: that it began, with its size when its ByteSource states one, then the bytes sent so far, then the resource made. An upload whose source states no length reports none: a size it made up would be a size the caller could not tell from a true one.",
   "oneOf": [
     {
       "type": "object",
@@ -17,12 +17,11 @@
         "totalBytes": {
           "type": "integer",
           "minimum": 0,
-          "description": "How many bytes the upload is."
+          "description": "How many bytes the upload is: its ByteSource's length. Absent when the source states none."
         }
       },
       "required": [
-        "phase",
-        "totalBytes"
+        "phase"
       ],
       "additionalProperties": false
     },
@@ -44,13 +43,12 @@
         "totalBytes": {
           "type": "integer",
           "minimum": 0,
-          "description": "How many bytes the upload is."
+          "description": "How many bytes the upload is: its ByteSource's length. Absent when the source states none."
         }
       },
       "required": [
         "phase",
-        "bytesUploaded",
-        "totalBytes"
+        "bytesUploaded"
       ],
       "additionalProperties": false
     },

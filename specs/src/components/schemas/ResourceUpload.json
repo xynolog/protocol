@@ -10,7 +10,7 @@
     },
     "file": {
       "$ref": "https://xynolog.org/protocol/Binary.json",
-      "description": "Binary content"
+      "description": "The bytes, as the part carries them."
     },
     "format": {
       "type": "string",
