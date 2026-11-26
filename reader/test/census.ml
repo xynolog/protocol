@@ -1240,6 +1240,15 @@ let () =
     (fun _ -> `Int 65536)
     "/properties/port/maximum: is 65536, where \
      components/schemas/HttpEndpoint.json states 65535";
+  changed specs ~why:"names a vocabulary that is no table of words"
+    "client/types/DiscoveryState.json"
+    "oneOf/0/properties/reason/x-xynolog-codes"
+    (fun _ -> `String "client/discovery-absents.json")
+    "/oneOf/0/properties/reason: x-xynolog-codes names \
+     \"client/discovery-absents.json\", which is neither a vocabulary of \
+     errors/codes.json nor a table of words (busRequest, transport, job, \
+     session, signIn, kbIdentity, spanRefusal, control, \
+     client/discovery-absent.json)";
   changed specs ~why:"tells an emission's states apart by a status of its own"
     "conformance/ConformanceDriverLine.json"
     "oneOf/10/properties/emission/properties/state/oneOf/2/properties/status/const"

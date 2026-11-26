@@ -2,58 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://xynolog.org/protocol/DiscoveryRead.json",
   "title": "DiscoveryRead",
-  "description": "What one read of a launcher's discovery document gave, told apart by `kind`: no launcher was found, the knowledge bases one manages, or nothing changed since the last read. A launcher that manages none is not an absent one.",
+  "description": "What one read of a launcher's discovery document gave: the state it found, or that nothing changed since the last read. Told apart by `kind`, as DiscoveryState's are.",
   "oneOf": [
     {
-      "type": "object",
-      "description": "No launcher was found, and why.",
-      "properties": {
-        "kind": {
-          "type": "string",
-          "enum": [
-            "absent"
-          ]
-        },
-        "reason": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Why: one of client/discovery-absent.json's reasons."
-        },
-        "diagnostic": {
-          "type": "string",
-          "minLength": 1,
-          "description": "What was wrong, in words, when there is more to say."
-        }
-      },
-      "required": [
-        "kind",
-        "reason"
-      ],
-      "additionalProperties": false
-    },
-    {
-      "type": "object",
-      "description": "The knowledge bases a launcher manages: none is a launcher that manages nothing.",
-      "properties": {
-        "kind": {
-          "type": "string",
-          "enum": [
-            "managed"
-          ]
-        },
-        "kbs": {
-          "type": "array",
-          "items": {
-            "$ref": "https://xynolog.org/protocol/DiscoveredKB.json"
-          },
-          "description": "Each knowledge base, as the document lists it."
-        }
-      },
-      "required": [
-        "kind",
-        "kbs"
-      ],
-      "additionalProperties": false
+      "$ref": "https://xynolog.org/protocol/DiscoveryState.json"
     },
     {
       "type": "object",

@@ -1,13 +1,17 @@
 (* What errors/codes.json's vocabularies are named and read from agree with
    what states them elsewhere.
    - A schema that says its string is a code ([x-xynolog-codes]) names a
-     vocabulary errors/codes.json states: one of its members that lists
-     codes.
+     vocabulary: one of errors/codes.json's members that lists codes, or a
+     table of [tables], each a file of words.
    - Each of a transport code's [limitRefusals] is a refusal the gateway
      makes: a row of gateway/messages.json with its status and code. *)
 
 let table = "errors/codes.json"
 let messages = "gateway/messages.json"
+
+(* Each table of words a code may be of, by its file, and the member of the
+   file that lists its rows. *)
+let tables = [ ("client/discovery-absent.json", "reasons") ]
 let ( / ) pointer token = pointer ^ "/" ^ Decode.escape token
 
 let vocabularies = function
@@ -46,7 +50,15 @@ let vocabulary_names ~schema_files ~(read_json : string -> Yojson.Safe.t option)
         };
       ]
   | Some codes ->
-      let known = vocabularies codes in
+      let listed (file, rows) =
+        match read_json file with
+        | Some (`Assoc members) -> (
+            match List.assoc_opt rows members with
+            | Some (`List _) -> Some file
+            | _ -> None)
+        | _ -> None
+      in
+      let known = vocabularies codes @ List.filter_map listed tables in
       List.concat_map
         (fun file ->
           match read_json file with
@@ -63,8 +75,8 @@ let vocabulary_names ~schema_files ~(read_json : string -> Yojson.Safe.t option)
                           pointer;
                           message =
                             Printf.sprintf
-                              "x-xynolog-codes names %s, which is no \
-                               vocabulary of %s (%s)"
+                              "x-xynolog-codes names %s, which is neither a \
+                               vocabulary of %s nor a table of words (%s)"
                               (Yojson.Safe.to_string stated)
                               table (String.concat ", " known);
                         })
