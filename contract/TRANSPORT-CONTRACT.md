@@ -315,7 +315,9 @@ So is every line the stream carried that names no reader (§ The transport).
 - **A read that got no answer is sent once more**, after
   `requestRetryPauseMs`: one whose connection failed, or closed before any
   response came. A read unanswered at its deadline is not sent again
-  ([`specs/src/client/timing.json`](../specs/src/client/timing.json)).
+  ([`specs/src/client/timing.json`](../specs/src/client/timing.json)), and
+  nor is the naming request of an agent's sign-in
+  ([TRANSPORT-HTTP.md § An agent's sign-in](./TRANSPORT-HTTP.md#an-agents-sign-in)).
   *Held by `sdk/wire/read-unanswered`.*
 - **An upload that got no answer is sent once more**, after
   `requestRetryPauseMs`, with the key it was first sent with: one whose
@@ -364,7 +366,9 @@ that can renew its token does the same:
 
 A refused credential is renewed, never retried: no retry rule is asked
 about it, and it never waits out a `Retry-After`. A client that cannot renew
-its token takes the refusal as final at once.
+its token takes the refusal as final at once, and so does an agent's
+sign-in, of the token it was just granted
+([TRANSPORT-HTTP.md § An agent's sign-in](./TRANSPORT-HTTP.md#an-agents-sign-in)).
 
 ### Scopes
 
