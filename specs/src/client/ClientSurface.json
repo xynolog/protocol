@@ -335,7 +335,11 @@
                           },
                           "required": {
                             "type": "boolean",
-                            "description": "Whether a caller must give it. A parameter a caller need not give is left out; null is a value, which a caller gives only where the schema admits it."
+                            "description": "Whether a caller must give it. A parameter a caller need not give is left out; null is a value, which a caller gives only where the parameter is absent."
+                          },
+                          "absent": {
+                            "type": "boolean",
+                            "description": "Whether a caller may give null, for nothing: apart from `required`, which says whether it may be left out. Left out, it is false."
                           }
                         },
                         "required": [
@@ -665,8 +669,52 @@
                           "$comment": "What it takes, as a method's parameters are stated. Stated with `returns`, or neither is: then what it takes is the SDK's to type (a cache's key and value, a channel's payload, a verb's result), and stated nowhere."
                         },
                         "returns": {
-                          "$ref": "#/properties/namespaces/items/properties/methods/items/properties/returns",
-                          "$comment": "What it gives back, as a method's returns are stated; null when it gives nothing."
+                          "$comment": "What it gives back: as a method's returns are stated, null when it gives nothing; or, where what it gives is no schema but a thing of the surface's own, a handed of `worker` or a function as a member beside it gives.",
+                          "oneOf": [
+                            {
+                              "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/0"
+                            },
+                            {
+                              "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/1"
+                            },
+                            {
+                              "title": "Handed",
+                              "type": "object",
+                              "properties": {
+                                "handed": {
+                                  "type": "string",
+                                  "pattern": "^[a-z][A-Za-z]*$",
+                                  "description": "The handed of `worker` it gives."
+                                }
+                              },
+                              "required": [
+                                "handed"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "title": "Function",
+                              "type": "object",
+                              "properties": {
+                                "function": {
+                                  "type": "string",
+                                  "pattern": "^[a-z][A-Za-z]*$",
+                                  "description": "The member beside it whose function it gives, which takes and returns what that member's does."
+                                }
+                              },
+                              "required": [
+                                "function"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "absent": {
+                          "type": "boolean",
+                          "description": "Whether what it returns may be nothing. Left out, it is false: a function that returns nothing at all says so by its null returns."
                         }
                       },
                       "required": [

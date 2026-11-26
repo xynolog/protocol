@@ -1,7 +1,8 @@
 (* client/surface.json's cases against their methods' parameters: a method
    takes each parameter once, and each case gives it nothing it does not take,
    everything it requires, and each argument as its parameter's schema says,
-   with each [{"$fixture": name}] read as the table's fixture of that name.
+   or null where the parameter is absent, with each [{"$fixture": name}] read
+   as the table's fixture of that name.
 
    And each method's [returns] against its shape: a [signal] or [count]
    returns null, its shape saying all it gives; a promise may return null,
@@ -29,45 +30,50 @@ let name : Tables.Client_surface.parameters_item -> string = function
   | Value { parameter; _ } | Callback { parameter; _ } -> parameter
 
 (* [value], at [at] in [file], with each [{"$fixture": name}] read as the
-   fixture of that name in [fixtures]. *)
-let rec with_fixtures ~file fixtures at (value : Yojson.Safe.t) =
-  match value with
-  | `Assoc [ ("$fixture", `String fixture) ] -> (
-      match Decode.at_pointer ("" / fixture) fixtures with
-      | Some found -> (found, [])
-      | None ->
-          ( value,
-            [
-              {
-                Decode.file;
-                pointer = at;
-                message =
-                  Printf.sprintf "names the fixture %s, which the table has not"
-                    fixture;
-              };
-            ] ))
-  | `Assoc members ->
-      let members, refusals =
-        List.split
-          (List.map
-             (fun (key, member) ->
-               let member, refusals =
-                 with_fixtures ~file fixtures (at / key) member
-               in
-               ((key, member), refusals))
-             members)
-      in
-      (`Assoc members, List.concat refusals)
-  | `List items ->
-      let items, refusals =
-        List.split
-          (List.map
-             (fun (index, item) ->
-               with_fixtures ~file fixtures (at / string_of_int index) item)
-             (indexed items))
-      in
-      (`List items, List.concat refusals)
-  | other -> (other, [])
+   fixture of that name in [fixtures], and each fixture a fixture names read
+   in turn. A fixture that names itself, through others or not, is refused. *)
+let with_fixtures ~file fixtures at (value : Yojson.Safe.t) =
+  let refused at message = { Decode.file; pointer = at; message } in
+  let rec read ~naming at (value : Yojson.Safe.t) =
+    match value with
+    | `Assoc [ ("$fixture", `String fixture) ] when List.mem fixture naming ->
+        ( value,
+          [
+            refused at
+              (Printf.sprintf "names the fixture %s, which names itself" fixture);
+          ] )
+    | `Assoc [ ("$fixture", `String fixture) ] -> (
+        match Decode.at_pointer ("" / fixture) fixtures with
+        | Some found -> read ~naming:(fixture :: naming) at found
+        | None ->
+            ( value,
+              [
+                refused at
+                  (Printf.sprintf
+                     "names the fixture %s, which the table has not" fixture);
+              ] ))
+    | `Assoc members ->
+        let members, refusals =
+          List.split
+            (List.map
+               (fun (key, member) ->
+                 let member, refusals = read ~naming (at / key) member in
+                 ((key, member), refusals))
+               members)
+        in
+        (`Assoc members, List.concat refusals)
+    | `List items ->
+        let items, refusals =
+          List.split
+            (List.map
+               (fun (index, item) ->
+                 read ~naming (at / string_of_int index) item)
+               (indexed items))
+        in
+        (`List items, List.concat refusals)
+    | other -> (other, [])
+  in
+  read ~naming:[] at value
 
 (* The method at [at], which a caller calls as [called]. *)
 let method_refusals ~ids ~schema_at ~fixtures ~at ~called
@@ -98,6 +104,7 @@ let method_refusals ~ids ~schema_at ~fixtures ~at ~called
         [ refusal at_argument (Printf.sprintf "is no parameter of %s" called) ]
     | Some (_, Callback _) ->
         [ refusal at_argument "is a callback, which a case cannot give" ]
+    | Some (_, Value { absent = Some true; _ }) when value = `Null -> []
     | Some (k, Value _) -> (
         let value, unnamed = with_fixtures ~file fixtures at_argument value in
         let place : Validate.place =
@@ -303,9 +310,15 @@ let named name rows =
 (* How a member's [gives] is not what the rest of the surface says of it: a
    member of its handed's [record] is a value of the record's property, a
    member that [takes] what a verb takes is a function and no more, and a
-   function states its parameters and what it returns together, or neither. *)
+   function states its parameters and what it returns together, or neither.
+   A function that may return nothing returns something when it does; one
+   that returns a handed names one of [worker]'s, and one that returns a
+   function names a function beside it that returns no function. *)
 let gives_refusals ~read_json surface =
-  let member_refusals ~record place (j, member) =
+  let handeds =
+    List.filter_map (text "handed") (items (field "worker" surface))
+  in
+  let member_refusals ~record ~siblings place (j, member) =
     let at = place / string_of_int j / "gives" in
     let gives = field "gives" member in
     let of_record =
@@ -360,12 +373,66 @@ let gives_refusals ~read_json surface =
           | _ -> [])
       | _ -> []
     in
-    of_record @ taking @ together
+    let returned =
+      match gives with
+      | Some gives when text "form" gives = Some "function" -> (
+          let returns = field "returns" gives in
+          (match (field "absent" gives, returns) with
+            | Some (`Bool true), (None | Some `Null) ->
+                [
+                  refusal (at / "absent")
+                    "says it may return nothing, and it returns nothing at \
+                     all: a function that may return nothing returns something \
+                     when it does";
+                ]
+            | _ -> [])
+          @
+          match returns with
+          | Some (`Assoc [ ("handed", `String handed) ])
+            when not (List.mem handed handeds) ->
+              [
+                refusal
+                  (at / "returns" / "handed")
+                  (Printf.sprintf "names %s, which is no handed of worker"
+                     handed);
+              ]
+          | Some (`Assoc [ ("function", `String name) ]) -> (
+              match named name siblings with
+              | Some (_, sibling) -> (
+                  let sibling_gives = field "gives" sibling in
+                  match
+                    ( Option.bind sibling_gives (text "form"),
+                      Option.bind sibling_gives (field "returns") )
+                  with
+                  | Some "function", Some (`Assoc [ ("function", _) ]) ->
+                      [
+                        refusal
+                          (at / "returns" / "function")
+                          (Printf.sprintf
+                             "names %s, which returns a function itself" name);
+                      ]
+                  | Some "function", _ -> []
+                  | _ ->
+                      [
+                        refusal
+                          (at / "returns" / "function")
+                          (Printf.sprintf "names %s, which is no function" name);
+                      ])
+              | None ->
+                  [
+                    refusal
+                      (at / "returns" / "function")
+                      (Printf.sprintf "names %s, which is no member beside it"
+                         name);
+                  ])
+          | _ -> [])
+      | _ -> []
+    in
+    of_record @ taking @ together @ returned
   in
   let members ~record place row =
-    List.concat_map
-      (member_refusals ~record place)
-      (indexed (items (field "members" row)))
+    let siblings = indexed (items (field "members" row)) in
+    List.concat_map (member_refusals ~record ~siblings place) siblings
   in
   List.concat_map
     (fun (i, handed) ->
@@ -398,7 +465,10 @@ let gives_refusals ~read_json surface =
    hold null only where it may hold nothing; one whose [gives] names no
    schema holds the SDK's own (an error), which no schema checks, and a
    [{"$has": …}] states only some of what is held, so it is not checked
-   whole. *)
+   whole. And each [invoke] against the [parameters] of the member it names,
+   as a method's cases are against its own: nothing it does not take,
+   everything it requires, and each argument as its parameter's schema says.
+   A function that states no parameters takes what no case can check. *)
 let expect_refusals ~ids ~read_json ~schema_at surface =
   let cases_file = "client/state-units.json" in
   let refuse pointer message = { Decode.file = cases_file; pointer; message } in
@@ -480,8 +550,106 @@ let expect_refusals ~ids ~read_json ~schema_at surface =
                   ]
               | Some (u, row) ->
                   let members = indexed (items (field "members" row)) in
+                  let invoked at member_name args =
+                    match named member_name members with
+                    | None ->
+                        [
+                          refuse (at / "invoke")
+                            (Printf.sprintf "names %s, which is no member of %s"
+                               member_name unit_name);
+                        ]
+                    | Some (m, member) -> (
+                        let called = unit_name ^ "." ^ member_name in
+                        let parameters_at =
+                          "" / "stateUnits" / string_of_int u / "members"
+                          / string_of_int m / "gives" / "parameters"
+                        in
+                        let args_at = at / "args" in
+                        match
+                          ( Option.bind (field "gives" member)
+                              (field "parameters"),
+                            Option.value ~default:(`Assoc []) args )
+                        with
+                        | Some (`List parameters), `Assoc args ->
+                            let parameters = indexed parameters in
+                            let lacks =
+                              List.filter_map
+                                (fun (_, parameter) ->
+                                  match
+                                    ( text "parameter" parameter,
+                                      field "required" parameter )
+                                  with
+                                  | Some p, Some (`Bool true)
+                                    when not (List.mem_assoc p args) ->
+                                      Some
+                                        (refuse args_at
+                                           (Printf.sprintf
+                                              "lacks %s, which %s requires" p
+                                              called))
+                                  | _ -> None)
+                                parameters
+                            in
+                            let argument (key, value) =
+                              let at_argument = args_at / key in
+                              match
+                                List.find_opt
+                                  (fun (_, parameter) ->
+                                    text "parameter" parameter = Some key)
+                                  parameters
+                              with
+                              | None ->
+                                  [
+                                    refuse at_argument
+                                      (Printf.sprintf "is no parameter of %s"
+                                         called);
+                                  ]
+                              | Some (_, parameter)
+                                when field "schema" parameter = None ->
+                                  [
+                                    refuse at_argument
+                                      "is a callback, which a case cannot give";
+                                  ]
+                              | Some (k, _) -> (
+                                  let value, unnamed =
+                                    with_fixtures ~file:cases_file fixtures
+                                      at_argument value
+                                  in
+                                  let place : Validate.place =
+                                    {
+                                      file;
+                                      pointer =
+                                        parameters_at / string_of_int k
+                                        / "schema";
+                                    }
+                                  in
+                                  unnamed
+                                  @
+                                  match schema_at place with
+                                  | None ->
+                                      [
+                                        refusal place.pointer
+                                          "is no schema the reader can read";
+                                      ]
+                                  | Some schema ->
+                                      List.map
+                                        (fun (pointer, message) ->
+                                          refuse pointer message)
+                                        (Validate.errors ids schema_at schema
+                                           value at_argument))
+                            in
+                            lacks @ List.concat_map argument args
+                        | Some (`List _), _ ->
+                            [ refuse args_at "is no object of arguments" ]
+                        | _ -> [])
+                  in
                   List.concat_map
                     (fun (s, step) ->
+                      let step_at = case_at / "steps" / string_of_int s in
+                      (match field "invoke" step with
+                        | Some (`String member_name) ->
+                            invoked step_at member_name (field "args" step)
+                        | _ -> [])
+                      @
                       match field "expect" step with
                       | Some (`Assoc made) ->
                           List.concat_map

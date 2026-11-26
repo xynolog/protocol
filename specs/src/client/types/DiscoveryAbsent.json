@@ -12,9 +12,8 @@
       ]
     },
     "reason": {
-      "type": "string",
-      "x-xynolog-codes": "client/discovery-absent.json",
-      "description": "Why: one of client/discovery-absent.json's reasons."
+      "$ref": "https://xynolog.org/protocol/DiscoveryAbsentReason.json",
+      "description": "Why."
     },
     "diagnostic": {
       "type": "string",

@@ -699,6 +699,22 @@ let () =
     "components/schemas/ArchivistHealth.json: /: is reached by Archivist's \
      document alone, not by a gateway route or the bus: it is Archivist's own, \
      so its place is archivist/";
+  surface specs ~why:"may return nothing, and returns nothing at all"
+    "stateUnits/9/members/9/gives/returns"
+    (fun _ -> `Null)
+    "/stateUnits/9/members/9/gives/absent: says it may return nothing, and it \
+     returns nothing at all: a function that may return nothing returns \
+     something when it does";
+  surface specs ~why:"returns a handed worker has not"
+    "worker/0/members/0/gives/returns/handed"
+    (fun _ -> `String "nobody")
+    "/worker/0/members/0/gives/returns/handed: names nobody, which is no \
+     handed of worker";
+  surface specs ~why:"returns a function as a member that is none"
+    "stateUnits/9/members/10/gives/returns/function"
+    (fun _ -> `String "token")
+    "/stateUnits/9/members/10/gives/returns/function: names token, which is no \
+     function";
   surface specs ~why:"gives a method an argument it does not take"
     "namespaces/8/methods/4/cases/0/args"
     (members (fun args -> args @ [ ("jobID", `String "job-1") ]))
@@ -724,6 +740,26 @@ let () =
     "namespaces/6/methods/1/cases/1/args/stallDeadlineMs"
     (fun _ -> `Int (-1))
     "/namespaces/6/methods/1/cases/1/args/stallDeadlineMs: is less than 0";
+  changed specs ~why:"has a fixture name itself through another"
+    "client/state-units.json" "fixtures/context"
+    (fun _ -> `Assoc [ ("$fixture", `String "generation") ])
+    "/cases/34/steps/1/args/params/context: names the fixture generation, \
+     which names itself";
+  changed specs ~why:"invokes a unit's member with an argument it does not take"
+    "client/state-units.json" "cases/17/steps/0/args"
+    (members (fun args -> args @ [ ("contextWindow", `Int 500) ]))
+    "/cases/17/steps/0/args/contextWindow: is no parameter of \
+     gather.gatherAnnotation";
+  changed specs ~why:"invokes a unit's member without an argument it requires"
+    "client/state-units.json" "cases/17/steps/0/args"
+    (members (List.remove_assoc "annotationId"))
+    "/cases/17/steps/0/args: lacks annotationId, which gather.gatherAnnotation \
+     requires";
+  changed specs
+    ~why:"invokes a unit's member with an argument its schema refuses"
+    "client/state-units.json" "cases/17/steps/0/args/annotationId"
+    (fun _ -> `Int 5)
+    "/cases/17/steps/0/args/annotationId: is 5, which is no string";
   surface specs ~why:"names a fixture the table has not"
     "namespaces/5/methods/0/cases/0/args/context"
     (fun _ -> `Assoc [ ("$fixture", `String "nowhere") ])
@@ -1240,14 +1276,12 @@ let () =
     (fun _ -> `Int 65536)
     "/properties/port/maximum: is 65536, where \
      components/schemas/HttpEndpoint.json states 65535";
-  changed specs ~why:"names a vocabulary that is no table of words"
-    "client/types/DiscoveryAbsent.json" "properties/reason/x-xynolog-codes"
-    (fun _ -> `String "client/discovery-absents.json")
-    "/properties/reason: x-xynolog-codes names \
-     \"client/discovery-absents.json\", which is neither a vocabulary of \
-     errors/codes.json nor a table of words (busRequest, transport, job, \
-     session, signIn, kbIdentity, spanRefusal, control, \
-     client/discovery-absent.json)";
+  changed specs ~why:"names a vocabulary errors/codes.json does not state"
+    "control/ErrorData.json" "properties/code/x-xynolog-codes"
+    (fun _ -> `String "controls")
+    "/properties/code: x-xynolog-codes names \"controls\", which is no \
+     vocabulary of errors/codes.json (busRequest, transport, job, session, \
+     signIn, kbIdentity, spanRefusal, control)";
   changed specs ~why:"tells an emission's states apart by a status of its own"
     "conformance/ConformanceDriverLine.json"
     "oneOf/10/properties/emission/properties/state/oneOf/2/properties/status/const"
@@ -1281,6 +1315,15 @@ let () =
      [\"unique-match\",\"context-recovered\",\"first-of-many\",\"fuzzy\"], \
      not, one branch each and in order, AnchorMethod's \
      [\"unique-match\",\"context-recovered\",\"first-of-many\",\"fuzzy-match\"]";
+  changed specs ~why:"states the absent reasons out of their order"
+    "client/discovery-absent.json" "reasons"
+    (function
+      | `List (a :: b :: rest) -> `List (b :: a :: rest)
+      | _ -> failwith "not a list")
+    "/reasons: states \
+     [\"not-json\",\"not-found\",\"invalid\",\"unsupported-version\",\"unreadable\"], \
+     not, each once and in order, DiscoveryAbsentReason's \
+     [\"not-found\",\"not-json\",\"invalid\",\"unsupported-version\",\"unreadable\"]";
   changed specs ~why:"opens a client type" "client/types/SearchState.json" ""
     (members (List.remove_assoc "additionalProperties"))
     "/: is an open object: a client type is closed, by additionalProperties, \
@@ -1567,6 +1610,21 @@ let () =
            ]))
     "/get/responses: GET /api/health: takes a credential, a parameter or a \
      body and declares no 4xx";
+  changed specs ~why:"lets a client type's member be overridden that it lacks"
+    "client/timing.json" "timing/25/override"
+    (fun _ -> `String "JobPollOptions.nowhere")
+    "/timing/25/override: nowhere is no member of the client type \
+     JobPollOptions";
+  changed specs ~why:"lets an owner be overridden that surface.json lacks"
+    "client/timing.json" "timing/37/override"
+    (fun _ -> `String "nowhereUnit.delay")
+    "/timing/37/override: names nowhereUnit, which is no client type, state \
+     unit or function of client/surface.json";
+  changed specs ~why:"lets two rows be overridden at one place"
+    "client/timing.json" "timing/26/override"
+    (fun _ -> `String "JobPollOptions.everyMs")
+    "/timing/26/override: jobPollTimeoutMs is overridden where jobPollMs is: \
+     JobPollOptions.everyMs";
   if !failures > 0 then exit 1;
   print_endline
     "The model reads every file of Protocol, and refuses a copy with a stray \
@@ -1586,5 +1644,6 @@ let () =
      case its schema disagrees with, a server URL its variables disagree with, \
      a malformed or ambiguous path, a path parameter undeclared or unnamed, a \
      parameter or an operationId twice, a response keyed by no status, an \
-     operation without the 2xx or the 4xx it owes, or a protocol fact left to \
-     the code; and it reads each value as the type its schema states"
+     operation without the 2xx or the 4xx it owes, a timing overridden where \
+     nothing is or where another is, or a protocol fact left to the code; and \
+     it reads each value as the type its schema states"

@@ -185,6 +185,24 @@ let () =
     "worker"
     (claimed (held ^ {|, "maxRetries": -1|}))
     (at "worker" ^ ": /steps/1/claimed/maxRetries: is less than 0");
+  refused ~why:"overrides a timing client/timing.json fixes" "wire"
+    {|{"about": "a", "source": "s", "steps": [{"driver": "open", "with": {"timing": {"reconnectMs": 50, "emitTimeoutMs": 50}}}]}|}
+    (at "wire"
+   ^ ": /steps/0/with/timing/emitTimeoutMs: overrides emitTimeoutMs, which \
+      client/timing.json does not let a caller override");
+  (match
+     refusals ~root spec
+       [
+         ( "wire",
+           {|{"about": "a", "source": "s", "steps": [{"driver": "open", "with": {"timing": {"reconnectMs": 50, "emitRetry": {"attempts": 2, "initialDelayMs": 1, "maxDelayMs": 2}}}}]}|}
+         );
+       ]
+   with
+  | [] -> ()
+  | found ->
+      prerr_endline "A case that overrides a timing a caller may was refused:";
+      List.iter (Printf.eprintf "  %s\n") found;
+      incr failures);
   if !failures > 0 then exit 1;
   print_endline
     "The reader holds the conformance corpus to its schema, refusing a case \
@@ -192,5 +210,6 @@ let () =
      steps, an outcome both returned and failed, a settling of two kinds; and \
      to the spec, refusing an operation the gateway does not declare, a \
      channel or a request the registry does not have, a live case without its \
-     tier or another with one, a step of another layer, and a claimed row that \
-     is not the record a driver's claimed line carries"
+     tier or another with one, a step of another layer, a timing overridden \
+     that no caller may, and a claimed row that is not the record a driver's \
+     claimed line carries"

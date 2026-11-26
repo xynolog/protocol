@@ -16,6 +16,8 @@
    - each row a worker case expects claimed has every member of the record
      a driver's claimed line carries and no other, each value with no
      operator in it as that member's schema says.
+   - each timing a case's open step overrides is a row of client/timing.json
+     with an override.
 
    A harness reads the corpus with [load]; the reader's check holds it with
    [refusals]. *)
@@ -165,7 +167,8 @@ let claimed_record ~root (spec : Spec.t) =
 
 (* What [case] names of the spec that the spec must have, and how its steps
    fit its layer, at [file]. *)
-let held ~operations ~channels ~requests ~layer ~claimed_as { file; case; _ } =
+let held ~operations ~channels ~requests ~overridable ~layer ~claimed_as
+    { file; case; _ } =
   let refuse pointer message = refusal file pointer message in
   let operation pointer what named =
     if List.mem named operations then []
@@ -262,6 +265,24 @@ let held ~operations ~channels ~requests ~layer ~claimed_as { file; case; _ } =
                | _ -> [])
            | Driver { driver = "listen"; with_; _ } ->
                literal at with_ "channel" channel
+           | Driver { driver = "open"; with_; _ } -> (
+               match
+                 List.assoc_opt "timing" (Option.value ~default:[] with_)
+               with
+               | Some (`Assoc timing) ->
+                   List.filter_map
+                     (fun (name, _) ->
+                       if List.mem name overridable then None
+                       else
+                         Some
+                           (refuse
+                              (at / "with" / "timing" / name)
+                              (Printf.sprintf
+                                 "overrides %s, which client/timing.json does \
+                                  not let a caller override"
+                                 name)))
+                     timing
+               | _ -> [])
            | Frame { frame; _ } -> channel (at / "frame") frame
            | Frames { frames; _ } -> channel (at / "frames") frames
            | Bus_fetch { fetch; _ } -> request (at / "fetch") fetch
@@ -368,6 +389,9 @@ let refusals ~root (spec : Spec.t) =
   let operations = gateway_operations spec in
   let channels = channels spec.tables.bus_registry in
   let requests = requests spec.tables.bus_registry in
+  let overridable =
+    List.map fst (Timing_rules.overridable spec.tables.client_timing)
+  in
   List.concat_map
     (fun directory ->
       let layer = layer_of directory in
@@ -388,6 +412,7 @@ let refusals ~root (spec : Spec.t) =
               with
               | Error e -> e
               | Ok case ->
-                  held ~operations ~channels ~requests ~layer ~claimed_as case)
+                  held ~operations ~channels ~requests ~overridable ~layer
+                    ~claimed_as case)
             listed)
     Places.corpus

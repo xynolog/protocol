@@ -10,14 +10,12 @@
     "reasons": {
       "type": "array",
       "minItems": 1,
-      "description": "Each reason, and what it means.",
+      "description": "Each reason, in DiscoveryAbsentReason's order, and what it means.",
       "items": {
         "type": "object",
         "properties": {
           "reason": {
-            "type": "string",
-            "pattern": "^[a-z]+(-[a-z]+)*$",
-            "description": "The reason, as every SDK spells it."
+            "$ref": "https://xynolog.org/protocol/DiscoveryAbsentReason.json"
           },
           "docs": {
             "type": "string",

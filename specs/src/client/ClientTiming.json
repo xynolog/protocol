@@ -31,6 +31,11 @@
               }
             ]
           },
+          "override": {
+            "type": "string",
+            "pattern": "^(client|transport|[A-Za-z][A-Za-z]*\\.[a-z][A-Za-z]*)$",
+            "description": "Where a caller may override it, when a caller may: `client` is the client's own timing record, `transport` the transport's; `Owner.member` is a member of the client type Owner (specs/src/client/types), or a parameter of a state unit or of a function client/surface.json lists. Absent, the timing is fixed: every client keeps it."
+          },
           "docs": {
             "type": "string",
             "minLength": 1,
