@@ -59,6 +59,12 @@ type 'a layer = {
   codes : string option;
       (** [x-xynolog-codes]: a string that is a code of the vocabulary of
           errors/codes.json it names. *)
+  type_parameters : string list option;
+      (** [x-xynolog-typeParameters]: the types a client type is generic over,
+          which a reference to it gives as its [typeArguments]. *)
+  type_parameter : string option;
+      (** [x-xynolog-typeParameter]: a value of one of the types its client type
+          is generic over, by its name. *)
 }
 
 type t = Boolean_schema of bool | Schema of schema
@@ -102,6 +108,8 @@ let empty : schema =
     discriminator = None;
     defs = None;
     codes = None;
+    type_parameters = None;
+    type_parameter = None;
   }
 
 (* The schemas [layer] holds, in the order its keywords are written here. A
@@ -145,6 +153,8 @@ let children
       discriminator = _;
       defs;
       codes = _;
+      type_parameters = _;
+      type_parameter = _;
     } =
   let one = Option.to_list and each = Option.value ~default:[] in
   List.concat
@@ -303,6 +313,8 @@ let keywords
       discriminator;
       defs;
       codes;
+      type_parameters;
+      type_parameter;
     } =
   let is name value = if Option.is_some value then [ name ] else [] in
   List.concat
@@ -342,6 +354,8 @@ let keywords
       is "discriminator" discriminator;
       is "$defs" defs;
       is "x-xynolog-codes" codes;
+      is "x-xynolog-typeParameters" type_parameters;
+      is "x-xynolog-typeParameter" type_parameter;
     ]
 
 let literal_json : literal -> Yojson.Safe.t = function
@@ -548,6 +562,13 @@ and schema cursor =
         Decode.optional o "x-xynolog-codes"
           (only_under type_ String "x-xynolog-codes" Decode.non_empty_string)
       in
+      let type_parameters =
+        Decode.optional o "x-xynolog-typeParameters"
+          (Decode.non_empty_list Decode.non_empty_string)
+      in
+      let type_parameter =
+        Decode.optional o "x-xynolog-typeParameter" Decode.non_empty_string
+      in
       {
         schema;
         id;
@@ -584,5 +605,7 @@ and schema cursor =
         discriminator;
         defs;
         codes;
+        type_parameters;
+        type_parameter;
       })
     cursor
