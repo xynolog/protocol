@@ -337,8 +337,94 @@ let () =
           ("form", `String "function");
           ("signature", `Assoc [ ("parameters", `List []); ("returns", `Null) ]);
         ])
-    "/worker/1/members/17/gives: is not a function and no more, and the member \
-     takes what a verb takes: its takes says what";
+    "/worker/1/members/17/gives: is no function one of whose parameters is \
+     decided in its takes, and the member takes what a verb takes";
+  surface specs ~why:"names a type parameter its unit does not declare"
+    "stateUnits/8/members/1/gives/signature/returns/typeParameter"
+    (fun _ -> `String "W")
+    "/stateUnits/8/members/1/gives/signature/returns: names the type parameter W, which \
+     cache does not declare";
+  surface specs ~why:"has a unit declare a type parameter none of it names"
+    "stateUnits/6/typeParameters"
+    (function
+      | `List declared ->
+          `List
+            (declared
+            @ [ `Assoc [ ("name", `String "S"); ("docs", `String "Unnamed.") ] ]
+            )
+      | other -> other)
+    "/stateUnits/6/typeParameters/1: declares S, which none of search's \
+     members names";
+  surface specs ~why:"has the cache declare its type parameters out of order"
+    "stateUnits/8/typeParameters"
+    (function `List [ k; v ] -> `List [ v; k ] | other -> other)
+    "/stateUnits/8/typeParameters: declares [\"V\",\"K\"]: a cache declares K, \
+     what a query is keyed by, and V, what it holds, in that order";
+  surface specs ~why:"names a type parameter outside a state unit"
+    "worker/1/members/15/gives/signature/parameters/0/schema"
+    (fun _ -> `Assoc [ ("typeParameter", `String "V") ])
+    "/worker/1/members/15/gives/signature/parameters/0/schema: names the type parameter \
+     V, and only a state unit's members name one, which their unit declares";
+  surface specs ~why:"gives a generic client type other type arguments"
+    "stateUnits/6/members/1/gives/schema/typeArguments"
+    (fun _ -> `Assoc [ ("S", `Assoc [ ("typeParameter", `String "R") ]) ])
+    "/stateUnits/6/members/1/gives/schema: gives SearchState the type \
+     arguments [\"S\"], and it is generic over [\"R\"]";
+  surface specs ~why:"has a schema decided by no member beside it"
+    "worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member"
+    (fun _ -> `String "verb")
+    "/worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member: names \
+     verb, which is no member beside it";
+  surface specs ~why:"has a schema decided by a member that holds no enum's"
+    "worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member"
+    (fun _ -> `String "attempt")
+    "/worker/1/members/17/gives/signature/parameters/0/schema/decided/by/member: names \
+     attempt, which holds no enum's value";
+  surface specs ~why:"has takes miss a value of what decides it"
+    "worker/1/members/17/takes"
+    (fun _ -> `Assoc [ ("mark", `String "MarkJobResult") ])
+    "/worker/1/members/17/takes: states [\"mark\"], not, each once and in \
+     order, the values of jobType, [\"mark\",\"yield\"]";
+  surface specs ~why:"has a schema decided outside a handed's function"
+    "stateUnits/8/members/1/gives/signature/parameters/0/schema"
+    (fun _ ->
+      `Assoc
+        [
+          ( "decided",
+            `Assoc
+              [
+                ("by", `Assoc [ ("member", `String "get") ]);
+                ("in", `String "takes");
+              ] );
+        ])
+    "/stateUnits/8/members/1/gives/signature/parameters/0/schema: is decided by a member \
+     beside it, and only a parameter of a handed's function is";
+  surface specs ~why:"has a method take what is the SDK's own"
+    "namespaces/0/methods/0/parameters/0"
+    (members (List.remove_assoc "schema"))
+    "/namespaces/0/methods/0/parameters/0: states no schema, and a method \
+     takes only what Protocol states";
+  surface specs ~why:"has a case give a parameter that is the SDK's own"
+    "namespaces/0/methods/0/parameters/0"
+    (members (List.remove_assoc "schema"))
+    "/namespaces/0/methods/0/cases/0/args/type: is the SDK's own, which a case \
+     cannot give";
+  changed specs ~why:"tells CacheState's branches apart by other statuses"
+    "client/types/CacheState.json" "oneOf/0/properties/status/enum/0"
+    (fun _ -> `String "stale")
+    "/oneOf: is told apart by status [\"stale\",\"ready\",\"failed\"], not, \
+     one branch each and in order, CacheStatus's \
+     [\"pending\",\"ready\",\"failed\"]";
+  changed specs ~why:"names a type parameter its client type does not declare"
+    "client/types/SearchState.json"
+    "properties/results/items/x-xynolog-typeParameter"
+    (fun _ -> `String "S")
+    "/properties/results/items: names the type parameter S, which its \
+     x-xynolog-typeParameters does not declare";
+  changed specs ~why:"declares a type parameter its client type does not name"
+    "client/types/SearchState.json" "x-xynolog-typeParameters"
+    (fun _ -> `List [ `String "R"; `String "S" ])
+    "/x-xynolog-typeParameters/1: declares S, which nothing in it names";
   surface specs
     ~why:"has a member's gives name what is no component or client type"
     "worker/0/members/3/gives/schema/$ref"
@@ -753,6 +839,21 @@ let () =
     "client/state-units.json" "cases/17/steps/0/args/annotationId"
     (fun _ -> `Int 5)
     "/cases/17/steps/0/args/annotationId: is 5, which is no string";
+  changed specs
+    ~why:"invokes a unit's member with null where its parameter is not absent"
+    "client/state-units.json" "cases/7/steps/0/args/annotationId"
+    (fun _ -> `Null)
+    "/cases/7/steps/0/args/annotationId: is null, which is no string";
+  refused specs
+    ~why:"has a case invoke a unit's member with what is the SDK's own"
+    (fun copied ->
+      rewrite
+        (Filename.concat copied "client/surface.json")
+        (update
+           [ "stateUnits"; "4"; "members"; "1"; "gives"; "parameters"; "0" ]
+           (members (List.remove_assoc "schema"))))
+    "client/state-units.json: /cases/7/steps/0/args/annotationId: is the SDK's \
+     own, which a case cannot give";
   surface specs ~why:"names a fixture the table has not"
     "namespaces/5/methods/0/cases/0/args/context"
     (fun _ -> `Assoc [ ("$fixture", `String "nowhere") ])

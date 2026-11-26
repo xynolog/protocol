@@ -278,7 +278,7 @@
                             "description": "The parameter, in camelCase."
                           },
                           "schema": {
-                            "description": "What the parameter is.",
+                            "description": "What the parameter is. Left out where it is the SDK's own: its error, which no schema states.",
                             "oneOf": [
                               {
                                 "title": "Reference",
@@ -288,6 +288,14 @@
                                     "type": "string",
                                     "pattern": "^https://xynolog\\.org/protocol/[A-Z][A-Za-z]*\\.json(#(/properties/[a-z][A-Za-z]*)+)?$",
                                     "description": "The $id of a component, a member within one, or a client type of specs/src/client/types: an object is always one of these, so that it is named."
+                                  },
+                                  "typeArguments": {
+                                    "type": "object",
+                                    "minProperties": 1,
+                                    "description": "What each of the client type's type parameters is here, by its name: a type parameter of the unit it is given in, one for each the client type's x-xynolog-typeParameters states, and only where it states any.",
+                                    "additionalProperties": {
+                                      "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/2"
+                                    }
                                   }
                                 },
                                 "required": [
@@ -330,6 +338,64 @@
                                   "description"
                                 ],
                                 "additionalProperties": false
+                              },
+                              {
+                                "title": "TypeParameter",
+                                "type": "object",
+                                "properties": {
+                                  "typeParameter": {
+                                    "type": "string",
+                                    "pattern": "^[A-Z][A-Za-z]*$",
+                                    "description": "A type parameter of the state unit the member is of, by its name: what it is, the unit's maker says."
+                                  }
+                                },
+                                "required": [
+                                  "typeParameter"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "title": "Decided",
+                                "type": "object",
+                                "properties": {
+                                  "decided": {
+                                    "type": "object",
+                                    "description": "What a value decides: the schema a table names for it.",
+                                    "properties": {
+                                      "by": {
+                                        "type": "object",
+                                        "description": "What decides it.",
+                                        "properties": {
+                                          "member": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "A member beside the function, whose value is of an enum."
+                                          }
+                                        },
+                                        "required": [
+                                          "member"
+                                        ],
+                                        "additionalProperties": false
+                                      },
+                                      "in": {
+                                        "type": "string",
+                                        "enum": [
+                                          "takes"
+                                        ],
+                                        "description": "The table that names the schema: `takes`, the function's own, by each of the enum's values in its order."
+                                      }
+                                    },
+                                    "required": [
+                                      "by",
+                                      "in"
+                                    ],
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "required": [
+                                  "decided"
+                                ],
+                                "additionalProperties": false
                               }
                             ]
                           },
@@ -344,7 +410,6 @@
                         },
                         "required": [
                           "parameter",
-                          "schema",
                           "required"
                         ],
                         "additionalProperties": false
@@ -365,11 +430,23 @@
                           "required": {
                             "type": "boolean",
                             "description": "Whether a caller must give it."
+                          },
+                          "returns": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "$comment": "What the callback gives back each time it is called: null when it gives nothing."
                           }
                         },
                         "required": [
                           "parameter",
                           "calls",
+                          "returns",
                           "required"
                         ],
                         "additionalProperties": false
@@ -682,6 +759,9 @@
                                   "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/1"
                                 },
                                 {
+                                  "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema/oneOf/2"
+                                },
+                                {
                                   "title": "Handed",
                                   "type": "object",
                                   "properties": {
@@ -708,6 +788,34 @@
                                   },
                                   "required": [
                                     "function"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "title": "Stream",
+                                  "type": "object",
+                                  "properties": {
+                                    "stream": {
+                                      "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema",
+                                      "$comment": "Each of what it tells, as a member's stream tells it."
+                                    }
+                                  },
+                                  "required": [
+                                    "stream"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "title": "Items",
+                                  "type": "object",
+                                  "properties": {
+                                    "list": {
+                                      "$ref": "#/properties/namespaces/items/properties/methods/items/properties/parameters/items/oneOf/0/properties/schema",
+                                      "$comment": "What each item is, in the SDK's list."
+                                    }
+                                  },
+                                  "required": [
+                                    "list"
                                   ],
                                   "additionalProperties": false
                                 },
@@ -785,6 +893,31 @@
             "additionalProperties": {
               "type": "string",
               "minLength": 1
+            }
+          },
+          "typeParameters": {
+            "type": "array",
+            "minItems": 1,
+            "description": "What its maker decides for it, each a type it is generic over, which its members name as a typeParameter.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Za-z]*$",
+                  "description": "The type parameter, by its name."
+                },
+                "docs": {
+                  "type": "string",
+                  "pattern": "\\S",
+                  "description": "What it is."
+                }
+              },
+              "required": [
+                "name",
+                "docs"
+              ],
+              "additionalProperties": false
             }
           },
           "members": {

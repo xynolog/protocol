@@ -36,7 +36,11 @@
    - client/connection-states.json states each of ConnectionState's values
      once, in its order, and each row's moves in that order.
    - client/discovery-absent.json states each of DiscoveryAbsentReason's
-     values once, in its order. *)
+     values once, in its order.
+   - CacheState's branches are told apart by CacheStatus's words, one each,
+     in order.
+   - A client type names, as [x-xynolog-typeParameter], only a type parameter
+     its [x-xynolog-typeParameters] declares, and each it declares. *)
 
 let ( / ) pointer token = pointer ^ "/" ^ Decode.escape token
 let at = Decode.at_pointer
@@ -519,4 +523,65 @@ let refusals ~ids ~files ~(read_json : string -> Yojson.Safe.t option) =
           ~rows:(items (at "/reasons" table))
           ~key:"reason"
     | _ -> ());
+  let cache_state = "client/types/CacheState.json" in
+  with_files [ cache_status; cache_state ] (function
+    | [ status; state ] ->
+        let tags =
+          List.map
+            (fun branch ->
+              match at "/properties/status/enum" branch with
+              | Some (`List [ one ]) -> one
+              | _ -> `Null)
+            (items (at "/oneOf" state))
+        in
+        let statuses = items (at "/enum" status) in
+        if tags <> statuses then
+          refuse cache_state "/oneOf"
+            "is told apart by status %s, not, one branch each and in order, \
+             CacheStatus's %s"
+            (shown (`List tags))
+            (shown (`List statuses))
+    | _ -> ());
+  let rec named pointer = function
+    | `Assoc members ->
+        (match List.assoc_opt "x-xynolog-typeParameter" members with
+          | Some (`String name) -> [ (pointer, name) ]
+          | _ -> [])
+        @ List.concat_map
+            (fun (key, member) -> named (pointer / key) member)
+            members
+    | `List items ->
+        List.concat
+          (List.mapi
+             (fun i item -> named (pointer / string_of_int i) item)
+             items)
+    | _ -> []
+  in
+  List.iter
+    (fun file ->
+      match read file with
+      | None -> ()
+      | Some json ->
+          let declared = texts (at "/x-xynolog-typeParameters" json) in
+          let used = named "" json in
+          List.iter
+            (fun (pointer, name) ->
+              if not (List.mem name declared) then
+                refuse file pointer
+                  "names the type parameter %s, which its \
+                   x-xynolog-typeParameters does not declare"
+                  name)
+            used;
+          List.iteri
+            (fun j name ->
+              if not (List.exists (fun (_, other) -> other = name) used) then
+                refuse file
+                  ("/x-xynolog-typeParameters" / string_of_int j)
+                  "declares %s, which nothing in it names" name)
+            declared)
+    (List.filter
+       (fun file ->
+         Filename.dirname file = "client/types"
+         && Filename.check_suffix file ".json")
+       files);
   List.rev !found
