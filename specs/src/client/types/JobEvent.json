@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://xynolog.org/protocol/JobEvent.json",
   "title": "JobEvent",
-  "description": "What a delegation reports as its job goes, told apart by `kind`: the queue's naming of the job first, then its progress, each failure the queue will try again, and each frame of the job's that was refused, and last its completion. A failure the queue will not try again is no event: the delegation ends with it, as an error (contract/JOBS.md). Each operation that delegates completes with its own verb's completion, a branch of JobCompleteCommand.",
+  "description": "What a delegation reports as its job goes, told apart by `kind`, JobEventKind's: the queue's naming of the job first, then its progress, each failure the queue will try again, and each frame of the job's that was refused, and last its completion. A failure the queue will not try again is no event: the delegation ends with it, as an error (contract/JOBS.md). Each operation that delegates completes with its own verb's completion, a branch of JobCompleteCommand.",
   "oneOf": [
     {
       "type": "object",

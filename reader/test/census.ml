@@ -461,6 +461,13 @@ let () =
     "/oneOf: is told apart by status [\"stale\",\"ready\",\"failed\"], not, \
      one branch each and in order, CacheStatus's \
      [\"pending\",\"ready\",\"failed\"]";
+  changed specs ~why:"tells JobEvent's branches apart by other kinds"
+    "client/types/JobEvent.json" "oneOf/2/properties/kind/enum/0"
+    (fun _ -> `String "retrying")
+    "/oneOf: is told apart by kind \
+     [\"created\",\"progress\",\"retrying\",\"refused\",\"complete\"], not, \
+     one branch each and in order, JobEventKind's \
+     [\"created\",\"progress\",\"failed\",\"refused\",\"complete\"]";
   changed specs ~why:"names a type parameter its client type does not declare"
     "client/types/SearchState.json"
     "properties/results/items/x-xynolog-typeParameter"
