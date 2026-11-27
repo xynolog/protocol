@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xynolog.org/protocol/JobEventKind.json",
+  "title": "JobEventKind",
+  "type": "string",
+  "description": "What a delegation's event reports of its job (contract/JOBS.md): created, the queue's naming of the job; progress; failed, a failure the queue will try again; refused, a frame of the job's that was refused; or complete, its completion.",
+  "enum": [
+    "created",
+    "progress",
+    "failed",
+    "refused",
+    "complete"
+  ]
+}

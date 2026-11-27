@@ -39,6 +39,8 @@
      values once, in its order.
    - CacheState's branches are told apart by CacheStatus's words, one each,
      in order.
+   - JobEvent's branches are told apart by JobEventKind's words, one each,
+     in order.
    - A client type names, as [x-xynolog-typeParameter], only a type parameter
      its [x-xynolog-typeParameters] declares, and each it declares.
    - ChannelName states bus/registry.json's channels, each once and in its
@@ -596,6 +598,26 @@ let refusals ~ids ~files ~(read_json : string -> Yojson.Safe.t option) =
              CacheStatus's %s"
             (shown (`List tags))
             (shown (`List statuses))
+    | _ -> ());
+  let job_event_kind = "client/types/JobEventKind.json" in
+  let job_event = "client/types/JobEvent.json" in
+  with_files [ job_event_kind; job_event ] (function
+    | [ kind; event ] ->
+        let tags =
+          List.map
+            (fun branch ->
+              match at "/properties/kind/enum" branch with
+              | Some (`List [ one ]) -> one
+              | _ -> `Null)
+            (items (at "/oneOf" event))
+        in
+        let kinds = items (at "/enum" kind) in
+        if tags <> kinds then
+          refuse job_event "/oneOf"
+            "is told apart by kind %s, not, one branch each and in order, \
+             JobEventKind's %s"
+            (shown (`List tags))
+            (shown (`List kinds))
     | _ -> ());
   let rec named pointer = function
     | `Assoc members ->
