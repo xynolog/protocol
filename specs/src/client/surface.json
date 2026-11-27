@@ -4908,32 +4908,26 @@
         },
         {
           "member": "DiscoveryAbsentReason",
-          "kind": "type",
-          "named": {
-            "haskell": "DiscoveryAbsentCode"
-          }
+          "kind": "type"
         },
         {
           "member": "DiscoveryRead",
-          "kind": "type",
-          "named": {
-            "typescript": "DiscoveryReadResult"
-          }
+          "kind": "type"
         },
         {
           "member": "DiscoveryState",
           "kind": "type"
         },
         {
-          "member": "Absent",
+          "member": "DiscoveryAbsent",
           "kind": "type"
         },
         {
-          "member": "Managed",
+          "member": "DiscoveryManaged",
           "kind": "type"
         },
         {
-          "member": "Unchanged",
+          "member": "DiscoveryUnchanged",
           "kind": "type"
         },
         {
